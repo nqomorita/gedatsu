@@ -7,13 +7,13 @@ CFLAGS = -O2
 
 MOD_DIR  = -J ./include
 
-# DEFAULT FLAGS
-FLAG_MPI   = -DWITH_MPI
-FLAG_METIS = -DWITH_METIS
-
 METIS_DIR  = .
 METIS_INC  = -I $(METIS_DIR)/include
 METIS_LIB  = -L$(METIS_DIR)/lib -lmetis
+
+PARMETIS_DIR  = .
+PARMETIS_INC  = -I $(METIS_DIR)/include
+PARMETIS_LIB  = -L$(METIS_DIR)/lib -lmetis
 
 ifdef FLAGS
 	comma:= ,
@@ -50,7 +50,7 @@ OBJ_DIR  = ./obj
 LIB_DIR  = ./lib
 LIB_LIST = libgedatsu.a
 GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu
-CPP      = -cpp $(FLAG_MPI) $(FLAG_METIS) $(FLAG_TEST) $(FLAG_DEBUG)
+CPP      = -cpp $(FLAG_MPI) $(FLAG_METIS) $(FLAG_PARMETIS) $(FLAG_TEST) $(FLAG_DEBUG)
 
 BIN_PART = gedatsu_partitioner
 
@@ -59,11 +59,11 @@ CD       = cd
 RM       = rm -r
 AR       = - ar ruv
 
-LIBTARGET  = $(addprefix $(LIB_DIR)/, $(LIB_LIST))
+LIBTARGET = $(addprefix $(LIB_DIR)/, $(LIB_LIST))
 #PARTTARGET = $(addprefix $(BIN_DIR)/, $(BIN_PART))
 
-SRC_LIST_UTIL   = def_prm.f90 def_graph.f90 util.f90 io.f90
-SRC_LIST_GRAPH  = graph.f90
+SRC_LIST_UTIL  = def_prm.f90 def_graph.f90 util.f90 io.f90
+SRC_LIST_GRAPH = graph.f90
 #SRC_PART        = partitioner/partitioner.f90
 
 SRC_ALL_LIST    = $(addprefix util/, $(SRC_LIST_UTIL))
