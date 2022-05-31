@@ -59,10 +59,10 @@ contains
     graph_item = graph_item + 1
   end subroutine gedatsu_convert_mesh_to_nodal_graph
 
-  subroutine gedatsu_part_graph_metis_kway(n_node, graph_index, graph_item, n_part, node_wgt, edge_wgt, part_id)
+  subroutine gedatsu_part_graph_metis_kway(n_vertex, graph_index, graph_item, n_part, node_wgt, edge_wgt, part_id)
     use iso_c_binding
     implicit none
-    integer(gint) :: n_node, ncon, n_part, objval
+    integer(gint) :: n_vertex, ncon, n_part, objval
     integer(gint), pointer :: part_id(:)
     integer(c_int), pointer :: node_wgt(:)
     integer(c_int), pointer :: edge_wgt(:)
@@ -89,19 +89,19 @@ contains
       graph_item = graph_item - 1
 
 #ifdef WITH_METIS
-      call METIS_PARTGRAPHRECURSIVE(n_node, ncon, graph_index, graph_item, &
+      call METIS_PARTGRAPHRECURSIVE(n_vertex, ncon, graph_index, graph_item, &
         & node_wgt, vsize, edge_wgt, n_part, tpwgts, ubvec, options, objval, part_id)
 #elif WITH_METIS64
       ncon8 = 1
       n_part8 = n_part
-      n_node8 = n_node
-      allocate(node_wgt8(n_node))
+      n_node8 = n_vertex
+      allocate(node_wgt8(n_vertex))
       node_wgt8 = node_wgt
-      allocate(index8(n_node+1))
+      allocate(index8(n_vertex+1))
       index8 = graph_index
-      allocate(item8(graph_index(n_node+1)))
+      allocate(item8(graph_index(n_vertex+1)))
       item8 = item
-      allocate(part_id8(n_node))
+      allocate(part_id8(n_vertex))
       call METIS_PARTGRAPHRECURSIVE(n_node8, ncon8, index8, item8, &
         & node_wgt8, vsize8, edge_wgt8, n_part8, tpwgts, ubvec8, options, objval8, part_id8)
       part_id = part_id8

@@ -32,20 +32,20 @@ contains
   end subroutine gedatsu_graph_partition
 
   !> main routines
-  subroutine gedatsu_get_partitioned_graph(n_node, graph_index, graph_item, n_domain, part_id)
+  subroutine gedatsu_get_partitioned_graph(n_vertex, graph_index, graph_item, n_domain, part_id)
     use iso_c_binding
     implicit none
     integer(gint), pointer :: part_id(:)
     integer(c_int), pointer :: graph_index(:), graph_item(:)
     integer(c_int), pointer :: node_wgt(:) => null()
     integer(c_int), pointer :: edge_wgt(:) => null()
-    integer(gint) :: n_domain, n_node
+    integer(gint) :: n_domain, n_vertex
 
     call gedatsu_debug_header("gedatsu_get_partitioned_graph")
-    call gedatsu_part_graph_metis_kway(n_node, graph_index, graph_item, n_domain, node_wgt, edge_wgt, part_id)
+    call gedatsu_part_graph_metis_kway(n_vertex, graph_index, graph_item, n_domain, node_wgt, edge_wgt, part_id)
   end subroutine gedatsu_get_partitioned_graph
 
-  subroutine gedatsu_get_partitioned_graph_with_weight(n_node, graph_index, graph_item, n_domain, &
+  subroutine gedatsu_get_partitioned_graph_with_weight(n_vertex, graph_index, graph_item, n_domain, &
     & node_wgt, edge_wgt, part_id)
     use iso_c_binding
     implicit none
@@ -53,16 +53,16 @@ contains
     integer(c_int), pointer :: graph_index(:), graph_item(:)
     integer(c_int), pointer :: node_wgt_(:)
     integer(c_int), pointer :: edge_wgt_(:)
-    integer(gint) :: n_domain, n_node
+    integer(gint) :: n_domain, n_vertex
 
     call gedatsu_debug_header("gedatsu_get_partitioned_graph_with_weight")
 
-    allocate(node_wgt_(n_node), source = 0)
-    allocate(edge_wgt_(n_node), source = 0)
+    allocate(node_wgt_(n_vertex), source = 0)
+    allocate(edge_wgt_(n_vertex), source = 0)
     node_wgt_ = node_wgt
     edge_wgt_ = edge_wgt
 
-    call gedatsu_part_graph_metis_kway(n_node, graph_index, graph_item, n_domain, node_wgt_, edge_wgt_, part_id)
+    call gedatsu_part_graph_metis_kway(n_vertex, graph_index, graph_item, n_domain, node_wgt_, edge_wgt_, part_id)
 
     deallocate(node_wgt_)
     deallocate(edge_wgt_)
