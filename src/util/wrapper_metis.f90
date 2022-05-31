@@ -6,7 +6,60 @@ module mod_gedatsu_wrapper_metis
 
 contains
 
-  subroutine gedatsu_get_mesh_part_kway(nnode, index, item, npart, node_wgt, edge_wgt, part_id)
+  subroutine gedatsu_convert_mesh_to_nodal_graph &
+    & (nnode, nelem, mesh_index, mesh_item, index, item)
+    use iso_c_binding
+    implicit none
+    integer(gint) :: i, j, nnode, numflag
+    integer(gint) :: nelem
+    integer(gint), pointer :: mesh_index(:), mesh_item(:)
+    integer(c_int), pointer :: index(:), item(:)
+    type(c_ptr) :: xadj, adjncy
+#if WITH_METIS64
+    integer(c_int64_t) :: nelem8, nnode8, numflag8
+    integer(c_int64_t), pointer :: mesh_index8(:), mesh_item8(:)
+    integer(c_int64_t), pointer :: index8(:), item8(:)
+#endif
+
+    call gedatsu_debug_header("gedatsu_convert_mesh_to_nodal_graph")
+
+    numflag = 0
+
+    !> convert to 0 origin
+    mesh_item = mesh_item - 1
+
+#ifdef WITH_METIS
+    call METIS_MESHTONODAL(nelem, nnode, mesh_index, mesh_item, numflag, xadj, adjncy)
+    call c_f_pointer(xadj, index, shape=[nnode+1])
+    call c_f_pointer(adjncy, item, shape=[index(nnode+1)])
+#elif WITH_METIS64
+    nnode8 = nnode
+    nelem8 = nelem
+    numflag8 = numflag
+    allocate(mesh_index8(nelem+1))
+    allocate(mesh_item8(mesh_index(nelem+1)))
+    mesh_index8 = mesh_index
+    mesh_item8 = mesh_item
+    call METIS_MESHTONODAL(nelem8, nnode8, mesh_index8, mesh_item8, numflag8, xadj, adjncy)
+    call c_f_pointer(xadj, index8, shape=[nnode+1])
+    call c_f_pointer(adjncy, item8, shape=[index8(nnode+1)])
+    allocate(index(nnode+1))
+    allocate(item(index8(nnode+1)))
+    index = index8
+    item = item8
+#else
+    call gedatsu_warning_header("gedatsu_convert_mesh_to_nodal_graph: METIS is NOT enabled")
+    stop
+#endif
+
+    !> convert to 1 origin
+    mesh_item = mesh_item + 1
+
+    !> convert to 1 origin
+    item = item + 1
+  end subroutine gedatsu_convert_mesh_to_nodal_graph
+
+  subroutine gedatsu_part_graph_metis_kway(nnode, index, item, npart, node_wgt, edge_wgt, part_id)
     use iso_c_binding
     implicit none
     integer(gint) :: nnode, ncon, npart, objval
@@ -28,7 +81,7 @@ contains
     integer(c_int64_t), pointer :: index8(:), item8(:)
 #endif
 
-    call gedatsu_debug_header("gedatsu_get_mesh_part_kway")
+    call gedatsu_debug_header("gedatsu_part_graph_metis_kway")
 
     if(npart /= 1)then
       ncon = 1
@@ -53,13 +106,13 @@ contains
         & options, objval8, part_id8)
       part_id = part_id8
 #else
-    call gedatsu_warning_header("gedatsu_get_mesh_part_kway: METIS is NOT enabled")
+    call gedatsu_warning_header("gedatsu_part_graph_metis_kway: METIS is NOT enabled")
     stop
 #endif
 
       !> convert to 1 origin
       item = item + 1
     endif
-  end subroutine gedatsu_get_mesh_part_kway
+  end subroutine gedatsu_part_graph_metis_kway
 
 end module mod_gedatsu_wrapper_metis

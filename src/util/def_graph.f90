@@ -5,7 +5,6 @@ module mod_gedatsu_graph
 
   type gedatsu_graph
     integer(gint) :: n_vertex
-    !integer(gint) :: n_edge
 
     integer(gint), allocatable :: vertex_id(:)
     integer(gint), allocatable :: vertex_domain_id(:)
