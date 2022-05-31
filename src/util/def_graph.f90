@@ -8,6 +8,7 @@ module mod_gedatsu_graph
     !integer(gint) :: n_edge
 
     integer(gint), allocatable :: vertex_id(:)
+    integer(gint), allocatable :: vertex_domain_id(:)
 
     integer(c_int), pointer :: index(:) => null()
     integer(c_int), pointer :: item(:)  => null()

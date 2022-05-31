@@ -1,5 +1,6 @@
 module mod_gedatsu_graph_handler
   use mod_gedatsu_prm
+  use mod_gedatsu_graph
   use mod_gedatsu_util
 
   implicit none

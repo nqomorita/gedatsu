@@ -66,7 +66,7 @@ SRC_LIST_UTIL  = def_prm.f90 def_graph.f90 util.f90 io.f90 wrapper_metis.f90
 SRC_LIST_GRAPH = graph_handler.f90 graph_convert.f90 graph_part.f90
 #SRC_PART        = partitioner/partitioner.f90
 
-SRC_ALL_LIST    = $(addprefix util/, $(SRC_LIST_UTIL))
+SRC_ALL_LIST    = $(addprefix util/, $(SRC_LIST_UTIL)) $(addprefix graph/, $(SRC_LIST_GRAPH))
 
 SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL_LIST))
 OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.f90=.o))

@@ -1,5 +1,6 @@
 module mod_gedatsu_graph_convert
   use mod_gedatsu_prm
+  use mod_gedatsu_graph
   use mod_gedatsu_util
 
   implicit none
@@ -9,9 +10,9 @@ contains
   subroutine gedatsu_convert_mesh_to_connectivity(nelem, nb, elem, ebase_func, connectivity)
     use iso_c_binding
     implicit none
-    integer(kint) :: i, j, nb
-    integer(kint) :: nelem, elem(:,:)
-    integer(kint), pointer :: ebase_func(:), connectivity(:)
+    integer(gint) :: i, j, nb
+    integer(gint) :: nelem, elem(:,:)
+    integer(gint), pointer :: ebase_func(:), connectivity(:)
 
     allocate(ebase_func(nelem+1), source = 0)
     allocate(connectivity(nelem*nb), source = 0)
@@ -31,8 +32,8 @@ contains
     & (nnode, nelem, ebase_func, connectivity, index, item)
     use iso_c_binding
     implicit none
-    integer(kint) :: nnode, nelem
-    integer(kint), pointer :: ebase_func(:), connectivity(:)
+    integer(gint) :: nnode, nelem
+    integer(gint), pointer :: ebase_func(:), connectivity(:)
     integer(c_int), pointer :: index(:), item(:)
 
     call gedatsu_convert_connectivity_to_nodal &
@@ -43,9 +44,9 @@ contains
     & (nnode, nelem, ebase_func, connectivity, index, item)
     use iso_c_binding
     implicit none
-    integer(kint) :: i, j, nnode, numflag
-    integer(kint) :: nelem
-    integer(kint), pointer :: ebase_func(:), connectivity(:)
+    integer(gint) :: i, j, nnode, numflag
+    integer(gint) :: nelem
+    integer(gint), pointer :: ebase_func(:), connectivity(:)
     integer(c_int), pointer :: index(:), item(:)
     type(c_ptr) :: xadj, adjncy
 #if WITH_METIS64
