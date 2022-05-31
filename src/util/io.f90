@@ -5,7 +5,7 @@ module mod_gedatsu_io
 
 contains
 
-  subroutine gedatsu_input_graph(fname, graph)
+  subroutine gedatsu_graph_input(fname, graph)
     implicit none
     type(gedatsu_graph) :: graph
     integer(gint) :: i, in, j, tmp, nz
@@ -33,13 +33,13 @@ contains
         nz = nz + in
       enddo
     close(20)
-  end subroutine gedatsu_input_graph
+  end subroutine gedatsu_graph_input
 
-  subroutine gedatsu_output_graph(fname, graph)
+  subroutine gedatsu_graph_output(fname, graph)
     implicit none
     type(gedatsu_graph) :: graph
     !integer(kint) :: i, in, j, tmp, nz
     character :: fname*100
-  end subroutine gedatsu_output_graph
+  end subroutine gedatsu_graph_output
 
 end module mod_gedatsu_io
