@@ -62,8 +62,8 @@ AR       = - ar ruv
 LIBTARGET = $(addprefix $(LIB_DIR)/, $(LIB_LIST))
 #PARTTARGET = $(addprefix $(BIN_DIR)/, $(BIN_PART))
 
-SRC_LIST_UTIL  = def_prm.f90 def_graph.f90 util.f90 io.f90
-SRC_LIST_GRAPH = graph.f90
+SRC_LIST_UTIL  = def_prm.f90 def_graph.f90 util.f90 io.f90 wrapper_metis.f90
+SRC_LIST_GRAPH = graph_handler.f90 graph_convert.f90 graph_part.f90
 #SRC_PART        = partitioner/partitioner.f90
 
 SRC_ALL_LIST    = $(addprefix util/, $(SRC_LIST_UTIL))
