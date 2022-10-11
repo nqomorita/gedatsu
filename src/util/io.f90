@@ -5,11 +5,15 @@ module mod_gedatsu_io
 
 contains
 
+  !> gedatsu graph フォーマットの入力
   subroutine gedatsu_graph_input(fname, graph)
     implicit none
+    !> graph 構造体
     type(gedatsu_graph) :: graph
-    integer(gint) :: i, in, j, tmp, nz
+    !> 入力ファイル名
     character :: fname*100
+    !> 一次変数
+    integer(gint) :: i, in, j, tmp, nz
 
     nz = 0
     open(20, file = fname, status = "old")
@@ -35,10 +39,13 @@ contains
     close(20)
   end subroutine gedatsu_graph_input
 
+  !> gedatsu graph フォーマットの出力
   subroutine gedatsu_graph_output(fname, graph)
     implicit none
+    !> graph 構造体
     type(gedatsu_graph) :: graph
     !integer(kint) :: i, in, j, tmp, nz
+    !> 出力ファイル名
     character :: fname*100
   end subroutine gedatsu_graph_output
 
