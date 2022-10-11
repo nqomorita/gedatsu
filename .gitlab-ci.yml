@@ -11,14 +11,14 @@ build_doxygen:
     - doxygen
   artifacts:
     paths:
-      - docs
+      - doc
 
 pages:
   stage: deploy
   dependencies:
     - build_doxygen
   script:
-    - mv docs public
+    - mv doc/docs public
   artifacts:
     paths:
       - public
