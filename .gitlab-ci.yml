@@ -16,7 +16,7 @@ build_book:
 pages:
   stage: deploy
   dependencies:
-    - build_doxygen
+    - build
   script:
     - mv docs public
   artifacts:
