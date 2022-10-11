@@ -4,7 +4,7 @@ stages:
   - build
   - deploy
 
-build_book:
+build_doxygen:
   stage: build
   script:
     - cd doc
@@ -16,7 +16,7 @@ build_book:
 pages:
   stage: deploy
   dependencies:
-    - build
+    - build_doxygen
   script:
     - mv docs public
   artifacts:
