@@ -1,3 +1,4 @@
+!> グラフ分割モジュール
 module mod_gedatsu_graph_part
   use mod_gedatsu_prm
   use mod_gedatsu_graph

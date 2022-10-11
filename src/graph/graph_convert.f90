@@ -1,3 +1,4 @@
+!> グラフデータ変換モジュール
 module mod_gedatsu_graph_convert
   use mod_gedatsu_prm
   use mod_gedatsu_graph

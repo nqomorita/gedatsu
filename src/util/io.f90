@@ -1,3 +1,4 @@
+!> IO モジュール
 module mod_gedatsu_io
   use mod_gedatsu_prm
   use mod_gedatsu_graph
@@ -11,8 +12,7 @@ contains
     !> graph 構造体
     type(gedatsu_graph) :: graph
     !> 入力ファイル名
-    character :: fname*100
-    !> 一次変数
+    character(gedatsu_charlen) :: fname
     integer(gint) :: i, in, j, tmp, nz
 
     nz = 0
@@ -44,9 +44,8 @@ contains
     implicit none
     !> graph 構造体
     type(gedatsu_graph) :: graph
-    !integer(kint) :: i, in, j, tmp, nz
     !> 出力ファイル名
-    character :: fname*100
+    character(gedatsu_charlen) :: fname
   end subroutine gedatsu_graph_output
 
 end module mod_gedatsu_io

@@ -1,3 +1,4 @@
+!> parameter モジュール
 module mod_gedatsu_prm
   implicit none
 

@@ -1,0 +1,3 @@
+\page install インストールマニュアル
+
+- TBA

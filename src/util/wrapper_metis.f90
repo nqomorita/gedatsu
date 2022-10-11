@@ -1,3 +1,4 @@
+!> metis ラッパーモジュール
 module mod_gedatsu_wrapper_metis
   use mod_gedatsu_prm
   use mod_gedatsu_util
