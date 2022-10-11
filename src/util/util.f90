@@ -6,11 +6,14 @@ module mod_gedatsu_util
   !> @defgroup group1 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ
 
-  !> @defgroup group2 グラフデータ処理
+  !> @defgroup group2 ファイル入出力
+  !> ファイル入出力に関連する関数グループ
+
+  !> @defgroup group3 グラフデータ処理
   !> グラフデータ処理に関連する関数グループ
 
-  !> @defgroup group3 動的負荷分散処理
-  !> 動的負荷分散処理に関連する関数グループ
+  !> @defgroup group4 動的負荷分散
+  !> 動的負荷分散に関連する関数グループ
 
 contains
 
@@ -20,9 +23,6 @@ contains
   !> MPI の初期化処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
   subroutine gedatsu_global_initialize()
     implicit none
-    !call gedatsu_mpi_initialize()
-    !myrank = gedatsu_global_myrank()
-    !mycomm = gedatsu_global_comm()
   end subroutine gedatsu_global_initialize
 
   !> @ingroup group1
@@ -30,7 +30,6 @@ contains
   !> @details MPI の終了処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
   subroutine gedatsu_global_finalize()
     implicit none
-    !call gedatsu_mpi_finalize()
   end subroutine gedatsu_global_finalize
 
   !> エラーストップ関数
