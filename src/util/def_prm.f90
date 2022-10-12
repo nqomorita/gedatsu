@@ -16,7 +16,7 @@ module mod_gedatsu_prm
 
   !> parameter 構造体
   type gedatsu_prm
-    !> 何らかの方法のフラグ
+    !> TBA
     integer(gint) :: method = 1
   end type gedatsu_prm
 
@@ -25,17 +25,15 @@ contains
   !> parameter 構造体の初期化関数
   subroutine gedatsu_prm_initialize(param)
     implicit none
-    !> parameter 構造体
+    !> [in] parameter 構造体
     type(gedatsu_prm) :: param
-
   end subroutine gedatsu_prm_initialize
 
   !> parameter 構造体の終了関数
   subroutine gedatsu_prm_finalize(param)
     implicit none
-    !> parameter 構造体
+    !> [in] parameter 構造体
     type(gedatsu_prm) :: param
-
   end subroutine gedatsu_prm_finalize
 
 end module mod_gedatsu_prm

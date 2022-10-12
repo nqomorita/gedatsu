@@ -4,18 +4,17 @@ module mod_gedatsu_io
   use mod_gedatsu_graph
   implicit none
 
-  !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
-  !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
-
 contains
 
   !> @ingroup group_io
   !> gedatsu graph フォーマットの入力
+  !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
+  !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
   subroutine gedatsu_graph_input(fname, graph)
     implicit none
-    !> 入力ファイル名
+    !> [in] 入力ファイル名
     character(gedatsu_charlen) :: fname
-    !> graph 構造体
+    !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     integer(gint) :: i, in, j, tmp, nz
 
@@ -47,9 +46,9 @@ contains
   !> gedatsu graph フォーマットの出力
   subroutine gedatsu_graph_output(fname, graph)
     implicit none
-    !> 出力ファイル名
+    !> [in] 出力ファイル名
     character(gedatsu_charlen) :: fname
-    !> graph 構造体
+    !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     integer(gint) :: i, in, j, jS, jE
 
@@ -67,5 +66,13 @@ contains
       enddo
     close(20)
   end subroutine gedatsu_graph_output
+
+  !> エラー出力関数
+  subroutine gedatsu_error_string(fname)
+    implicit none
+    !> [in] 入力ファイル名
+    character(*) :: fname
+    write(*,"(a)")"** GEDATSU ERROR: ", trim(fname)
+  end subroutine gedatsu_error_string
 
 end module mod_gedatsu_io

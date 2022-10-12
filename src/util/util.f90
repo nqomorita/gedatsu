@@ -9,7 +9,7 @@ module mod_gedatsu_util
   !> @defgroup group_io ファイル入出力
   !> ファイル入出力に関連する関数グループ
 
-  !> @defgroup group3 グラフデータ処理
+  !> @defgroup group_graph グラフデータ処理
   !> グラフデータ処理に関連する関数グループ
 
   !> @defgroup group4 動的負荷分散

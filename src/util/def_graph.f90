@@ -5,6 +5,8 @@ module mod_gedatsu_graph
   implicit none
 
   !> graph 構造体
+  !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
+  !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
   type gedatsu_graph
     !> ノード数
     integer(gint) :: n_vertex
@@ -24,7 +26,7 @@ contains
   !> graph 構造体の初期化関数
   subroutine gedatsu_graph_initialize(graph)
     implicit none
-    !> graph 構造体
+    !> [in] graph 構造体
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_graph_initialize
 
@@ -32,7 +34,7 @@ contains
   !> graph 構造体の終了関数
   subroutine gedatsu_graph_finalize(graph)
     implicit none
-    !> graph 構造体
+    !> [in] graph 構造体
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_graph_finalize
 
