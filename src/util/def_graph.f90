@@ -28,6 +28,9 @@ contains
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    graph%n_vertex = 0
+
   end subroutine gedatsu_graph_initialize
 
   !> @ingroup group_init
