@@ -20,7 +20,7 @@ module mod_gedatsu_graph
 
 contains
 
-  !> @ingroup group1
+  !> @ingroup group_init
   !> graph 構造体の初期化関数
   subroutine gedatsu_graph_initialize(graph)
     implicit none
@@ -28,7 +28,7 @@ contains
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_graph_initialize
 
-  !> @ingroup group1
+  !> @ingroup group_init
   !> graph 構造体の終了関数
   subroutine gedatsu_graph_finalize(graph)
     implicit none

@@ -4,7 +4,7 @@
 
 ## Manual
 
-- [TBA](./)
+- [Doxygen](https://morita.gitlab.io/gedatsu/)
 
 ## License
 

@@ -3,10 +3,10 @@ module mod_gedatsu_util
   use mod_gedatsu_graph
   implicit none
 
-  !> @defgroup group1 初期化・終了処理
+  !> @defgroup group_init 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ
 
-  !> @defgroup group2 ファイル入出力
+  !> @defgroup group_io ファイル入出力
   !> ファイル入出力に関連する関数グループ
 
   !> @defgroup group3 グラフデータ処理
@@ -17,7 +17,7 @@ module mod_gedatsu_util
 
 contains
 
-  !> @ingroup group1
+  !> @ingroup group_init
   !> gedatsu ライブラリを利用するためのグローバル初期化関数
   !> @details 全ての gedatsu ライブラリの関数を呼ぶ前に実行しておく必要がある。
   !> MPI の初期化処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
@@ -25,7 +25,7 @@ contains
     implicit none
   end subroutine gedatsu_global_initialize
 
-  !> @ingroup group1
+  !> @ingroup group_init
   !> gedatsu ライブラリを利用するためのグローバル終了関数
   !> @details MPI の終了処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
   subroutine gedatsu_global_finalize()

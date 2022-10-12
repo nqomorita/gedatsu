@@ -4,9 +4,12 @@ module mod_gedatsu_io
   use mod_gedatsu_graph
   implicit none
 
+  !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
+  !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
+
 contains
 
-  !> @ingroup group2
+  !> @ingroup group_io
   !> gedatsu graph フォーマットの入力
   subroutine gedatsu_graph_input(fname, graph)
     implicit none
@@ -40,7 +43,7 @@ contains
     close(20)
   end subroutine gedatsu_graph_input
 
-  !> @ingroup group2
+  !> @ingroup group_io
   !> gedatsu graph フォーマットの出力
   subroutine gedatsu_graph_output(fname, graph)
     implicit none
