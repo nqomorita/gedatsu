@@ -5,6 +5,7 @@ module mod_gedatsu_alloc
 
 contains
 
+  !> @ingroup group_dev_alloc
   !> 1 次元整数配列のメモリ確保
   subroutine gedatsu_alloc_int_1d(var, i)
     implicit none
@@ -27,6 +28,7 @@ contains
     endif
   end subroutine gedatsu_alloc_int_1d
 
+  !> @ingroup group_dev_alloc
   !> 1 次元整数配列のメモリ開放
   subroutine gedatsu_dealloc_int_1d(var)
     implicit none
@@ -41,6 +43,7 @@ contains
     deallocate(var)
   end subroutine gedatsu_dealloc_int_1d
 
+  !> @ingroup group_dev_alloc
   !> 2 次元整数配列のメモリ確保
   !> @details 配列サイズは var(i,j) として確保される。
   subroutine gedatsu_alloc_int_2d(var, i, j)
@@ -66,6 +69,7 @@ contains
     endif
   end subroutine gedatsu_alloc_int_2d
 
+  !> @ingroup group_dev_alloc
   !> 2 次元整数配列のメモリ開放
   subroutine gedatsu_dealloc_int_2d(var)
     implicit none
@@ -80,6 +84,7 @@ contains
     deallocate(var)
   end subroutine gedatsu_dealloc_int_2d
 
+  !> @ingroup group_dev_alloc
   !> 1 次元浮動小数点配列のメモリ確保
   subroutine gedatsu_alloc_real_1d(var, i)
     implicit none
@@ -102,6 +107,7 @@ contains
     endif
   end subroutine gedatsu_alloc_real_1d
 
+  !> @ingroup group_dev_alloc
   !> 1 次元浮動小数点配列のメモリ開放
   subroutine gedatsu_dealloc_real_1d(var)
     implicit none
@@ -116,6 +122,7 @@ contains
     deallocate(var)
   end subroutine gedatsu_dealloc_real_1d
 
+  !> @ingroup group_dev_alloc
   !> 2 次元浮動小数点配列のメモリ確保
   !> @details 配列サイズは var(i,j) として確保される。
   subroutine gedatsu_alloc_real_2d(var, i, j)
@@ -155,6 +162,7 @@ contains
     deallocate(var)
   end subroutine gedatsu_dealloc_real_2d
 
+  !> @ingroup group_dev_alloc
   !> 1 次元論理型配列のメモリ確保
   subroutine gedatsu_alloc_bool_1d(var, i)
     implicit none
@@ -177,6 +185,7 @@ contains
     endif
   end subroutine gedatsu_alloc_bool_1d
 
+  !> @ingroup group_dev_alloc
   !> 1 次元論理型配列のメモリ開放
   subroutine gedatsu_dealloc_bool_1d(var)
     implicit none
@@ -191,6 +200,7 @@ contains
     deallocate(var)
   end subroutine gedatsu_dealloc_bool_1d
 
+  !> @ingroup group_dev_alloc
   !> 2 次元論理型配列のメモリ確保
   !> @details 配列サイズは var(i,j) として確保される。
   subroutine gedatsu_alloc_bool_2d(var, i, j)
@@ -216,6 +226,7 @@ contains
     endif
   end subroutine gedatsu_alloc_bool_2d
 
+  !> @ingroup group_dev_alloc
   !> 2 次元論理型配列のメモリ開放
   subroutine gedatsu_dealloc_bool_2d(var)
     implicit none

@@ -27,16 +27,16 @@ contains
       enddo
     close(20)
 
-    allocate(graph%vertex_id(graph%n_vertex), source = 0)
-    allocate(graph%index(0:graph%n_vertex), source = 0)
-    allocate(graph%item(nz), source = 0)
+    call gedatsu_alloc_int_1d(graph%vertex_id, graph%n_vertex)
+    call gedatsu_alloc_int_1d(graph%index, graph%n_vertex+1)
+    call gedatsu_alloc_int_1d(graph%item, nz)
 
     nz = 0
     open(20, file = fname, status = "old")
       read(20,*) graph%n_vertex
       do i = 1, graph%n_vertex
         read(20,*) graph%vertex_id(i), in, (graph%item(nz+j), j = 1, in)
-        graph%index(i) = graph%index(i-1) + in
+        graph%index(i+1) = graph%index(i) + in
         nz = nz + in
       enddo
     close(20)
@@ -55,8 +55,8 @@ contains
     open(20, file = trim(fname), status = "replace")
       write(20,"(i0)") graph%n_vertex
       do i = 1, graph%n_vertex
-        jS = graph%index(i-1) + 1
-        jE = graph%index(i)
+        jS = graph%index(i) + 1
+        jE = graph%index(i+1)
         in = jE - jS + 1
         write(20,"(i0,x,i0,x,$)") graph%vertex_id(i), in
         do j = jS, jE

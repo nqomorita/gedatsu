@@ -15,6 +15,9 @@ module mod_gedatsu_util
   !> @defgroup group4 動的負荷分散
   !> 動的負荷分散に関連する関数グループ
 
+  !> @defgroup group_dev_alloc 開発者用：メモリ確保
+  !> メモリ確保・メモリ開放に関連する関数グループ
+
 contains
 
   !> @ingroup group_init
