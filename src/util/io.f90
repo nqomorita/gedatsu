@@ -10,7 +10,7 @@ contains
   !> gedatsu graph フォーマットの入力
   !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
   !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
-  subroutine gedatsu_graph_input(fname, graph)
+  subroutine gedatsu_input_graph(fname, graph)
     implicit none
     !> [in] 入力ファイル名
     character(gedatsu_charlen) :: fname
@@ -40,11 +40,11 @@ contains
         nz = nz + in
       enddo
     close(20)
-  end subroutine gedatsu_graph_input
+  end subroutine gedatsu_input_graph
 
   !> @ingroup group_io
   !> gedatsu graph フォーマットの出力
-  subroutine gedatsu_graph_output(fname, graph)
+  subroutine gedatsu_output_graph(fname, graph)
     implicit none
     !> [in] 出力ファイル名
     character(gedatsu_charlen) :: fname
@@ -65,7 +65,89 @@ contains
         write(20,*)""
       enddo
     close(20)
-  end subroutine gedatsu_graph_output
+  end subroutine gedatsu_output_graph
+
+  !> @ingroup group_io
+  !> gedatsu node フォーマットの入力
+  subroutine gedatsu_input_node(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_input_node
+
+  !> @ingroup group_io
+  !> gedatsu node フォーマットの出力
+  subroutine gedatsu_output_node(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_output_node
+
+  !> @ingroup group_io
+  !> gedatsu elem フォーマットの入力
+  !> @note gedatsu IO では elem 形式フォーマットを入出力するが、
+  !> プログラム内部では dedatsu graph の CSR 圧縮形式によってグラフを保持する。
+  subroutine gedatsu_input_elem(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_input_elem
+
+  !> @ingroup group_io
+  !> gedatsu elem フォーマットの出力
+  subroutine gedatsu_output_elem(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_output_elem
+
+  !> @ingroup group_io
+  !> gedatsu bc フォーマットの入力
+  subroutine gedatsu_input_bc(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_input_bc
+
+  !> @ingroup group_io
+  !> gedatsu bc フォーマットの出力
+  subroutine gedatsu_output_bc(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_output_bc
+
+  !> @ingroup group_io
+  !> gedatsu distval フォーマットの入力
+  subroutine gedatsu_input_distval(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_input_distval
+
+  !> @ingroup group_io
+  !> gedatsu distval フォーマットの出力
+  subroutine gedatsu_output_distval(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+  end subroutine gedatsu_output_distval
 
   !> エラー出力関数
   subroutine gedatsu_error_string(fname)
