@@ -56,7 +56,7 @@ GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu
 CPP      = -cpp $(FLAG_INT64)
 
 #> bin target
-PART_TGT = $(BIN_DIR)/gedatsu_part
+PRT_G_TGT = $(BIN_DIR)/gedatsu_graph_partitioner
 
 #> library target
 LIB_TGT = \
@@ -78,13 +78,14 @@ graph_part.f90
 
 SRC_ALL_LIST = \
 $(addprefix util/, $(SRC_LIST_UTIL)) \
-$(addprefix graph/, $(SRC_LIST_GRAPH))
+$(addprefix graph/, $(SRC_LIST_GRAPH)) \
+main/gedatsu.f90
 
 SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL_LIST))
 OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.f90=.o))
 
 #> compilation
-all: $(LIB_TGT) $(PART_TGT)
+all: $(LIB_TGT) $(PRT_G_TGT)
 
 $(LIB_TGT): $(OBJS)
 	$(AR) $@ $(OBJS)
@@ -95,19 +96,19 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(FLAG_METIS) -o $@ -c $<
 
-$(PART_TGT): driver/main.f90
-	$(FC) $(FFLAGS) -o $@ $< $(GEDATSU_LIB)
+$(PRT_G_TGT): driver/main.f90
+	$(FC) $(FFLAGS) $(INCLUDE) -o $@ $< $(GEDATSU_LIB)
 
 #> clean
 clean:
 	$(RM) $(OBJS) $(LIB_TGT) ./include/*.mod \
-	$(PART_TGT)
+	$(PRT_G_TGT)
 
 distclean:
 	$(RM) $(OBJS) $(LIB_TGT) /include/*.mod \
-	$(PART_TGT)
+	$(PRT_G_TGT)
 
 binclean:
-	$(RM) $(PART_TGT)
+	$(RM) $(PRT_G_TGT)
 
 .PHONY: clean

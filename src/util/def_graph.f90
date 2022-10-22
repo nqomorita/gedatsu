@@ -1,7 +1,7 @@
 !> graph モジュール
 module mod_gedatsu_graph
   use mod_gedatsu_prm
-  use iso_c_binding
+  !use iso_c_binding
   implicit none
 
   !> graph 構造体
@@ -30,7 +30,6 @@ contains
     type(gedatsu_graph) :: graph
 
     graph%n_vertex = 0
-
   end subroutine gedatsu_graph_initialize
 
   !> @ingroup group_init
