@@ -1,12 +1,16 @@
-#> monolis Makefile
+#> gedatsu Makefile
 FC     = mpif90
 FFLAGS = -O2 -mtune=native -march=native -std=legacy
 
 CC     = mpic++
 CFLAGS = -O2
 
-MOD_DIR  = -J ./include
+MAKE     = make
+CD       = cd
+RM       = rm -r
+AR       = - ar ruv
 
+#> library setting
 METIS_DIR  = .
 METIS_INC  = -I $(METIS_DIR)/include
 METIS_LIB  = -L$(METIS_DIR)/lib -lmetis
@@ -15,6 +19,7 @@ PARMETIS_DIR  = .
 PARMETIS_INC  = -I $(METIS_DIR)/include
 PARMETIS_LIB  = -L$(METIS_DIR)/lib -lmetis
 
+#> option setting
 ifdef FLAGS
 	comma:= ,
 	empty:=
@@ -33,36 +38,31 @@ ifdef FLAGS
 		MOD_DIR = -module ./include
 	endif
 
-	ifeq ($(findstring TEST, $(DFLAGS)), TEST)
-		FLAG_TEST = -DTEST
-	endif
-
-	ifeq ($(findstring METIS64, $(DFLAGS)), METIS64)
-		FLAG_METIS = -DWITH_METIS64
+	ifeq ($(findstring INT64, $(DFLAGS)), INT64)
+		FLAG_INT64 = -DINT64
 	endif
 endif
 
+#> compilation directories
 INCLUDE  = -I /usr/include -I ./include $(METIS_INC)
 LIBRARY  = $(METIS_LIB)
 BIN_DIR  = ./bin
 SRC_DIR  = ./src
 OBJ_DIR  = ./obj
 LIB_DIR  = ./lib
+MOD_DIR  = -J ./include
 LIB_LIST = libgedatsu.a
 GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu
-CPP      = -cpp $(FLAG_MPI) $(FLAG_METIS) $(FLAG_PARMETIS) $(FLAG_TEST) $(FLAG_DEBUG)
+CPP      = -cpp $(FLAG_INT64)
 
-BIN_PART = gedatsu_partitioner
+#> bin target
+PART_TGT = $(BIN_DIR)/gedatsu_part
 
-MAKE     = make
-CD       = cd
-RM       = rm -r
-AR       = - ar ruv
+#> library target
+LIB_TGT = \
+$(addprefix $(LIB_DIR)/, $(LIB_LIST))
 
-LIBTARGET = $(addprefix $(LIB_DIR)/, $(LIB_LIST))
-#PARTTARGET = $(addprefix $(BIN_DIR)/, $(BIN_PART))
-
-SRC_LIST_UTIL  = \
+SRC_LIST_UTIL = \
 def_prm.f90 \
 def_graph.f90 \
 util.f90 \
@@ -76,21 +76,18 @@ graph_handler.f90 \
 graph_convert.f90 \
 graph_part.f90
 
-#SRC_PART        = partitioner/partitioner.f90
-
-SRC_ALL_LIST    = $(addprefix util/, $(SRC_LIST_UTIL)) $(addprefix graph/, $(SRC_LIST_GRAPH))
+SRC_ALL_LIST = \
+$(addprefix util/, $(SRC_LIST_UTIL)) \
+$(addprefix graph/, $(SRC_LIST_GRAPH))
 
 SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL_LIST))
 OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.f90=.o))
 
-all: $(LIBTARGET)
-#$(PARTTARGET)
+#> compilation
+all: $(LIB_TGT) $(PART_TGT)
 
-$(LIBTARGET): $(OBJS)
+$(LIB_TGT): $(OBJS)
 	$(AR) $@ $(OBJS)
-
-$(PARTTARGET): $(OBJS_PART)
-	$(FC) $(FFLAGS) -o $@ $(OBJS_PART) $(MONOLIS_LIB) $(LIBRARY)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -98,12 +95,19 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(FLAG_METIS) -o $@ -c $<
 
+$(PART_TGT): driver/main.f90
+	$(FC) $(FFLAGS) -o $@ $< $(GEDATSU_LIB)
+
+#> clean
 clean:
-	$(RM) $(OBJS) $(LIBTARGET) $(PARTTARGET) ./include/*.mod
+	$(RM) $(OBJS) $(LIB_TGT) ./include/*.mod \
+	$(PART_TGT)
 
 distclean:
-	$(RM) $(OBJS) $(LIBTARGET) $(PARTTARGET) /include/*.mod
+	$(RM) $(OBJS) $(LIB_TGT) /include/*.mod \
+	$(PART_TGT)
 
-sampleclean:
+binclean:
+	$(RM) $(PART_TGT)
 
 .PHONY: clean
