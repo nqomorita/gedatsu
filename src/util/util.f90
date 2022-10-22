@@ -49,4 +49,12 @@ contains
     implicit none
     error stop gedatsu_fail
   end subroutine gedatsu_error_stop
+
+  !> エラー出力関数
+  subroutine gedatsu_error_string(fname)
+    implicit none
+    !> [in] 入力ファイル名
+    character(*) :: fname
+    write(*,"(a)")"** GEDATSU ERROR: ", trim(fname)
+  end subroutine gedatsu_error_string
 end module mod_gedatsu_util

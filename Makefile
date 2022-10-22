@@ -68,6 +68,7 @@ def_graph.f90 \
 util.f90 \
 alloc.f90 \
 io.f90 \
+io_arg.f90 \
 wrapper_metis.f90 \
 wrapper_parmetis.f90
 

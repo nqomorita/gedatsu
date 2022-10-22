@@ -1,5 +1,6 @@
 !> メモリ確保モジュール
 module mod_gedatsu_alloc
+  use mod_gedatsu_util
   use mod_gedatsu_prm
   implicit none
 

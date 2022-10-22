@@ -2,6 +2,7 @@
 module mod_gedatsu_io
   use mod_gedatsu_prm
   use mod_gedatsu_graph
+  use mod_gedatsu_alloc
   implicit none
 
 contains
@@ -148,13 +149,4 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_output_distval
-
-  !> エラー出力関数
-  subroutine gedatsu_error_string(fname)
-    implicit none
-    !> [in] 入力ファイル名
-    character(*) :: fname
-    write(*,"(a)")"** GEDATSU ERROR: ", trim(fname)
-  end subroutine gedatsu_error_string
-
 end module mod_gedatsu_io
