@@ -17,10 +17,11 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    integer(gint) :: i, in, j, tmp, nz
+    integer(gint) :: i, in, j, tmp, nz, ierr
 
     nz = 0
-    open(20, file = fname, status = "old")
+    open(20, file = fname, status = "old", iostat = ierr)
+      call gedatsu_input_file_error_check(ierr)
       read(20,*) graph%n_vertex
       do i = 1, graph%n_vertex
         read(20,*) tmp, in
@@ -33,7 +34,7 @@ contains
     call gedatsu_alloc_int_1d(graph%item, nz)
 
     nz = 0
-    open(20, file = fname, status = "old")
+    open(20, file = fname, status = "old", iostat = ierr)
       read(20,*) graph%n_vertex
       do i = 1, graph%n_vertex
         read(20,*) graph%vertex_id(i), in, (graph%item(nz+j), j = 1, in)
@@ -149,4 +150,13 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_output_distval
+
+  subroutine gedatsu_input_file_error_check(ierr)
+    implicit none
+    integer(gint) :: ierr
+    if(ierr /= 0)then
+      call gedatsu_error_string("file open")
+      call gedatsu_error_stop()
+    endif
+  end subroutine gedatsu_input_file_error_check
 end module mod_gedatsu_io

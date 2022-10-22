@@ -9,19 +9,21 @@ contains
 
   !> metis ラッパー関数（グラフ重みなし）
   subroutine gedatsu_part_graph_metis(n_vertex, index, item, n_part, part_id)
-    use iso_c_binding
     implicit none
     !> [in] メモリ確保する配列
     integer(gint) :: n_vertex
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: index(:)
+    integer(gint), allocatable :: index(:)
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: item(:)
+    integer(gint), allocatable :: item(:)
     !> [in] メモリ確保する配列
     integer(gint) :: n_part
     !> [in] メモリ確保する配列
-    integer(gint), pointer :: part_id(:)
+    integer(gint), allocatable :: part_id(:)
+    integer(gint), allocatable :: node_wgt(:)
+    integer(gint), allocatable :: edge_wgt(:)
 
+    call gedatsu_part_graph_metis_with_weight(n_vertex, index, item, node_wgt, edge_wgt, n_part, part_id)
   end subroutine gedatsu_part_graph_metis
 
   !> metis ラッパー関数（グラフ重みあり）
@@ -31,41 +33,24 @@ contains
     !> [in] メモリ確保する配列
     integer(gint) :: n_vertex
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: index(:)
+    integer(gint), allocatable, target :: index(:)
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: item(:)
+    integer(gint), allocatable, target :: item(:)
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: node_wgt(:)
+    integer(gint), allocatable, target :: node_wgt(:)
     !> [in] メモリ確保する配列
-    integer(c_int), pointer :: edge_wgt(:)
-    !> [in] メモリ確保する配列
-    integer(gint) :: n_part
-    !> [in] メモリ確保する配列
-    integer(gint), pointer :: part_id(:)
-
-  end subroutine gedatsu_part_graph_metis_with_weight
-
-  !> metis ラッパーのメイン関数
-  subroutine gedatsu_part_graph_metis_main(n_vertex, index, item, node_wgt, edge_wgt, n_part, part_id)
-    use iso_c_binding
-    implicit none
-    !> [in] メモリ確保する配列
-    integer(gint) :: n_vertex
-    !> [in] メモリ確保する配列
-    integer(c_int), pointer :: index(:)
-    !> [in] メモリ確保する配列
-    integer(c_int), pointer :: item(:)
-    !> [in] メモリ確保する配列
-    integer(c_int), pointer :: node_wgt(:)
-    !> [in] メモリ確保する配列
-    integer(c_int), pointer :: edge_wgt(:)
+    integer(gint), allocatable, target :: edge_wgt(:)
     !> [in] メモリ確保する配列
     integer(gint) :: n_part
     !> [in] メモリ確保する配列
-    integer(gint), pointer :: part_id(:)
+    integer(gint), allocatable :: part_id(:)
     integer(gint) :: ncon, objval
-    integer(gint), pointer :: vsize(:) => null()
-    integer(gint), pointer :: ubvec(:) => null()
+    integer(c_int), pointer :: index_c(:)
+    integer(c_int), pointer :: item_c(:)
+    integer(c_int), pointer :: node_wgt_c(:)
+    integer(c_int), pointer :: edge_wgt_c(:)
+    integer(c_int), pointer :: vsize(:) => null()
+    integer(c_int), pointer :: ubvec(:) => null()
     real(gdouble), pointer :: options(:) => null()
     real(gdouble), pointer :: tpwgts(:) => null()
 
@@ -85,11 +70,15 @@ contains
       item = item - 1
 
 #ifdef NO_METIS
-    call gedatsu_warning_header("gedatsu_part_graph_metis_main: METIS is NOT enabled")
+    call gedatsu_warning_header("gedatsu_part_graph_metis_with_weight: METIS is NOT enabled")
     stop
 #else
-      call METIS_PARTGRAPHRECURSIVE(n_vertex, ncon, index, item, &
-        & node_wgt, vsize, edge_wgt, n_part, tpwgts, ubvec, options, objval, part_id)
+      index_c => index
+      item_c => item
+      node_wgt_c => node_wgt
+      edge_wgt_c => edge_wgt
+      call METIS_PARTGRAPHRECURSIVE(n_vertex, ncon, index_c, item_c, &
+        & node_wgt_c, vsize, edge_wgt_c, n_part, tpwgts, ubvec, options, objval, part_id)
 !#elif WITH_METIS64
 !      ncon8 = 1
 !      n_part8 = n_part
@@ -109,6 +98,6 @@ contains
       !> convert to 1 origin
       item = item + 1
     endif
-  end subroutine gedatsu_part_graph_metis_main
+  end subroutine gedatsu_part_graph_metis_with_weight
 
 end module mod_gedatsu_wrapper_metis

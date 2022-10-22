@@ -1,6 +1,7 @@
 #> gedatsu Makefile
 FC     = mpif90
-FFLAGS = -O2 -mtune=native -march=native -std=legacy
+#FFLAGS = -O2 -mtune=native -march=native -std=legacy
+FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow
 
 CC     = mpic++
 CFLAGS = -O2
@@ -13,11 +14,11 @@ AR       = - ar ruv
 #> library setting
 METIS_DIR  = .
 METIS_INC  = -I $(METIS_DIR)/include
-METIS_LIB  = -L$(METIS_DIR)/lib -lmetis
+METIS_LIB  = -L$(METIS_DIR)/lib -lmetis -lGKlib
 
 PARMETIS_DIR  = .
 PARMETIS_INC  = -I $(METIS_DIR)/include
-PARMETIS_LIB  = -L$(METIS_DIR)/lib -lmetis
+PARMETIS_LIB  = -L$(METIS_DIR)/lib -lparmetis
 
 #> option setting
 ifdef FLAGS
@@ -45,14 +46,13 @@ endif
 
 #> compilation directories
 INCLUDE  = -I /usr/include -I ./include $(METIS_INC)
-LIBRARY  = $(METIS_LIB)
 BIN_DIR  = ./bin
 SRC_DIR  = ./src
 OBJ_DIR  = ./obj
 LIB_DIR  = ./lib
 MOD_DIR  = -J ./include
 LIB_LIST = libgedatsu.a
-GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu
+GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu $(METIS_LIB)
 CPP      = -cpp $(FLAG_INT64)
 
 #> bin target
@@ -97,7 +97,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDE) $(FLAG_METIS) -o $@ -c $<
 
-$(PRT_G_TGT): driver/main.f90
+$(PRT_G_TGT): driver/gedatsu_graph_partitioner.f90
 	$(FC) $(FFLAGS) $(INCLUDE) -o $@ $< $(GEDATSU_LIB)
 
 #> clean

@@ -2,6 +2,7 @@
 module mod_gedatsu_io_arg
   use mod_gedatsu_prm
   use mod_gedatsu_graph
+  use mod_gedatsu_util
   implicit none
 
 contains
@@ -33,6 +34,7 @@ contains
     character(gedatsu_charlen) :: argc1
     character(gedatsu_charlen) :: argc2
 
+    count = iargc()
     if(mod(count,2) /= 0)then
       call gedatsu_output_arg_help()
       write(*,"(a)") "* gedatsu input arg error"
@@ -57,6 +59,7 @@ contains
     character(gedatsu_charlen) :: argc1
     character(gedatsu_charlen) :: argc2
 
+    count = iargc()
     if(mod(count,2) /= 0)then
       call gedatsu_output_arg_help()
       write(*,"(a)") "* gedatsu input arg error"

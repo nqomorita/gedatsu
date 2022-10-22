@@ -3,6 +3,8 @@ program gedatsu_graph_partitioner
   implicit none
   !> graph 構造体
   type(gedatsu_graph) :: graph
+  !> 分割後の graph 構造体
+  type(gedatsu_graph), allocatable :: subgraphs(:)
   !> 分割数
   integer(gint) :: n_domain
   !> 入力ファイル名
@@ -16,7 +18,7 @@ program gedatsu_graph_partitioner
 
   call gedatsu_input_graph(fname, graph)
 
-!  call monolis_part_nodal_graph(graph, n_domain)
+  !call gedatsu_graph_partition(graph, n_domain, subgraphs)
 
 !  call monolis_get_overlap_commtable_graph(graph, comm, node_list, n_domain)
 
