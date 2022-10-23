@@ -66,9 +66,13 @@ contains
     endif
 
     iold = size(var)
+
     call gedatsu_alloc_int_1d(temp, iold)
+
     temp(:) = var(:)
+
     call gedatsu_dealloc_int_1d(var)
+
     call gedatsu_alloc_int_1d(var, i)
 
     do j = 1, min(iold, i)

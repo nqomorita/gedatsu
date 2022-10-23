@@ -245,10 +245,15 @@ contains
     integer(gint), allocatable :: perm(:)
 
     call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+
     call gedatsu_alloc_int_1d(ids, n_vertex)
+
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+
     call gedatsu_alloc_int_1d(perm, n_vertex)
+
     call gedatsu_get_sequence_array_int(perm, n_vertex, 1, 1)
+
     call gedatsu_qsort_int_with_perm(ids, 1, n_vertex, perm)
 
     n_edge_all = 0

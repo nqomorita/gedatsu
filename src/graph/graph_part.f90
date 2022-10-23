@@ -90,6 +90,7 @@ contains
     call gedatsu_alloc_int_1d(subgraph%item, n_edge)
 
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, subgraph%vertex_id)
+
     call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, subgraph%index, subgraph%item)
   end subroutine gedatsu_get_parted_graph_main
 
@@ -106,10 +107,15 @@ contains
     integer(gint), allocatable :: OVL_vertex_id(:), edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
+
     call gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
+
     call gedatsu_alloc_int_1d(OVL_vertex_id, n_vertex)
+
     call gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, OVL_vertex_id)
+
     call gedatsu_alloc_int_2d(edge, 2, n_edge)
+
     call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
   end subroutine gedatsu_add_overlapping_nodes
 end module mod_gedatsu_graph_part
