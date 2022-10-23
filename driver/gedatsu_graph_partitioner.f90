@@ -18,7 +18,7 @@ program gedatsu_graph_partitioner
 
   call gedatsu_input_graph(fname, graph)
 
-  !call gedatsu_graph_partition(graph, n_domain, subgraphs)
+  call gedatsu_graph_partition(graph, n_domain, subgraphs)
 
 !  call monolis_get_overlap_commtable_graph(graph, comm, node_list, n_domain)
 
