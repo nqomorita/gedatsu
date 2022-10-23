@@ -3,6 +3,7 @@ module mod_gedatsu_graph_handler
   use mod_gedatsu_prm
   use mod_gedatsu_graph
   use mod_gedatsu_util
+  use mod_gedatsu_alloc
 
   implicit none
 
@@ -62,6 +63,45 @@ contains
     n_vertex = graph%n_vertex
   end subroutine gedatsu_graph_get_n_vertex
 
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id に属するノード数を取得
+  subroutine gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフのノード数
+    integer(gint) :: n_vertex
+    integer(gint) :: i
+
+    n_vertex = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) == domain_id) n_vertex = n_vertex + 1
+    enddo
+  end subroutine gedatsu_graph_get_n_vertex_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id に属するノード番号を取得
+  subroutine gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] 領域番号 domain_id に属する節点番号
+    integer(gint) :: ids(:)
+    integer(gint) :: i, in
+
+    in = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) == domain_id)then
+        in = in + 1
+        ids(in) = graph%vertex_id(i)
+      endif
+    enddo
+  end subroutine gedatsu_graph_get_vertex_id_in_subdomain
+
 !!  !> @ingroup group_graph_1
 !!  !> グラフの i 番目のノードを削除
 !!  !> @details i 番目のノードに関連するエッジも削除される。
@@ -73,34 +113,66 @@ contains
 !!    integer(gint) :: vertex_id
 !!  end subroutine gedatsu_graph_delete_vertex
 
-!! !> @ingroup group_graph_1
-!! !> グラフの i 番目のノード id を取得
-!! subroutine gedatsu_graph_get_ith_vertex_id(graph, i, vertex_id)
-!!   implicit none
-!!   !> [in] graph 構造体
-!!   type(gedatsu_graph) :: graph
-!!   !> [in] ノード番号 i
-!!   integer(gint) :: i
-!!   !> [out] グラフの i 番目のノード id
-!!   integer(gint) :: vertex_id
-
-!!   if(graph%n_vertex < i)then
-!!     call gedatsu_error_string("gedatsu_graph_get_ith_vertex_id")
-!!     call gedatsu_error_string("input node number is larger than the number of graph node
-!!     call gedatsu_error_stop()
-!!   endif
-
-!!   if(i < 1)then
-!!     call gedatsu_error_string("gedatsu_graph_get_ith_vertex_id")
-!!     call gedatsu_error_string("input node number is less than 0")
-!!     call gedatsu_error_stop()
-!!   endif
-
-!!   vertex_id = graph%vertex_id(i)
-!! end subroutine gedatsu_graph_get_ith_vertex_id
+  !> @ingroup group_graph_1
+  !> グラフのエッジ数を取得
+  subroutine gedatsu_graph_get_n_edge(graph, n_edge)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [out] グラフのノード数
+    integer(gint) :: n_edge
+    n_edge = graph%index(graph%n_vertex+1)
+  end subroutine gedatsu_graph_get_n_edge
 
   !> @ingroup group_graph_1
-  !> グラフのノード数を取得
+  !> 領域番号 domain_id に属するグラフのエッジ数を取得
+  subroutine gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフのノード数
+    integer(gint) :: n_edge
+    integer(gint) :: i, j, jS, jE, nid
+
+    n_edge = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i+1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) == domain_id) n_edge = n_edge + 1
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_n_edge_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id に属するグラフのエッジを取得
+  !> @detalis エッジの組はローカル節点番号で表現される
+  subroutine gedatsu_graph_get_edge_in_subdomain(graph, domain_id, index, item)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフの index 配列
+    integer(gint) :: index(:)
+    !> [out] グラフの item 配列
+    integer(gint) :: item(:)
+
+    integer(gint) :: n_vertex
+    integer(gint), allocatable :: ids(:)
+
+    call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+    call gedatsu_alloc_int_1d(ids, n_vertex)
+    call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+
+  end subroutine gedatsu_graph_get_edge_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> グラフのエッジを追加
   subroutine gedatsu_graph_add_edge(graph, n_edge, edge)
     implicit none
     !> [in] graph 構造体
@@ -110,10 +182,5 @@ contains
     !> [in] グラフエッジ
     integer(gint) :: edge(:,:)
   end subroutine gedatsu_graph_add_edge
-
-!gedatsu_graph_delete_edge(graph, n_edge, array)
-!gedatsu_graph_set_ith_vertex_id(graph, i, vertex_id)
-!gedatsu_graph_set_vertex_id_array(graph, array)
-!gedatsu_graph_get_vertex_id_array(graph, array)
 
 end module mod_gedatsu_graph_handler

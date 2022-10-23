@@ -8,6 +8,7 @@ module mod_gedatsu_wrapper_metis
 contains
 
   !> metis ラッパー関数（グラフ重みなし）
+  !> @details 戻り値の領域番号は 0 オリジン
   subroutine gedatsu_part_graph_metis(n_vertex, index, item, n_part, part_id)
     implicit none
     !> [in] メモリ確保する配列
@@ -28,6 +29,7 @@ contains
   end subroutine gedatsu_part_graph_metis
 
   !> metis ラッパー関数（グラフ重みあり）
+  !> @details 戻り値の領域番号は 0 オリジン
   subroutine gedatsu_part_graph_metis_with_weight(n_vertex, index, item, node_wgt, edge_wgt, n_part, part_id)
     use iso_c_binding
     implicit none

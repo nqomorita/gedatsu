@@ -26,11 +26,19 @@ contains
     error stop gedatsu_fail
   end subroutine gedatsu_error_stop
 
-  !> エラー出力関数
+  !> エラー出力関数（ERROR）
   subroutine gedatsu_error_string(fname)
     implicit none
     !> [in] 入力ファイル名
     character(*) :: fname
     write(*,"(a,a)")"** GEDATSU ERROR: ", trim(fname)
   end subroutine gedatsu_error_string
+
+  !> 警告出力関数（WARNING）
+  subroutine gedatsu_warning_string(fname)
+    implicit none
+    !> [in] 入力ファイル名
+    character(*) :: fname
+    write(*,"(a,a)")"** GEDATSU EARNING: ", trim(fname)
+  end subroutine gedatsu_warning_string
 end module mod_gedatsu_util

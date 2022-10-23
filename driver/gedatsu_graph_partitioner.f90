@@ -20,7 +20,7 @@ program gedatsu_graph_partitioner
 
   call gedatsu_graph_partition(graph, n_domain, subgraphs)
 
-!  call monolis_get_overlap_commtable_graph(graph, comm, node_list, n_domain)
+!  call monolis_get_commnication_table(graph, comm, node_list, n_domain)
 
 !  call monolis_output_parted_nodal_graph(fname, graph, graph_format, comm, node_list, n_domain)
 
