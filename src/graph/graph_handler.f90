@@ -4,6 +4,7 @@ module mod_gedatsu_graph_handler
   use mod_gedatsu_graph
   use mod_gedatsu_util
   use mod_gedatsu_alloc
+  use mod_gedatsu_std
 
   implicit none
 
@@ -82,6 +83,30 @@ contains
   end subroutine gedatsu_graph_get_n_vertex_in_subdomain
 
   !> @ingroup group_graph_1
+  !> 領域番号 domain_id のオーバーラッピング領域に属するノード数を取得
+  subroutine gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフのノード数
+    integer(gint) :: n_vertex
+    integer(gint) :: i, j, jS, jE, nid
+
+    n_vertex = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) /= domain_id) n_vertex = n_vertex + 1
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_n_vertex_in_overlap_region
+
+  !> @ingroup group_graph_1
   !> 領域番号 domain_id に属するノード番号を取得
   subroutine gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
     implicit none
@@ -91,16 +116,44 @@ contains
     integer(gint) :: domain_id
     !> [out] 領域番号 domain_id に属する節点番号
     integer(gint) :: ids(:)
-    integer(gint) :: i, in
+    integer(gint) :: i, n_vertex
 
-    in = 0
+    n_vertex = 0
     do i = 1, graph%n_vertex
       if(graph%vertex_domain_id(i) == domain_id)then
-        in = in + 1
-        ids(in) = graph%vertex_id(i)
+        n_vertex = n_vertex + 1
+        ids(n_vertex) = graph%vertex_id(i)
       endif
     enddo
   end subroutine gedatsu_graph_get_vertex_id_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id のオーバーラッピング領域に属するノード番号を取得
+  subroutine gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] 領域番号 domain_id に属する節点番号
+    integer(gint) :: ids(:)
+    integer(gint) :: n_vertex
+    integer(gint) :: i, j, jS, jE, nid
+
+    n_vertex = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) /= domain_id)then
+          n_vertex = n_vertex + 1
+          ids(n_vertex) = graph%vertex_id(i)
+        endif
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_vertex_id_in_overlap_region
 
 !!  !> @ingroup group_graph_1
 !!  !> グラフの i 番目のノードを削除
@@ -119,9 +172,9 @@ contains
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    !> [out] グラフのノード数
+    !> [out] グラフのエッジ数
     integer(gint) :: n_edge
-    n_edge = graph%index(graph%n_vertex+1)
+    n_edge = graph%index(graph%n_vertex + 1)
   end subroutine gedatsu_graph_get_n_edge
 
   !> @ingroup group_graph_1
@@ -132,7 +185,7 @@ contains
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
     integer(gint) :: domain_id
-    !> [out] グラフのノード数
+    !> [out] グラフのエッジ数
     integer(gint) :: n_edge
     integer(gint) :: i, j, jS, jE, nid
 
@@ -140,13 +193,37 @@ contains
     do i = 1, graph%n_vertex
       if(graph%vertex_domain_id(i) /= domain_id) cycle
       jS = graph%index(i) + 1
-      jE = graph%index(i+1)
+      jE = graph%index(i + 1)
       do j = jS, jE
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) == domain_id) n_edge = n_edge + 1
       enddo
     enddo
   end subroutine gedatsu_graph_get_n_edge_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id のオーバーラッピング領域に属するグラフのエッジ数を取得
+  subroutine gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフのエッジ数
+    integer(gint) :: n_edge
+    integer(gint) :: i, j, jS, jE, nid
+
+    n_edge = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 1
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_n_edge_in_overlap_region
 
   !> @ingroup group_graph_1
   !> 領域番号 domain_id に属するグラフのエッジを取得
@@ -162,14 +239,69 @@ contains
     !> [out] グラフの item 配列
     integer(gint) :: item(:)
 
-    integer(gint) :: n_vertex
+    integer(gint) :: i, nid, local_id, idx, j, jS, jE
+    integer(gint) :: n_vertex, n_edge, n_edge_all, n_node_cur
     integer(gint), allocatable :: ids(:)
+    integer(gint), allocatable :: perm(:)
 
     call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
     call gedatsu_alloc_int_1d(ids, n_vertex)
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+    call gedatsu_alloc_int_1d(perm, n_vertex)
+    call gedatsu_get_sequence_array_int(perm, n_vertex, 1, 1)
+    call gedatsu_qsort_int_with_perm(ids, 1, n_vertex, perm)
 
+    n_edge_all = 0
+    n_node_cur = 0
+    index = 0
+    item = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      n_node_cur = n_node_cur + 1
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      n_edge = 0
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) == domain_id)then
+          n_edge_all = n_edge_all + 1
+          n_edge = n_edge + 1
+          call gedatsu_bsearch_int(ids, 1, n_vertex, nid, idx)
+          local_id = perm(idx)
+          item(n_edge_all) = local_id
+        endif
+      enddo
+      index(n_node_cur) = n_edge
+    enddo
+
+    do i = 1, n_vertex
+      index(i+1) = index(i+1) + index(i)
+    enddo
   end subroutine gedatsu_graph_get_edge_in_subdomain
+
+  !> @ingroup group_graph_1
+  !> 領域番号 domain_id のオーバーラッピング領域に属するグラフのエッジ数を取得
+  subroutine gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] グラフエッジ
+    integer(gint) :: edge(:,:)
+    integer(gint) :: i, j, jS, jE, nid
+
+    !n_edge = 0
+    !do i = 1, graph%n_vertex
+    !  if(graph%vertex_domain_id(i) /= domain_id) cycle
+    !  jS = graph%index(i) + 1
+    !  jE = graph%index(i + 1)
+    !  do j = jS, jE
+    !    nid = graph%item(j)
+    !    if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 1
+    !  enddo
+    !enddo
+  end subroutine gedatsu_graph_get_edge_in_overlap_region
 
   !> @ingroup group_graph_1
   !> グラフのエッジを追加

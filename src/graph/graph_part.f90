@@ -63,11 +63,11 @@ contains
 
     do i = 1, n_domain
       call gedatsu_get_parted_graph_main(graph, i-1, subgraphs(i))
-      !call gedatsu_add_overlapping_nodes(graph, subgraphs(i))
+      call gedatsu_add_overlapping_nodes(graph, i-1, subgraphs(i))
     enddo
   end subroutine gedatsu_get_parted_graph
 
-  !> 領域番号 domain_id に属する分割グラフを取得
+  !> 領域番号 domain_id に属するオーバーラップ領域を含めない分割グラフを取得
   subroutine gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
     implicit none
     !> [in] graph 構造体
@@ -91,7 +91,25 @@ contains
 
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, subgraph%vertex_id)
     call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, subgraph%index, subgraph%item)
-
   end subroutine gedatsu_get_parted_graph_main
 
+  !> 領域番号 domain_id に属するオーバーラップ領域をグラフ構造体に追加
+  subroutine gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 領域番号
+    integer(gint) :: domain_id
+    !> [out] 領域番号 domain_id に属する分割 graph 構造体
+    type(gedatsu_graph) :: subgraph
+    integer(gint) :: n_vertex, n_edge
+    integer(gint), allocatable :: OVL_vertex_id(:), edge(:,:)
+
+    call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
+    call gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
+    call gedatsu_alloc_int_1d(OVL_vertex_id, n_vertex)
+    call gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, OVL_vertex_id)
+    call gedatsu_alloc_int_2d(edge, 2, n_edge)
+    call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
+  end subroutine gedatsu_add_overlapping_nodes
 end module mod_gedatsu_graph_part

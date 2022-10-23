@@ -44,8 +44,8 @@ contains
       right = right - 1
     enddo
 
-    if(iS < left-1)  call gedatsu_qsort_int(array, iS, left-1)
-    if(right+1 < iE) call gedatsu_qsort_int(array, right+1, iE)
+    if(iS < left - 1)  call gedatsu_qsort_int(array, iS, left - 1)
+    if(right + 1 < iE) call gedatsu_qsort_int(array, right + 1, iE)
   end subroutine gedatsu_qsort_int
 
   !> @ingroup std
@@ -92,8 +92,8 @@ contains
       right = right - 1
     enddo
 
-    if(iS < left-1)  call gedatsu_qsort_int_with_perm(array, iS, left-1, perm)
-    if(right+1 < iE) call gedatsu_qsort_int_with_perm(array, right+1, iE, perm)
+    if(iS < left - 1)  call gedatsu_qsort_int_with_perm(array, iS, left - 1, perm)
+    if(right + 1 < iE) call gedatsu_qsort_int_with_perm(array, right + 1, iE, perm)
   end subroutine gedatsu_qsort_int_with_perm
 
   !> @ingroup std
@@ -135,5 +135,25 @@ contains
       endif
     enddo
   end subroutine gedatsu_bsearch_int
+
+  !> @ingroup std
+  !> 整数配列の二分探索
+  subroutine gedatsu_get_sequence_array_int(array, n, origin, difference)
+    implicit none
+    !> [out] 整数配列
+    integer(gint), intent(out) :: array(:)
+    !> [in] 整数配列のサイズ
+    integer(gint), intent(in) :: n
+    !> [in] 初項
+    integer(gint), intent(in) :: origin
+    !> [in] 交差
+    integer(gint), intent(in) :: difference
+
+    integer(gint) :: i
+
+    do i = 1, n
+      array(i) = origin + (i-1)*difference
+    enddo
+  end subroutine gedatsu_get_sequence_array_int
 
 end module mod_gedatsu_std
