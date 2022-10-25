@@ -7,8 +7,8 @@ module mod_gedatsu_std
 contains
 
   !> @ingroup std
-  !> クイックソート（整数配列）
-  recursive subroutine gedatsu_qsort_int(array, iS, iE)
+  !> クイックソート（1次元整数配列）
+  recursive subroutine gedatsu_qsort_int_1d(array, iS, iE)
     implicit none
     !> [inout] 整数配列
     integer(gint), intent(inout) :: array(:)
@@ -44,13 +44,13 @@ contains
       right = right - 1
     enddo
 
-    if(iS < left - 1)  call gedatsu_qsort_int(array, iS, left - 1)
-    if(right + 1 < iE) call gedatsu_qsort_int(array, right + 1, iE)
-  end subroutine gedatsu_qsort_int
+    if(iS < left - 1)  call gedatsu_qsort_int_1d(array, iS, left - 1)
+    if(right + 1 < iE) call gedatsu_qsort_int_1d(array, right + 1, iE)
+  end subroutine gedatsu_qsort_int_1d
 
   !> @ingroup std
-  !> 置換ベクトルを戻すクイックソート（整数配列）
-  recursive subroutine gedatsu_qsort_int_with_perm(array, iS, iE, perm)
+  !> 置換ベクトルを戻すクイックソート（1次元整数配列）
+  recursive subroutine gedatsu_qsort_int_1d_with_perm(array, iS, iE, perm)
     implicit none
     !> [inout] 整数配列
     integer(gint), intent(inout) :: array(:)
@@ -92,9 +92,57 @@ contains
       right = right - 1
     enddo
 
-    if(iS < left - 1)  call gedatsu_qsort_int_with_perm(array, iS, left - 1, perm)
-    if(right + 1 < iE) call gedatsu_qsort_int_with_perm(array, right + 1, iE, perm)
-  end subroutine gedatsu_qsort_int_with_perm
+    if(iS < left - 1)  call gedatsu_qsort_int_1d_with_perm(array, iS, left - 1, perm)
+    if(right + 1 < iE) call gedatsu_qsort_int_1d_with_perm(array, right + 1, iE, perm)
+  end subroutine gedatsu_qsort_int_1d_with_perm
+
+  !> @ingroup std
+  !> クイックソート（2次元整数配列）
+  recursive subroutine gedatsu_qsort_int_2d(array1, array2, iS, iE)
+    implicit none
+    !> [inout] ソートされる整数配列
+    integer(gint), intent(inout) :: array1(:)
+    !> [inout] ソートに従属する整数配列
+    integer(gint), intent(inout) :: array2(:)
+    !> [in] ソートする開始位置
+    integer(gint), intent(in) :: iS
+    !> [in] ソートする終了位置
+    integer(gint), intent(in) :: iE
+
+    integer(gint) :: pivot, center, left, right, tmp
+
+    if (iS >= iE) return
+
+    center = (iS + iE) / 2
+    pivot = array1(center)
+    left = iS
+    right = iE
+
+    do
+      do while (array1(left) < pivot)
+        left = left + 1
+      enddo
+      do while (pivot < array1(right))
+        right = right - 1
+      enddo
+
+      if (left >= right) exit
+
+      tmp = array1(left)
+      array1(left) = array1(right)
+      array1(right) = tmp
+
+      tmp = array2(left)
+      array2(left) = array2(right)
+      array2(right) = tmp
+
+      left = left + 1
+      right = right - 1
+    enddo
+
+    if(iS < left - 1)  call gedatsu_qsort_int_2d(array1, array2, iS, left - 1)
+    if(right + 1 < iE) call gedatsu_qsort_int_2d(array1, array2, right + 1, iE)
+  end subroutine gedatsu_qsort_int_2d
 
   !> @ingroup std
   !> 整数配列の二分探索

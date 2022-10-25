@@ -78,6 +78,7 @@ contains
     !> [out] 領域番号 domain_id に属する分割 graph 構造体
     type(gedatsu_graph) :: subgraph
     integer(gint) :: n_vertex, n_edge
+    integer(gint), allocatable :: edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
 
@@ -89,10 +90,13 @@ contains
     call gedatsu_alloc_int_1d(subgraph%vertex_id, n_vertex)
     call gedatsu_alloc_int_1d(subgraph%index, n_vertex + 1)
     call gedatsu_alloc_int_1d(subgraph%item, n_edge)
+    call gedatsu_alloc_int_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, subgraph%vertex_id)
 
-    call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, subgraph%index, subgraph%item)
+    call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
+
+    call gedatsu_graph_set_edge(graph, n_edge, edge)
   end subroutine gedatsu_get_parted_graph_main
 
   !> 領域番号 domain_id に属するオーバーラップ領域をグラフ構造体に追加
@@ -118,5 +122,7 @@ contains
     call gedatsu_alloc_int_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
+
+    call gedatsu_graph_add_edge(graph, n_edge, edge)
   end subroutine gedatsu_add_overlapping_nodes
 end module mod_gedatsu_graph_part
