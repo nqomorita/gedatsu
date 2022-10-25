@@ -8,21 +8,33 @@ program gedatsu_graph_partitioner
   !> 分割数
   integer(gint) :: n_domain
   !> 入力ファイル名
-  character(gedatsu_charlen) :: fname
+  character(gedatsu_charlen) :: finame
+  !> 出力ファイル名
+  character(gedatsu_charlen) :: foname
+  character(gedatsu_charlen) :: fdname
+  integer(gint) :: i
+
+  fdname = "parted.0"
+
+  call system('if [ ! -d parted.0 ]; then (echo "** create parted.0"; mkdir -p parted.0); fi')
 
   call gedatsu_global_initialize()
 
-  call gedatsu_get_arg_graph_partitioner(fname, n_domain)
+  call gedatsu_get_arg_graph_partitioner(finame, n_domain)
 
   if(n_domain <= 1) stop
 
-  call gedatsu_input_graph(fname, graph)
+  call gedatsu_input_graph(finame, graph)
 
   call gedatsu_graph_partition(graph, n_domain, subgraphs)
 
 !  call monolis_get_commnication_table(graph, comm, node_list, n_domain)
 
-!  call monolis_output_parted_nodal_graph(fname, graph, graph_format, comm, node_list, n_domain)
+  do i = 1, n_domain
+    foname = gedatsu_get_output_file_name(fdname, finame, i - 1)
+
+    call gedatsu_output_graph(foname, subgraphs(i))
+  enddo
 
   call gedatsu_global_finalize()
 end program gedatsu_graph_partitioner

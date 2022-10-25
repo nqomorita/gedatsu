@@ -68,6 +68,7 @@ util.f90 \
 alloc.f90 \
 def_graph.f90 \
 std.f90 \
+io_file_name.f90 \
 io.f90 \
 io_arg.f90 \
 wrapper_metis.f90 \
