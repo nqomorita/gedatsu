@@ -1,6 +1,6 @@
 !> util モジュール
 module mod_gedatsu_util
-  use mod_gedatsu_graph
+  use mod_gedatsu_prm
   implicit none
 
 contains

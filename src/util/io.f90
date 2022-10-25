@@ -3,6 +3,7 @@ module mod_gedatsu_io
   use mod_gedatsu_prm
   use mod_gedatsu_graph
   use mod_gedatsu_alloc
+  use mod_gedatsu_util
   implicit none
 
 contains

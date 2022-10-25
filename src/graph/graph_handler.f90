@@ -202,7 +202,7 @@ contains
   end subroutine gedatsu_graph_get_n_edge_in_subdomain
 
   !> @ingroup group_graph_1
-  !> 領域番号 domain_id のオーバーラッピング領域に属するグラフのエッジ数を取得
+  !> 領域番号 domain_id のオーバーラッピング領域に属するエッジ数を取得
   subroutine gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
@@ -220,14 +220,15 @@ contains
       jE = graph%index(i + 1)
       do j = jS, jE
         nid = graph%item(j)
-        if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 1
+        !> 無向グラフのため 2 を加算
+        if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 2
       enddo
     enddo
   end subroutine gedatsu_graph_get_n_edge_in_overlap_region
 
   !> @ingroup group_graph_1
   !> 領域番号 domain_id に属するグラフのエッジを取得
-  !> @detalis エッジの組はローカル節点番号で表現される
+  !> @details エッジの組はローカル節点番号で表現される
   subroutine gedatsu_graph_get_edge_in_subdomain(graph, domain_id, index, item)
     implicit none
     !> [in] graph 構造体
@@ -285,7 +286,7 @@ contains
   end subroutine gedatsu_graph_get_edge_in_subdomain
 
   !> @ingroup group_graph_1
-  !> 領域番号 domain_id のオーバーラッピング領域に属するグラフのエッジ数を取得
+  !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
   subroutine gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
@@ -295,17 +296,25 @@ contains
     !> [out] グラフエッジ
     integer(gint) :: edge(:,:)
     integer(gint) :: i, j, jS, jE, nid
+    integer(gint) :: n_edge
 
-    !n_edge = 0
-    !do i = 1, graph%n_vertex
-    !  if(graph%vertex_domain_id(i) /= domain_id) cycle
-    !  jS = graph%index(i) + 1
-    !  jE = graph%index(i + 1)
-    !  do j = jS, jE
-    !    nid = graph%item(j)
-    !    if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 1
-    !  enddo
-    !enddo
+    n_edge = 0
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) /= domain_id)then
+          n_edge = n_edge + 1
+          edge(1,n_edge) = i
+          edge(2,n_edge) = nid
+          n_edge = n_edge + 1
+          edge(1,n_edge) = nid
+          edge(2,n_edge) = i
+        endif
+      enddo
+    enddo
   end subroutine gedatsu_graph_get_edge_in_overlap_region
 
   !> @ingroup group_graph_1

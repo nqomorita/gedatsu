@@ -1,7 +1,7 @@
 !> graph モジュール
 module mod_gedatsu_graph
   use mod_gedatsu_prm
-  !use iso_c_binding
+  use mod_gedatsu_alloc
   implicit none
 
   !> graph 構造体
@@ -30,6 +30,12 @@ contains
     type(gedatsu_graph) :: graph
 
     graph%n_vertex = 0
+
+    call gedatsu_dealloc_int_1d(graph%vertex_domain_id)
+
+    call gedatsu_dealloc_int_1d(graph%index)
+
+    call gedatsu_dealloc_int_1d(graph%item)
   end subroutine gedatsu_graph_initialize
 
   !> @ingroup group_init
@@ -38,6 +44,14 @@ contains
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    graph%n_vertex = 0
+
+    call gedatsu_dealloc_int_1d(graph%vertex_domain_id)
+
+    call gedatsu_dealloc_int_1d(graph%index)
+
+    call gedatsu_dealloc_int_1d(graph%item)
   end subroutine gedatsu_graph_finalize
 
 end module mod_gedatsu_graph

@@ -63,6 +63,7 @@ contains
 
     do i = 1, n_domain
       call gedatsu_get_parted_graph_main(graph, i-1, subgraphs(i))
+
       call gedatsu_add_overlapping_nodes(graph, i-1, subgraphs(i))
     enddo
   end subroutine gedatsu_get_parted_graph

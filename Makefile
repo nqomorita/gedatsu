@@ -64,10 +64,10 @@ $(addprefix $(LIB_DIR)/, $(LIB_LIST))
 
 SRC_LIST_UTIL = \
 def_prm.f90 \
-def_graph.f90 \
 util.f90 \
-std.f90 \
 alloc.f90 \
+def_graph.f90 \
+std.f90 \
 io.f90 \
 io_arg.f90 \
 wrapper_metis.f90 \

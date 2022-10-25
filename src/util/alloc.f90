@@ -1,7 +1,7 @@
 !> メモリ確保モジュール
 module mod_gedatsu_alloc
-  use mod_gedatsu_util
   use mod_gedatsu_prm
+  use mod_gedatsu_util
   implicit none
 
 contains
@@ -40,9 +40,10 @@ contains
     integer(gint), allocatable :: var(:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_int_1d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_int_1d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
@@ -116,9 +117,10 @@ contains
     integer(gint), allocatable :: var(:,:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_int_2d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_int_2d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
@@ -157,9 +159,10 @@ contains
     real(gdouble), allocatable :: var(:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_real_1d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_real_1d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
@@ -200,9 +203,10 @@ contains
     real(gdouble), allocatable :: var(:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_real_2d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_real_2d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
@@ -241,9 +245,10 @@ contains
     logical, allocatable :: var(:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_bool_1d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_bool_1d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
@@ -285,9 +290,10 @@ contains
     logical, allocatable :: var(:,:)
 
     if(.not. allocated(var))then
-      call gedatsu_error_string("gedatsu_dealloc_bool_2d")
-      call gedatsu_error_string("input arg. is not allocated")
-      call gedatsu_error_stop()
+      return
+      !call gedatsu_error_string("gedatsu_dealloc_bool_2d")
+      !call gedatsu_error_string("input arg. is not allocated")
+      !call gedatsu_error_stop()
     endif
 
     deallocate(var)
