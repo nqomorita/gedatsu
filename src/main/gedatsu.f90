@@ -34,8 +34,11 @@ module mod_gedatsu
   !> @defgroup group4 動的負荷分散
   !> 動的負荷分散に関連する関数グループ
 
+  !> @defgroup mpi MPI 関数群
+  !> MPI に関連する関数グループ
+
   !> @defgroup std 標準関数群
-  !> 標準的なデータ処理に関連する関するグループ
+  !> 標準的なデータ処理に関連する関数グループ
 
   !> @defgroup group_dev_alloc 開発者用：メモリ確保
   !> メモリ確保・メモリ開放に関連する関数グループ

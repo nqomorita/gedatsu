@@ -74,6 +74,9 @@ io_arg.f90 \
 wrapper_metis.f90 \
 wrapper_parmetis.f90
 
+SRC_LIST_MPI = \
+mpi_util.f90
+
 SRC_LIST_GRAPH = \
 graph_handler.f90 \
 graph_convert.f90 \
@@ -81,6 +84,7 @@ graph_part.f90
 
 SRC_ALL_LIST = \
 $(addprefix util/, $(SRC_LIST_UTIL)) \
+$(addprefix mpi/, $(SRC_LIST_MPI)) \
 $(addprefix graph/, $(SRC_LIST_GRAPH)) \
 main/gedatsu.f90
 

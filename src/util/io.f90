@@ -62,9 +62,9 @@ contains
         jS = graph%index(i) + 1
         jE = graph%index(i+1)
         in = jE - jS + 1
-        write(20,"(i0,x,i0,x,$)") graph%vertex_id(i), in
+        write(20,"(i0,x,i0,$)") graph%vertex_id(i), in
         do j = jS, jE
-          write(20,"(i0,x,$)") graph%item(j)
+          write(20,"(x,i0,$)") graph%item(j)
         enddo
         write(20,*)""
       enddo

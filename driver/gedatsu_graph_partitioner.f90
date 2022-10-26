@@ -11,6 +11,7 @@ program gedatsu_graph_partitioner
   character(gedatsu_charlen) :: finame
   !> 出力ファイル名
   character(gedatsu_charlen) :: foname
+  !> 出力ディレクトリ名
   character(gedatsu_charlen) :: fdname
   integer(gint) :: i
 
@@ -25,6 +26,8 @@ program gedatsu_graph_partitioner
   if(n_domain <= 1) stop
 
   call gedatsu_input_graph(finame, graph)
+
+  allocate(subgraphs(n_domain))
 
   call gedatsu_graph_partition(graph, n_domain, subgraphs)
 

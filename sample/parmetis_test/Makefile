@@ -8,7 +8,7 @@ OBJS = main.o
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(FC) -o $@ $(OBJS) -L../../lib -lgedatsu -lparmetis -lmetis
+	$(FC) -o $@ $(OBJS) -L../../lib -lgedatsu -lparmetis -lmetis -lGKLib
 
 %.o: %.f90
 	$(FC) $(FFLAGS) -I../../include -o $@ -c $<

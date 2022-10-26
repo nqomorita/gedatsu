@@ -11,6 +11,8 @@ contains
   !> MPI の初期化処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
   subroutine gedatsu_global_initialize()
     implicit none
+
+    call gedatsu_mpi_initialize()
   end subroutine gedatsu_global_initialize
 
   !> @ingroup group_init
@@ -18,6 +20,8 @@ contains
   !> @details MPI の終了処理が実行され、プログラム中で 1 度だけ呼ぶことができる。
   subroutine gedatsu_global_finalize()
     implicit none
+
+    call gedatsu_mpi_finalize()
   end subroutine gedatsu_global_finalize
 
   !> エラーストップ関数
