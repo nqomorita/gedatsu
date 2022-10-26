@@ -153,6 +153,7 @@ contains
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_output_distval
 
+  !> Fortran open 文のエラー処理
   subroutine gedatsu_input_file_error_check(ierr)
     implicit none
     integer(gint) :: ierr

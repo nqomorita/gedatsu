@@ -63,8 +63,10 @@ contains
 
     do i = 1, n_domain
       call gedatsu_get_parted_graph_main(graph, i-1, subgraphs(i))
+    call gedatsu_graph_debug_write(subgraphs(i))
 
       call gedatsu_add_overlapping_nodes(graph, i-1, subgraphs(i))
+    call gedatsu_graph_debug_write(subgraphs(i))
     enddo
   end subroutine gedatsu_get_parted_graph
 
@@ -87,8 +89,8 @@ contains
 
     call gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
 
-    call gedatsu_alloc_int_1d(subgraph%vertex_id, n_vertex)
-    call gedatsu_alloc_int_1d(subgraph%index, n_vertex + 1)
+    call gedatsu_graph_set_n_vertex(subgraph, n_vertex)
+
     call gedatsu_alloc_int_1d(subgraph%item, n_edge)
     call gedatsu_alloc_int_2d(edge, 2, n_edge)
 
@@ -96,7 +98,7 @@ contains
 
     call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_get_parted_graph_main
 
   !> 領域番号 domain_id に属するオーバーラップ領域をグラフ構造体に追加
@@ -123,6 +125,8 @@ contains
 
     call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 
-    call gedatsu_graph_add_edge(graph, n_edge, edge)
+    call gedatsu_graph_add_n_vertex_with_vertex_id(subgraph, n_vertex, OVL_vertex_id)
+
+    call gedatsu_graph_add_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_add_overlapping_nodes
 end module mod_gedatsu_graph_part

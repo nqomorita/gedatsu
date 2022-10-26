@@ -54,4 +54,22 @@ contains
     call gedatsu_dealloc_int_1d(graph%item)
   end subroutine gedatsu_graph_finalize
 
+  !> graph 構造体のデバッグ用データ書き出し
+  subroutine gedatsu_graph_debug_write(graph)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+
+    write(*,*)"--- gedatsu_graph_debug_write"
+    write(*,*)"graph%n_vertex"
+    write(*,*)graph%n_vertex
+    write(*,*)"graph%vertex_id"
+    write(*,*)graph%vertex_id
+    write(*,*)"graph%vertex_domain_id"
+    write(*,*)graph%vertex_domain_id
+    write(*,*)"graph%index"
+    write(*,*)graph%index
+    write(*,*)"graph%item"
+    write(*,*)graph%item
+  end subroutine gedatsu_graph_debug_write
 end module mod_gedatsu_graph

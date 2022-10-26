@@ -30,6 +30,8 @@ contains
     call gedatsu_alloc_int_1d(graph%vertex_id, n_vertex)
     call gedatsu_alloc_int_1d(graph%vertex_domain_id, n_vertex)
     call gedatsu_alloc_int_1d(graph%index, n_vertex + 1)
+
+    graph%n_vertex = n_vertex
   end subroutine gedatsu_graph_set_n_vertex
 
   !> @ingroup group_graph_1
@@ -51,6 +53,33 @@ contains
 
     graph%n_vertex = n_vertex_all
   end subroutine gedatsu_graph_add_n_vertex
+
+  !> @ingroup group_graph_1
+  !> グラフにノードを追加
+  !> @details 追加されたノードに対応する節点番号は引数で初期化され、領域番号は 0 初期化される。
+  subroutine gedatsu_graph_add_n_vertex_with_vertex_id(graph, n_vertex_add, vertex_id)
+    implicit none
+    !> [inout] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] グラフに追加するノード数
+    integer(gint) :: n_vertex_add
+    !> [in] グラフに追加するノードに対応する節点番号
+    integer(gint) :: vertex_id(:)
+    integer(gint) :: n_vertex_all, i
+
+    n_vertex_all = graph%n_vertex + n_vertex_add
+
+    call gedatsu_realloc_int_1d(graph%vertex_id, n_vertex_all)
+    call gedatsu_realloc_int_1d(graph%vertex_domain_id, n_vertex_all)
+    call gedatsu_realloc_int_1d(graph%index, n_vertex_all + 1)
+
+    do i = 1, n_vertex_add
+      graph%vertex_id(graph%n_vertex + i) = vertex_id(i)
+      graph%index(graph%n_vertex + i + 1) = graph%index(graph%n_vertex + i + 1) + graph%index(graph%n_vertex + i)
+    enddo
+
+    graph%n_vertex = n_vertex_all
+  end subroutine gedatsu_graph_add_n_vertex_with_vertex_id
 
   !> @ingroup group_graph_1
   !> グラフのノード数を取得
@@ -148,7 +177,7 @@ contains
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) /= domain_id)then
           n_vertex = n_vertex + 1
-          ids(n_vertex) = graph%vertex_id(i)
+          ids(n_vertex) = graph%vertex_id(nid)
         endif
       enddo
     enddo
@@ -324,7 +353,7 @@ contains
 
     temp = edge
 
-    call gedatsu_qsort_int_2d(temp(:,1), temp(:,2), 1, n_edge)
+    call gedatsu_qsort_int_2d(temp(1,:), temp(2,:), 1, n_edge)
 
     if(graph%n_vertex < maxval(edge))then
       call gedatsu_error_string("gedatsu_graph_set_edge")
@@ -367,10 +396,9 @@ contains
     integer(gint), allocatable :: edge_all(:,:)
 
     n_edge_cur = graph%index(graph%n_vertex + 1)
+
     n_edge_all = n_edge_cur + n_edge
 
-    call gedatsu_dealloc_int_1d(graph%item)
-    call gedatsu_alloc_int_1d(graph%item, n_edge_all)
     call gedatsu_alloc_int_2d(edge_all, 2, n_edge_all)
 
     do i = 1, graph%n_vertex
@@ -381,6 +409,9 @@ contains
         edge_all(2,j) = graph%item(j)
       enddo
     enddo
+
+    call gedatsu_dealloc_int_1d(graph%item)
+    call gedatsu_alloc_int_1d(graph%item, n_edge_all)
 
     do i = 1, n_edge
       edge_all(1,n_edge_cur + i) = edge(1,i)
