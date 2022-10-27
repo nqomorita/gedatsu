@@ -25,7 +25,7 @@ write(*,*)"foname: ", trim(foname)
 
   call gedatsu_input_graph(finame, subgraph)
 
-  call gedatsu_part_graph_parmetis(vtxdist, index, item, n_part, part_id)
+  call gedatsu_graph_repartition(subgraph)
 
   call gedatsu_global_finalize()
 end program parmetis_test

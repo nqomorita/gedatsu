@@ -11,15 +11,15 @@ contains
   !> @details 戻り値の領域番号は 0 オリジン
   subroutine gedatsu_part_graph_metis(n_vertex, index, item, n_part, part_id)
     implicit none
-    !> [in] メモリ確保する配列
+    !> [in] グラフのノード数
     integer(gint) :: n_vertex
-    !> [in] メモリ確保する配列
+    !> [in] graph の CSR 圧縮形式の index 配列
     integer(gint), allocatable :: index(:)
-    !> [in] メモリ確保する配列
+    !> [in] graph の CSR 圧縮形式の item 配列
     integer(gint), allocatable :: item(:)
-    !> [in] メモリ確保する配列
+    !> [in] 分割数
     integer(gint) :: n_part
-    !> [in] メモリ確保する配列
+    !> [in] 領域番号
     integer(gint), allocatable :: part_id(:)
 
     integer(gint), allocatable :: node_wgt(:)
@@ -33,19 +33,19 @@ contains
   subroutine gedatsu_part_graph_metis_with_weight(n_vertex, index, item, node_wgt, edge_wgt, n_part, part_id)
     use iso_c_binding
     implicit none
-    !> [in] メモリ確保する配列
+    !> [in] グラフのノード数
     integer(gint) :: n_vertex
-    !> [in] メモリ確保する配列
+    !> [in] graph の CSR 圧縮形式の index 配列
     integer(gint), allocatable :: index(:)
-    !> [in] メモリ確保する配列
+    !> [in] graph の CSR 圧縮形式の item 配列
     integer(gint), allocatable :: item(:)
-    !> [in] メモリ確保する配列
+    !> [in] ノード重み
     integer(gint), allocatable :: node_wgt(:)
-    !> [in] メモリ確保する配列
+    !> [in] エッジ重み
     integer(gint), allocatable :: edge_wgt(:)
-    !> [in] メモリ確保する配列
+    !> [in] 分割数
     integer(gint) :: n_part
-    !> [in] メモリ確保する配列
+    !> [in] 領域番号
     integer(gint), allocatable  :: part_id(:)
 
     integer(gint) :: ncon, objval, nz

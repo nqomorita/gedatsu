@@ -32,6 +32,18 @@ contains
 #endif
   end subroutine gedatsu_mpi_finalize
 
+  !> MPI のグローバルコミュニケータを取得する関数
+  function gedatsu_mpi_global_comm()
+    implicit none
+    integer(gint) :: gedatsu_mpi_global_comm
+
+#ifdef WITH_MPI
+    gedatsu_mpi_global_comm = MPI_COMM_WORLD
+#else
+    gedatsu_mpi_global_comm = 0
+#endif
+  end function gedatsu_mpi_global_comm
+
   !> MPI のグローバルランクサイズを取得する関数
   function gedatsu_mpi_global_comm_size()
     implicit none
