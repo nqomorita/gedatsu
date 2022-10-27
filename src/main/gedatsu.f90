@@ -10,6 +10,7 @@ module mod_gedatsu
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis
   use mod_gedatsu_graph_part
+  use mod_gedatsu_graph_repart
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
 
@@ -31,7 +32,7 @@ module mod_gedatsu
   !> @defgroup group_graph_4 グラフデータ処理（グラフ分割関数）
   !> グラフ分割に関連する関数グループ
 
-  !> @defgroup group4 動的負荷分散
+  !> @defgroup group_dlb 動的負荷分散
   !> 動的負荷分散に関連する関数グループ
 
   !> @defgroup mpi MPI 関数群

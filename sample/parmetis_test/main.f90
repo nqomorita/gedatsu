@@ -15,15 +15,17 @@ program parmetis_test
 
   fdname = "parted.0"
 
-  call system('if [ ! -d parted.0 ]; then (echo "** create parted.0"; mkdir -p parted.0); fi')
-
   call gedatsu_global_initialize()
 
   call gedatsu_get_arg_graph_partitioner(finame, n_domain)
 
   foname = gedatsu_get_input_file_name(fdname, finame, i - 1)
 
-  call gedatsu_input_graph(finame, eigen_test)
+write(*,*)"foname: ", trim(foname)
+
+  call gedatsu_input_graph(finame, subgraph)
+
+  call gedatsu_part_graph_parmetis(vtxdist, index, item, n_part, part_id)
 
   call gedatsu_global_finalize()
 end program parmetis_test
