@@ -1,6 +1,8 @@
 !> util モジュール
 module mod_gedatsu_util
   use mod_gedatsu_prm
+  use mod_gedatsu_mpi_util
+
   implicit none
 
 contains

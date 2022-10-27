@@ -32,4 +32,37 @@ contains
 #endif
   end subroutine gedatsu_mpi_finalize
 
+  !> MPI のグローバルランクサイズを取得する関数
+  function gedatsu_mpi_global_comm_size()
+    implicit none
+    integer(gint) :: gedatsu_mpi_global_comm_size, ierr
+
+#ifndef WITH_NOMPI
+    call MPI_comm_size(MPI_COMM_WORLD, gedatsu_mpi_global_comm_size, ierr)
+#else
+    gedatsu_mpi_global_comm_size = 1
+#endif
+  end function gedatsu_mpi_global_comm_size
+
+  !> MPI のグローバルランクを取得する関数
+  function gedatsu_mpi_global_my_rank()
+    implicit none
+    integer(gint) :: gedatsu_mpi_global_my_rank, ierr
+
+#ifndef WITH_NOMPI
+    call MPI_comm_rank(MPI_COMM_WORLD, gedatsu_mpi_global_my_rank, ierr)
+#else
+    gedatsu_mpi_global_my_rank = 0
+#endif
+  end function gedatsu_mpi_global_my_rank
+
+  !> MPI バリア関数
+  subroutine gedatsu_mpi_barrier_(comm)
+    implicit none
+    integer(gint) :: comm
+    integer(gint) :: ierr
+#ifndef WITH_NOMPI
+    call MPI_barrier(comm, ierr)
+#endif
+  end subroutine gedatsu_mpi_barrier_
 end module mod_gedatsu_mpi_util

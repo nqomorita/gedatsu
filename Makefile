@@ -1,6 +1,6 @@
 #> gedatsu Makefile
 FC     = mpif90
-#FFLAGS = -O2 -mtune=native -march=native -std=legacy
+#FFLAGS = -O2 -std=legacy -mtune=native -march=native
 FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow
 
 CC     = mpic++
@@ -62,17 +62,19 @@ PRT_G_TGT = $(BIN_DIR)/gedatsu_graph_partitioner
 LIB_TGT = \
 $(addprefix $(LIB_DIR)/, $(LIB_LIST))
 
-SRC_LIST_UTIL = \
+SRC_LIST_UTIL1 = \
 def_prm.f90 \
+
+SRC_LIST_UTIL2 = \
 util.f90 \
 alloc.f90 \
 def_graph.f90 \
 std.f90 \
+wrapper_metis.f90 \
+wrapper_parmetis.f90 \
 io_file_name.f90 \
 io.f90 \
-io_arg.f90 \
-wrapper_metis.f90 \
-wrapper_parmetis.f90
+io_arg.f90
 
 SRC_LIST_MPI = \
 mpi_util.f90
@@ -83,8 +85,9 @@ graph_convert.f90 \
 graph_part.f90
 
 SRC_ALL_LIST = \
-$(addprefix util/, $(SRC_LIST_UTIL)) \
+$(addprefix util/, $(SRC_LIST_UTIL1)) \
 $(addprefix mpi/, $(SRC_LIST_MPI)) \
+$(addprefix util/, $(SRC_LIST_UTIL2)) \
 $(addprefix graph/, $(SRC_LIST_GRAPH)) \
 main/gedatsu.f90
 

@@ -2,7 +2,7 @@ program parmetis_test
   use mod_gedatsu
   implicit none
   !> 分割後の graph 構造体
-  type(gedatsu_graph), allocatable :: subgraphs(:)
+  type(gedatsu_graph) :: subgraph
   !> 分割数
   integer(gint) :: n_domain
   !> 入力ファイル名
@@ -21,13 +21,9 @@ program parmetis_test
 
   call gedatsu_get_arg_graph_partitioner(finame, n_domain)
 
-  allocate(subgraphs(n_domain))
+  foname = gedatsu_get_input_file_name(fdname, finame, i - 1)
 
-  do i = 1, n_domain
-    foname = gedatsu_get_output_file_name(fdname, finame, i - 1)
-
-    call gedatsu_input_graph(finame, subgraphs(i))
-  enddo
+  call gedatsu_input_graph(finame, eigen_test)
 
   call gedatsu_global_finalize()
 end program parmetis_test
