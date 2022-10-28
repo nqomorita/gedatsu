@@ -67,7 +67,7 @@ vtxdist(3) = 6
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
-    integer(gint) :: ncon, objval, nz, nflag, wflag, i
+    integer(c_int) :: ncon, objval, nz, nflag, wflag, i
     integer(c_int), pointer :: vtxdist_c(:) => null()
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
@@ -77,9 +77,9 @@ vtxdist(3) = 6
     integer(c_int), pointer :: vsize(:) => null()
     integer(c_int), pointer :: edgecut(:) => null()
     integer(c_int), pointer :: options(:) => null()
-    real(gdouble), pointer :: tpwgts(:) => null()
-    real(gdouble), pointer :: ubvec(:) => null()
-    real(c_double) :: itr
+    real(c_float), pointer :: tpwgts(:) => null()
+    real(c_float), pointer :: ubvec(:) => null()
+    real(c_float), pointer :: itr(:) => null()
 
     if(n_part > 1)then
 #ifdef NO_PARMETIS
@@ -90,8 +90,13 @@ vtxdist(3) = 6
       item = item - 1
 
       ncon = 1
-      wflag = 0
+
       nflag = 0
+
+      !wflag = 0 !> No weight
+      !wflag = 1 !> Only edge weight
+      wflag = 2 !> Only node weight
+      !wflag = 3 !> Both weight
 
       !> allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
@@ -108,12 +113,12 @@ vtxdist(3) = 6
 
       allocate(part_id_c(n_vertex), source = 0)
 
-      if(allocated(node_wgt))then
-        allocate(node_wgt_c(n_vertex), source = 0)
-        node_wgt_c = node_wgt
-      else
-        node_wgt_c => null()
-      endif
+      !if(allocated(node_wgt))then
+        allocate(node_wgt_c(n_vertex), source = 1)
+      !  node_wgt_c = node_wgt
+      !else
+      !  node_wgt_c => null()
+      !endif
 
       if(allocated(edge_wgt))then
         allocate(edge_wgt_c(nz), source = 0)
@@ -124,26 +129,26 @@ vtxdist(3) = 6
 
       allocate(vsize(n_vertex), source = 0)
 
-      allocate(tpwgts(ncon*n_part), source = 0.0d0)
+      allocate(tpwgts(ncon*n_part), source = 0.0)
 
-      allocate(ubvec(ncon), source = 1.0d0)
+      allocate(ubvec(ncon), source = 1.05)
 
       allocate(options(3), source = 0)
 
-      allocate(edgecut(nz), source = 0)
+      allocate(edgecut(1), source = 0)
 
-      tpwgts = 1.0d0/n_part
+      allocate(itr(1), source = 0.1)
 
-write(*,*)"tpwgts", tpwgts
+      tpwgts(1) = 1.0d0/n_part
+      tpwgts(2) = 1.0d0/n_part
 
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
         & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
 
-write(*,*)"itr", itr
 write(*,*)"edgecut", edgecut
-write(*,*)"part_id", part_id
+write(*,*)"part_id", part_id_c
 
       part_id = part_id_c
 

@@ -56,8 +56,8 @@ contains
     integer(c_int), pointer :: part_id_c(:) => null()
     integer(c_int), pointer :: vsize(:) => null()
     integer(c_int), pointer :: ubvec(:) => null()
-    real(gdouble), pointer :: options(:) => null()
-    real(gdouble), pointer :: tpwgts(:) => null()
+    real(c_float), pointer :: options(:) => null()
+    real(c_float), pointer :: tpwgts(:) => null()
 
     if(n_part /= 1)then
 #ifdef NO_METIS
