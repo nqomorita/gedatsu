@@ -9,10 +9,13 @@ contains
 
   !> parmetis ラッパー関数（グラフ重みなし）
   !> @details 戻り値の領域番号は 0 オリジン
-  subroutine gedatsu_repart_graph_parmetis(n_vertex, vtxdist, index, item, n_part, part_id, comm)
+  subroutine gedatsu_repart_graph_parmetis(n_vertex, vertex_id, &
+    &  vtxdist, index, item, n_part, part_id, comm)
     implicit none
     !> [in] グラフのノード数
     integer(gint) :: n_vertex
+    !> [in] グラフのノード id
+    integer(gint) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
     integer(gint), allocatable :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
@@ -29,16 +32,24 @@ contains
     integer(gint), allocatable :: node_wgt(:)
     integer(gint), allocatable :: edge_wgt(:)
 
-    call gedatsu_repart_graph_parmetis_with_weight(n_vertex, vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
+vtxdist(1) = 0
+vtxdist(2) = 3
+vtxdist(3) = 6
+
+    call gedatsu_repart_graph_parmetis_with_weight(n_vertex, vertex_id, &
+      & vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
   end subroutine gedatsu_repart_graph_parmetis
 
   !> parmetis ラッパー関数（グラフ重みあり）
   !> @details 戻り値の領域番号は 0 オリジン
-  subroutine gedatsu_repart_graph_parmetis_with_weight(n_vertex, vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
+  subroutine gedatsu_repart_graph_parmetis_with_weight(n_vertex, vertex_id, &
+    & vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
     use iso_c_binding
     implicit none
     !> [in] グラフのノード数
     integer(gint) :: n_vertex
+    !> [in] グラフのノード id
+    integer(gint) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
     integer(gint), allocatable :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
@@ -56,7 +67,7 @@ contains
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
-    integer(gint) :: ncon, objval, nz, nflag, wflag
+    integer(gint) :: ncon, objval, nz, nflag, wflag, i
     integer(c_int), pointer :: vtxdist_c(:) => null()
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
@@ -64,19 +75,23 @@ contains
     integer(c_int), pointer :: edge_wgt_c(:) => null()
     integer(c_int), pointer :: part_id_c(:) => null()
     integer(c_int), pointer :: vsize(:) => null()
-    integer(c_int), pointer :: ubvec(:) => null()
     integer(c_int), pointer :: edgecut(:) => null()
-    real(gdouble), pointer :: options(:) => null()
+    integer(c_int), pointer :: options(:) => null()
     real(gdouble), pointer :: tpwgts(:) => null()
+    real(gdouble), pointer :: ubvec(:) => null()
     real(c_double) :: itr
 
-    if(n_part /= 1)then
+    if(n_part > 1)then
 #ifdef NO_PARMETIS
       call gedatsu_error_string("gedatsu_repart_graph_parmetis_with_weight: ParMETIS is NOT enabled")
       stop
 #else
       !> convert to 0 origin
       item = item - 1
+
+      ncon = 1
+      wflag = 0
+      nflag = 0
 
       !> allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
@@ -87,7 +102,9 @@ contains
 
       nz = index(n_vertex+1)
       allocate(item_c(nz), source = 0)
-      item_c = item
+      do i = 1, n_vertex
+        item_c(i) = vertex_id(item(i) + 1)
+      enddo
 
       allocate(part_id_c(n_vertex), source = 0)
 
@@ -105,11 +122,28 @@ contains
         edge_wgt_c => null()
       endif
 
-      ncon = 1
+      allocate(vsize(n_vertex), source = 0)
+
+      allocate(tpwgts(ncon*n_part), source = 0.0d0)
+
+      allocate(ubvec(ncon), source = 1.0d0)
+
+      allocate(options(3), source = 0)
+
+      allocate(edgecut(nz), source = 0)
+
+      tpwgts = 1.0d0/n_part
+
+write(*,*)"tpwgts", tpwgts
 
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
-        & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, n_part, tpwgts, ubvec, itr, options, edgecut, part_id, comm)
+        & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
+        & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
+
+write(*,*)"itr", itr
+write(*,*)"edgecut", edgecut
+write(*,*)"part_id", part_id
 
       part_id = part_id_c
 

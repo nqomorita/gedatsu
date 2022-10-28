@@ -11,7 +11,6 @@ program parmetis_test
   character(gedatsu_charlen) :: foname
   !> ³öÁ¦¥Ç¥£¥ì¥¯¥È¥êÃû
   character(gedatsu_charlen) :: fdname
-  integer(gint) :: i
 
   fdname = "parted.0"
 
@@ -19,11 +18,13 @@ program parmetis_test
 
   call gedatsu_get_arg_graph_partitioner(finame, n_domain)
 
-  foname = gedatsu_get_input_file_name(fdname, finame, i - 1)
-
+  foname = gedatsu_get_input_file_name(fdname, finame, gedatsu_mpi_global_my_rank())
 write(*,*)"foname: ", trim(foname)
+  call gedatsu_input_graph(foname, subgraph)
 
-  call gedatsu_input_graph(finame, subgraph)
+  foname = gedatsu_get_input_file_name(fdname, "node.id", gedatsu_mpi_global_my_rank())
+write(*,*)"foname: ", trim(foname)
+  call gedatsu_input_node_id(foname, subgraph)
 
   call gedatsu_graph_repartition(subgraph)
 

@@ -62,7 +62,7 @@ contains
         jS = graph%index(i) + 1
         jE = graph%index(i+1)
         in = jE - jS + 1
-        write(20,"(i0,x,i0,$)") graph%vertex_id(i), in
+        write(20,"(i0,x,i0,$)") i, in
         do j = jS, jE
           write(20,"(x,i0,$)") graph%item(j)
         enddo
@@ -90,6 +90,42 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
   end subroutine gedatsu_output_node
+
+  !> @ingroup group_io
+  !> gedatsu node id フォーマットの入力
+  subroutine gedatsu_input_node_id(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    integer(gint) :: i, n_node
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) n_node
+      do i = 1, graph%n_vertex
+        read(20,*) graph%vertex_id(i)
+      enddo
+    close(20)
+  end subroutine gedatsu_input_node_id
+
+  !> @ingroup group_io
+  !> gedatsu node id フォーマットの出力
+  subroutine gedatsu_output_node_id(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    integer(gint) :: i
+
+    open(20, file = trim(fname), status = "replace")
+      write(20,"(i0)") graph%n_vertex
+      do i = 1, graph%n_vertex
+        write(20,"(i0)") graph%vertex_id(i)
+      enddo
+    close(20)
+  end subroutine gedatsu_output_node_id
 
   !> @ingroup group_io
   !> gedatsu elem フォーマットの入力

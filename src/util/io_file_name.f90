@@ -14,9 +14,9 @@ contains
     !> [out] 戻り値
     character(gedatsu_charlen) :: gedatsu_get_input_file_name
     !> [in] 出力ディレクトリ名
-    character(gedatsu_charlen) :: dirname
+    character(*) :: dirname
     !> [in] 出力ファイル名
-    character(gedatsu_charlen) :: fname
+    character(*) :: fname
     !> [in] 領域番号
     integer(gint) :: domain_id
     integer(gint) :: comm_size, myrank
@@ -40,9 +40,9 @@ contains
     !> [out] 戻り値
     character(gedatsu_charlen) :: gedatsu_get_output_file_name
     !> [in] 出力ディレクトリ名
-    character(gedatsu_charlen) :: dirname
+    character(*) :: dirname
     !> [in] 出力ファイル名
-    character(gedatsu_charlen) :: fname
+    character(*) :: fname
     !> [in] 領域番号
     integer(gint) :: domain_id
     character(gedatsu_charlen) :: cid

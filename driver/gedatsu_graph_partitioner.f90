@@ -37,6 +37,10 @@ program gedatsu_graph_partitioner
     foname = gedatsu_get_output_file_name(fdname, finame, i - 1)
 
     call gedatsu_output_graph(foname, subgraphs(i))
+
+    foname = gedatsu_get_output_file_name(fdname, "node.id", i - 1)
+
+    call gedatsu_output_node_id(foname, subgraphs(i))
   enddo
 
   call gedatsu_global_finalize()
