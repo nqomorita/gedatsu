@@ -79,6 +79,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_input_node
 
   !> @ingroup group_io
@@ -89,6 +93,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "replace")
+      write(20,"(i0)") graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_output_node
 
   !> @ingroup group_io
@@ -165,6 +173,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_input_elem
 
   !> @ingroup group_io
@@ -175,6 +187,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "replace")
+      write(20,"(i0)") graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_output_elem
 
   !> @ingroup group_io
@@ -185,6 +201,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_input_bc
 
   !> @ingroup group_io
@@ -195,6 +215,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "replace")
+      write(20,"(i0)") graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_output_bc
 
   !> @ingroup group_io
@@ -205,6 +229,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_input_distval
 
   !> @ingroup group_io
@@ -215,6 +243,10 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "replace")
+      write(20,"(i0)") graph%n_internal_vertex
+    close(20)
   end subroutine gedatsu_output_distval
 
   !> Fortran open 文のエラー処理

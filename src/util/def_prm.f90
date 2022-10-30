@@ -27,6 +27,7 @@ contains
     implicit none
     !> [in] parameter 構造体
     type(gedatsu_prm) :: param
+    param%method = 1
   end subroutine gedatsu_prm_initialize
 
   !> parameter 構造体の終了関数
@@ -34,6 +35,7 @@ contains
     implicit none
     !> [in] parameter 構造体
     type(gedatsu_prm) :: param
+    param%method = 1
   end subroutine gedatsu_prm_finalize
 
 end module mod_gedatsu_prm
