@@ -9,18 +9,12 @@ module mod_gedatsu_communicator
   use mod_gedatsu_mpi
   use mod_gedatsu_mpi_util
   use mod_gedatsu_graph_handler
+  use mod_gedatsu_communicator_util
   implicit none
-  private
 
   public :: gedatsu_comm_n_vertex_list
   !public :: gedatsu_comm_get_comm_table
-  public :: gedatsu_comm_get_comm_table_on_serial
-
-  type dedatsu_comm_node_list
-    integer(gint) :: nnode = 0
-    integer(gint) :: domid = -1
-    integer(gint), allocatable :: local_nid(:)
-  end type dedatsu_comm_node_list
+  public :: gedatsu_comm_get_comm_table_serial
 
 contains
 
@@ -45,7 +39,7 @@ contains
   end subroutine gedatsu_comm_n_vertex_list
 
   !> グラフの通信テーブルを作成
-  subroutine gedatsu_comm_get_comm_table_on_serial(graph, subgraphs, n_domain, comms)
+  subroutine gedatsu_comm_get_comm_table_serial(graph, subgraphs, n_domain, comms)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
@@ -55,11 +49,13 @@ contains
     integer(gint) :: n_domain
     !> [out] 分割領域に対応する comm 構造体
     type(gedatsu_comm) :: comms(:)
-    integer(gint) :: i
 
+    call gedatsu_comm_get_neib_domain_serial(graph, subgraphs, n_domain, comms)
 
+    call gedatsu_comm_get_recv_serial(graph, subgraphs, n_domain, comms)
 
-  end subroutine gedatsu_comm_get_comm_table_on_serial
+    call gedatsu_comm_get_send_serial(graph, subgraphs, n_domain, comms)
+  end subroutine gedatsu_comm_get_comm_table_serial
 
 !  !> グラフの通信テーブルを作成
 !  subroutine gedatsu_comm_get_comm_table(graph, n_internal_vertex, comm)

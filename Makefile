@@ -87,6 +87,7 @@ SRC_LIST_GRAPH = \
   graph_part.f90
 
 SRC_LIST_COMM = \
+  communicator_util.f90 \
   communicator.f90
 
 SRC_LIST_DLB = \

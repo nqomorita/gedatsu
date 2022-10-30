@@ -35,7 +35,7 @@ program gedatsu_graph_partitioner
 
   allocate(comms(n_domain))
 
-  call gedatsu_comm_get_comm_table_on_serial(graph, subgraphs, n_domain, comms)
+  call gedatsu_comm_get_comm_table_serial(graph, subgraphs, n_domain, comms)
 
   do i = 1, n_domain
     foname = gedatsu_get_output_file_name(fdname, finame, i - 1)
