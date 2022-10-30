@@ -37,7 +37,7 @@ contains
     implicit none
     integer(gint) :: gedatsu_mpi_global_comm
 
-#ifdef WITH_MPI
+#ifndef WITH_NOMPI
     gedatsu_mpi_global_comm = MPI_COMM_WORLD
 #else
     gedatsu_mpi_global_comm = 0

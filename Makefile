@@ -63,32 +63,33 @@ LIB_TGT = \
 $(addprefix $(LIB_DIR)/, $(LIB_LIST))
 
 SRC_LIST_UTIL1 = \
-def_prm.f90 \
+  def_prm.f90 \
 
 SRC_LIST_UTIL2 = \
-util.f90 \
-alloc.f90 \
-def_graph.f90 \
-std.f90 \
-wrapper_metis.f90 \
-wrapper_parmetis.f90 \
-io_file_name.f90 \
-io.f90 \
-io_arg.f90
+  util.f90 \
+  alloc.f90 \
+  def_graph.f90 \
+  std.f90 \
+  wrapper_metis.f90 \
+  wrapper_parmetis.f90 \
+  io_file_name.f90 \
+  io.f90 \
+  io_arg.f90
 
 SRC_LIST_MPI = \
-mpi_util.f90
+  mpi_util.f90 \
+  mpi.f90
 
 SRC_LIST_GRAPH = \
-graph_handler.f90 \
-graph_convert.f90 \
-graph_part.f90
+  graph_handler.f90 \
+  graph_convert.f90 \
+  graph_part.f90
 
 SRC_LIST_COMM = \
-comm.f90
+  comm.f90
 
 SRC_LIST_DLB = \
-graph_repart.f90
+  graph_repart.f90
 
 SRC_ALL_LIST = \
 $(addprefix util/, $(SRC_LIST_UTIL1)) \

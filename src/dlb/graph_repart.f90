@@ -32,7 +32,8 @@ contains
 
     call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, comm, vtxdist)
 
-!> make vertex_id
+    !> 必要？
+    call gedatsu_comm_get_comm_table(graph, graph%n_internal_vertex, comm)
 
 !> make new global node ids
 
