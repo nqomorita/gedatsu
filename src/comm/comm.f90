@@ -1,5 +1,5 @@
 !> グラフ分割モジュール（通信テーブル作成）
-module mod_gedatsu_graph_comm
+module mod_gedatsu_comm
   use mod_gedatsu_prm
   use mod_gedatsu_graph
   use mod_gedatsu_util
@@ -11,7 +11,7 @@ module mod_gedatsu_graph_comm
 contains
 
   !> 各領域の内部節点数リスト vtxdist を作成
-  subroutine gedatsu_graph_comm_n_vertex_list(n_internal_vertex, comm, vtxdist)
+  subroutine gedatsu_comm_n_vertex_list(n_internal_vertex, comm, vtxdist)
     implicit none
     !> [in] 分割領域の内部節点数
     integer(gint) :: n_internal_vertex
@@ -28,5 +28,5 @@ contains
     do i = 1, n_size
       vtxdist(i + 1) = vtxdist(i + 1) + vtxdist(i)
     enddo
-  end subroutine gedatsu_graph_comm_n_vertex_list
-end module mod_gedatsu_graph_comm
+  end subroutine gedatsu_comm_n_vertex_list
+end module mod_gedatsu_comm

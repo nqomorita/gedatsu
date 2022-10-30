@@ -5,7 +5,7 @@ module mod_gedatsu_graph_repart
   use mod_gedatsu_util
   use mod_gedatsu_alloc
   use mod_gedatsu_graph_handler
-  use mod_gedatsu_graph_comm
+  use mod_gedatsu_comm
   use mod_gedatsu_wrapper_parmetis
   implicit none
 
@@ -30,7 +30,7 @@ contains
 
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
-    call gedatsu_graph_comm_n_vertex_list(graph%n_internal_vertex, comm, vtxdist)
+    call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, comm, vtxdist)
 
 !> make vertex_id
 

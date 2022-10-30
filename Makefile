@@ -81,9 +81,11 @@ mpi_util.f90
 
 SRC_LIST_GRAPH = \
 graph_handler.f90 \
-graph_comm.f90 \
 graph_convert.f90 \
 graph_part.f90
+
+SRC_LIST_COMM = \
+comm.f90
 
 SRC_LIST_DLB = \
 graph_repart.f90
@@ -93,6 +95,7 @@ $(addprefix util/, $(SRC_LIST_UTIL1)) \
 $(addprefix mpi/, $(SRC_LIST_MPI)) \
 $(addprefix util/, $(SRC_LIST_UTIL2)) \
 $(addprefix graph/, $(SRC_LIST_GRAPH)) \
+$(addprefix comm/, $(SRC_LIST_COMM)) \
 $(addprefix dlb/, $(SRC_LIST_DLB)) \
 main/gedatsu.f90
 
