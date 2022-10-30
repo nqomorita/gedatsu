@@ -142,7 +142,7 @@ vtxdist(3) = 6
       tpwgts(1) = 1.0/n_part
       tpwgts(2) = 1.0/n_part
 
-!write(*,*)"vtxdist_c", vtxdist_c
+write(*,*)"vtxdist_c", vtxdist_c
 write(*,*)"index_c", index_c
 write(*,*)"item_c", item_c
 

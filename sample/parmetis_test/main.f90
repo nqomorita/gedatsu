@@ -26,6 +26,10 @@ program parmetis_test
 
   call gedatsu_input_node_id(foname, subgraph)
 
+  foname = gedatsu_get_input_file_name(fdname, "internal_node", gedatsu_mpi_global_my_rank())
+
+  call gedatsu_input_internal_node_number(foname, subgraph)
+
   call gedatsu_graph_repartition(subgraph)
 
   call gedatsu_global_finalize()

@@ -81,6 +81,7 @@ mpi_util.f90
 
 SRC_LIST_GRAPH = \
 graph_handler.f90 \
+graph_comm.f90 \
 graph_convert.f90 \
 graph_part.f90
 

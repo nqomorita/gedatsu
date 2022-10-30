@@ -68,6 +68,38 @@ contains
 #endif
   end function gedatsu_mpi_global_my_rank
 
+  !> MPI のローカルコミュニケータのランクサイズを取得する関数
+  function gedatsu_mpi_local_comm_size(comm)
+    implicit none
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [out] コミュニケータサイズ
+    integer(gint) :: gedatsu_mpi_local_comm_size
+    integer(gint) :: ierr
+
+#ifndef WITH_NOMPI
+    call MPI_comm_size(comm, gedatsu_mpi_local_comm_size, ierr)
+#else
+    gedatsu_mpi_local_comm_size = 1
+#endif
+  end function gedatsu_mpi_local_comm_size
+
+  !> MPI のローカルコミュニケータのランクサイズを取得する関数
+  function gedatsu_mpi_local_my_rank(comm)
+    implicit none
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [out] MPI ランク番号
+    integer(gint) :: gedatsu_mpi_local_my_rank
+    integer(gint) :: ierr
+
+#ifndef WITH_NOMPI
+    call MPI_comm_rank(comm, gedatsu_mpi_local_my_rank, ierr)
+#else
+    gedatsu_mpi_local_my_rank = 0
+#endif
+  end function gedatsu_mpi_local_my_rank
+
   !> MPI バリア関数
   subroutine gedatsu_mpi_barrier_(comm)
     implicit none
