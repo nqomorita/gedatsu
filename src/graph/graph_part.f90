@@ -83,6 +83,8 @@ contains
     if(n_vertex == 0) call gedatsu_warning_string("gedatsu_get_parted_graph_main")
     if(n_vertex == 0) call gedatsu_warning_string("n_vertex equals zero")
 
+    subgraph%n_internal_vertex = n_vertex
+
     call gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
 
     call gedatsu_graph_set_n_vertex(subgraph, n_vertex)

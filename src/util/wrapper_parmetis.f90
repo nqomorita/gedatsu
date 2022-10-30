@@ -93,9 +93,9 @@ vtxdist(3) = 6
 
       nflag = 0
 
-      !wflag = 0 !> No weight
+      wflag = 0 !> No weight
       !wflag = 1 !> Only edge weight
-      wflag = 2 !> Only node weight
+      !wflag = 2 !> Only node weight
       !wflag = 3 !> Both weight
 
       !> allocate section
@@ -113,12 +113,12 @@ vtxdist(3) = 6
 
       allocate(part_id_c(n_vertex), source = 0)
 
-      !if(allocated(node_wgt))then
-        allocate(node_wgt_c(n_vertex), source = 1)
-      !  node_wgt_c = node_wgt
-      !else
-      !  node_wgt_c => null()
-      !endif
+      if(allocated(node_wgt))then
+        allocate(node_wgt_c(n_vertex), source = 0)
+        node_wgt_c = node_wgt
+      else
+        node_wgt_c => null()
+      endif
 
       if(allocated(edge_wgt))then
         allocate(edge_wgt_c(nz), source = 0)
@@ -141,6 +141,10 @@ vtxdist(3) = 6
 
       tpwgts(1) = 1.0d0/n_part
       tpwgts(2) = 1.0d0/n_part
+
+!write(*,*)"vtxdist_c", vtxdist_c
+write(*,*)"index_c", index_c
+write(*,*)"item_c", item_c
 
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &

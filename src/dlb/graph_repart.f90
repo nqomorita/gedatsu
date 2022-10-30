@@ -29,6 +29,10 @@ contains
 
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
+!> make vertex_id
+
+!> make new global node ids
+
     call gedatsu_repart_graph_parmetis(graph%n_vertex, graph%vertex_id, &
       & vtxdist, graph%index, graph%item, n_part, vertex_domain_id, comm)
   end subroutine gedatsu_graph_repartition

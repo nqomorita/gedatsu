@@ -10,6 +10,8 @@ module mod_gedatsu_graph
   type gedatsu_graph
     !> ノード数
     integer(gint) :: n_vertex
+    !> 領域分割における内部ノード数
+    integer(gint) :: n_internal_vertex
     !> ノード id 配列
     integer(gint), allocatable :: vertex_id(:)
     !> 領域番号配列
