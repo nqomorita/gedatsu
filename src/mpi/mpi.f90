@@ -5,16 +5,26 @@ module mod_gedatsu_mpi
   implicit none
   private
 
+  !> MPI 演算タグ（和）
   integer(gint), parameter :: gedatsu_mpi_sum = 1
+  !> MPI 演算タグ（最大値）
   integer(gint), parameter :: gedatsu_mpi_max = 2
+  !> MPI 演算タグ（最小値）
   integer(gint), parameter :: gedatsu_mpi_min = 3
 
 contains
 
+  !> @ingroup mpi
+  !> allreduce 関数（整数型）
   subroutine gedatsu_allreduce_I1(val, tag, comm)
     implicit none
-    integer(gint), intent(in) :: tag, comm
-    integer(gint)  :: n, ierr, val, in(1), out(1)
+    !> [inout] 入出力値（整数型）
+    integer(gint) :: val
+    !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
+    integer(gint), intent(in) :: tag
+    !> [in] MPI コミュニケータ
+    integer(gint), intent(in) :: comm
+    integer(gint)  :: n, ierr, in(1), out(1)
 
 #ifndef WITH_NOMPI
     in = val
@@ -31,10 +41,19 @@ contains
 #endif
   end subroutine gedatsu_allreduce_I1
 
+  !> @ingroup mpi
+  !> allreduce 関数（整数配列型）
   subroutine gedatsu_allreduce_I(n, val, tag, comm)
     implicit none
-    integer(gint), intent(in) :: tag, comm
-    integer(gint)  :: n, ierr, val(n), temp(n)
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [inout] 入出力値（整数型）
+    integer(gint) :: val(n)
+    !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
+    integer(gint), intent(in) :: tag
+    !> [in] MPI コミュニケータ
+    integer(gint), intent(in) :: comm
+    integer(gint)  :: ierr, temp(n)
 
 #ifndef WITH_NOMPI
     temp = 0
@@ -49,11 +68,18 @@ contains
 #endif
   end subroutine gedatsu_allreduce_I
 
+  !> @ingroup mpi
+  !> allreduce 関数（浮動小数点型）
   subroutine gedatsu_allreduce_R1(val, tag, comm)
     implicit none
-    integer(gint), intent(in) :: tag, comm
+    !> [inout] 入出力値（浮動小数点型）
+    real(gdouble) :: val
+    !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
+    integer(gint), intent(in) :: tag
+    !> [in] MPI コミュニケータ
+    integer(gint), intent(in) :: comm
     integer(gint) :: n, ierr
-    real(gdouble) :: val, in(1), out(1)
+    real(gdouble) :: in(1), out(1)
 
 #ifndef WITH_NOMPI
     in = val
@@ -70,11 +96,20 @@ contains
 #endif
   end subroutine gedatsu_allreduce_R1
 
+  !> @ingroup mpi
+  !> allreduce 関数（浮動小数点配列型）
   subroutine gedatsu_allreduce_R(n, val, tag, comm)
     implicit none
-    integer(gint), intent(in) :: tag, comm
-    integer(gint) :: n, ierr
-    real(gdouble) :: val(n), temp(n)
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [inout] 入出力値（浮動小数点配列型）
+    real(gdouble) :: val(n)
+    !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
+    integer(gint), intent(in) :: tag
+    !> [in] MPI コミュニケータ
+    integer(gint), intent(in) :: comm
+    integer(gint) :: ierr
+    real(gdouble) :: temp(n)
 
 #ifndef WITH_NOMPI
     temp = 0.0d0
@@ -89,122 +124,205 @@ contains
 #endif
   end subroutine gedatsu_allreduce_R
 
+  !> @ingroup mpi
+  !> Isend 関数（整数配列型）
   subroutine gedatsu_Isend_I(n, ws, pe_id, comm, req)
     implicit none
-    integer(gint) :: ws(:), n, pe_id, comm, req, ierr
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [in] 送信値
+    integer(gint) :: ws(:)
+    !> [in] 送信先 MPI ランク
+    integer(gint) :: pe_id
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [in] MPI リクエスト
+    integer(gint) :: req
+    integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
     call MPI_Isend(ws, n, MPI_INTEGER, pe_id, 0, comm, req, ierr)
 #endif
   end subroutine gedatsu_Isend_I
 
+  !> @ingroup mpi
+  !> Irecv 関数（整数配列型）
   subroutine gedatsu_Irecv_I(n, ws, pe_id, comm, req)
     implicit none
-    integer(gint) :: ws(:), n, pe_id, comm, req, ierr
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [in] 受信値
+    integer(gint) :: ws(:)
+    !> [in] 送信元 MPI ランク
+    integer(gint) :: pe_id
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [in] MPI リクエスト
+    integer(gint) :: req
+    integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
     call MPI_Irecv(ws, n, MPI_INTEGER, pe_id, 0, comm, req, ierr)
 #endif
   end subroutine gedatsu_Irecv_I
 
+  !> @ingroup mpi
+  !> Isend 関数（浮動小数点配列型）
   subroutine gedatsu_Isend_R(n, ws, pe_id, comm, req)
     implicit none
-    integer(gint) :: n, pe_id, comm, req, ierr
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [in] 送信値
     real(gdouble) :: ws(:)
+    !> [in] 送信先 MPI ランク
+    integer(gint) :: pe_id
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [in] MPI リクエスト
+    integer(gint) :: req
+    integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
     call MPI_Isend(ws, n, MPI_REAL8, pe_id, 0, comm, req, ierr)
 #endif
   end subroutine gedatsu_Isend_R
 
+  !> @ingroup mpi
+  !> Irecv 関数（浮動小数点配列型）
   subroutine gedatsu_Irecv_R(n, ws, pe_id, comm, req)
     implicit none
-    integer(gint) :: n, pe_id, comm, req, ierr
+    !> [in] 配列サイズ
+    integer(gint) :: n
+    !> [in] 受信値
     real(gdouble) :: ws(:)
+    !> [in] 送信元 MPI ランク
+    integer(gint) :: pe_id
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    !> [in] MPI リクエスト
+    integer(gint) :: req
+    integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
     call MPI_Irecv(ws, n, MPI_REAL8, pe_id, 0, comm, req, ierr)
 #endif
   end subroutine gedatsu_Irecv_R
 
-  subroutine gedatsu_gatherv_I(sbuf, sc, rbuf, rcs, disp, root, comm)
+  !> @ingroup mpi
+  !> gatherv 関数（浮動小数点配列型）
+  subroutine gedatsu_gatherv_I(sbuf, sc, rbuf, rc, disp, root, comm)
     implicit none
-    integer(gint) :: sc
-    integer(gint) :: rcs(:)
-    integer(gint) :: disp(:)
-    integer(gint) :: root
-    integer(gint) :: comm
+    !> [in] 送信データ配列
     integer(gint) :: sbuf(:)
+    !> [in] 送信データ個数
+    integer(gint) :: sc
+    !> [in] 受信データ配列
     integer(gint) :: rbuf(:)
+    !> [in] 各ランクのデータ個数リスト
+    integer(gint) :: rc(:)
+    !> [in] 各ランクのデータ格納位置リスト
+    integer(gint) :: disp(:)
+    !> [in] データを格納する MPI ランク
+    integer(gint) :: root
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
     integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
-    call MPI_gatherv(sbuf, sc, MPI_REAL8, rbuf, rcs, disp, MPI_REAL8, root, comm, ierr)
+    call MPI_gatherv(sbuf, sc, MPI_INTEGER, rbuf, rc, disp, MPI_INTEGER, root, comm, ierr)
 #else
     rbuf(1:sc) = sbuf(1:sc)
 #endif
   end subroutine gedatsu_gatherv_I
 
-  subroutine gedatsu_scatterv_I(sbuf, scs, disp, rbuf, rc, root, comm)
+  !> @ingroup mpi
+  !> scatterv 関数（整数配列型）
+  subroutine gedatsu_scatterv_I(sbuf, sc, disp, rbuf, rc, root, comm)
     implicit none
-    integer(gint) :: scs(:)
-    integer(gint) :: disp(:)
-    integer(gint) :: rc
-    integer(gint) :: root
-    integer(gint) :: comm
+    !> [in] 送信データ配列
     integer(gint) :: sbuf(:)
+    !> [in] 送信データ個数
+    integer(gint) :: sc
+    !> [in] 受信データ配列
+    integer(gint) :: disp(:)
+    !> [in] データを格納する MPI ランク
     integer(gint) :: rbuf(:)
+    !> [in] 各ランクのデータ個数リスト
+    integer(gint) :: rc(:)
+    !> [in] 各ランクのデータ格納位置リスト
+    integer(gint) :: root
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
     integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
-    call MPI_scatterv(sbuf, scs, disp, MPI_REAL8, rbuf, rc, MPI_REAL8, root, comm, ierr)
+    call MPI_scatterv(sbuf, sc, disp, MPI_INTEGER, rbuf, rc, MPI_INTEGER, root, comm, ierr)
 #else
     rbuf(1:rc) = sbuf(1:rc)
 #endif
   end subroutine gedatsu_scatterv_I
 
-  subroutine gedatsu_gatherv_R(sbuf, sc, rbuf, rcs, disp, root, comm)
+  subroutine gedatsu_gatherv_R(sbuf, sc, rbuf, rc, disp, root, comm)
     implicit none
-    integer(gint) :: sc
-    integer(gint) :: rcs(:)
-    integer(gint) :: disp(:)
-    integer(gint) :: root
-    integer(gint) :: comm
+    !> [in] 送信データ配列
     real(gdouble) :: sbuf(:)
+    !> [in] 送信データ個数
+    integer(gint) :: sc
+    !> [in] 受信データ配列
     real(gdouble) :: rbuf(:)
+    !> [in] 各ランクのデータ個数リスト
+    integer(gint) :: rc(:)
+    !> [in] 各ランクのデータ格納位置リスト
+    integer(gint) :: disp(:)
+    !> [in] データを格納する MPI ランク
+    integer(gint) :: root
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
     integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
-    call MPI_gatherv(sbuf, sc, MPI_REAL8, rbuf, rcs, disp, MPI_REAL8, root, comm, ierr)
+    call MPI_gatherv(sbuf, sc, MPI_REAL8, rbuf, rc, disp, MPI_REAL8, root, comm, ierr)
 #else
     rbuf(1:sc) = sbuf(1:sc)
 #endif
   end subroutine gedatsu_gatherv_R
 
-  subroutine gedatsu_scatterv_R(sbuf, scs, disp, rbuf, rc, root, comm)
+  subroutine gedatsu_scatterv_R(sbuf, sc, disp, rbuf, rc, root, comm)
     implicit none
-    integer(gint) :: scs(:)
-    integer(gint) :: disp(:)
-    integer(gint) :: rc
-    integer(gint) :: root
-    integer(gint) :: comm
-    real(gdouble) :: rbuf(:)
+    !> [in] 送信データ配列
     real(gdouble) :: sbuf(:)
+    !> [in] 送信データ個数
+    integer(gint) :: sc
+    !> [in] 受信データ配列
+    integer(gint) :: disp(:)
+    !> [in] データを格納する MPI ランク
+    real(gdouble) :: rbuf(:)
+    !> [in] 各ランクのデータ個数リスト
+    integer(gint) :: rc(:)
+    !> [in] 各ランクのデータ格納位置リスト
+    integer(gint) :: root
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
     integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
-    call MPI_scatterv(sbuf, scs, disp, MPI_REAL8, rbuf, rc, MPI_REAL8, root, comm, ierr)
+    call MPI_scatterv(sbuf, sc, disp, MPI_REAL8, rbuf, rc, MPI_REAL8, root, comm, ierr)
 #else
     rbuf(1:rc) = sbuf(1:rc)
 #endif
   end subroutine gedatsu_scatterv_R
 
+  !> @ingroup mpi
+  !> allgather 関数（整数型）
   subroutine gedatsu_allgather_I1(sval, rbuf, comm)
     implicit none
+    !> [in] 送信データ
     integer(gint) :: sval
-    integer(gint) :: rbuf, out(1)
+    !> [in] 受信データ
+    integer(gint) :: rbuf
+    !> [in] MPI コミュニケータ
     integer(gint) :: comm
-    integer(gint) :: ierr
+    integer(gint) :: ierr, out(1)
 
 #ifndef WITH_NOMPI
     call MPI_allgather(sval, 1, MPI_INTEGER, out, 1, MPI_INTEGER, comm, ierr)

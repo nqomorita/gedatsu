@@ -32,10 +32,6 @@ contains
     integer(gint), allocatable :: node_wgt(:)
     integer(gint), allocatable :: edge_wgt(:)
 
-vtxdist(1) = 0
-vtxdist(2) = 3
-vtxdist(3) = 6
-
     call gedatsu_repart_graph_parmetis_with_weight(n_vertex, vertex_id, &
       & vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
   end subroutine gedatsu_repart_graph_parmetis
