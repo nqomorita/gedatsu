@@ -18,7 +18,7 @@ contains
   !> allreduce 関数（整数型）
   subroutine gedatsu_allreduce_I1(val, tag, comm)
     implicit none
-    !> [inout] 入出力値（整数型）
+    !> [in,out] 入出力値（整数型）
     integer(gint) :: val
     !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
     integer(gint), intent(in) :: tag
@@ -47,7 +47,7 @@ contains
     implicit none
     !> [in] 配列サイズ
     integer(gint) :: n
-    !> [inout] 入出力値（整数型）
+    !> [in,out] 入出力値（整数型）
     integer(gint) :: val(n)
     !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
     integer(gint), intent(in) :: tag
@@ -72,7 +72,7 @@ contains
   !> allreduce 関数（浮動小数点型）
   subroutine gedatsu_allreduce_R1(val, tag, comm)
     implicit none
-    !> [inout] 入出力値（浮動小数点型）
+    !> [in,out] 入出力値（浮動小数点型）
     real(gdouble) :: val
     !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
     integer(gint), intent(in) :: tag
@@ -102,7 +102,7 @@ contains
     implicit none
     !> [in] 配列サイズ
     integer(gint) :: n
-    !> [inout] 入出力値（浮動小数点配列型）
+    !> [in,out] 入出力値（浮動小数点配列型）
     real(gdouble) :: val(n)
     !> [in] MPI 演算タグ（gedatsu_mpi_sum, gedatsu_mpi_max, gedatsu_mpi_min）
     integer(gint), intent(in) :: tag
@@ -151,7 +151,7 @@ contains
     implicit none
     !> [in] 配列サイズ
     integer(gint) :: n
-    !> [in] 受信値
+    !> [out] 受信値
     integer(gint) :: ws(:)
     !> [in] 送信元 MPI ランク
     integer(gint) :: pe_id
@@ -193,7 +193,7 @@ contains
     implicit none
     !> [in] 配列サイズ
     integer(gint) :: n
-    !> [in] 受信値
+    !> [out] 受信値
     real(gdouble) :: ws(:)
     !> [in] 送信元 MPI ランク
     integer(gint) :: pe_id
@@ -216,7 +216,7 @@ contains
     integer(gint) :: sbuf(:)
     !> [in] 送信データ個数
     integer(gint) :: sc
-    !> [in] 受信データ配列
+    !> [out] 受信データ配列
     integer(gint) :: rbuf(:)
     !> [in] 各ランクのデータ個数リスト
     integer(gint) :: rc(:)
@@ -243,13 +243,13 @@ contains
     integer(gint) :: sbuf(:)
     !> [in] 送信データ個数
     integer(gint) :: sc
-    !> [in] 受信データ配列
+    !> [in] 各ランクのデータ格納位置リスト
     integer(gint) :: disp(:)
-    !> [in] データを格納する MPI ランク
+    !> [out] 受信データ配列
     integer(gint) :: rbuf(:)
     !> [in] 各ランクのデータ個数リスト
     integer(gint) :: rc(:)
-    !> [in] 各ランクのデータ格納位置リスト
+    !> [in] データを格納する MPI ランク
     integer(gint) :: root
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
@@ -268,7 +268,7 @@ contains
     real(gdouble) :: sbuf(:)
     !> [in] 送信データ個数
     integer(gint) :: sc
-    !> [in] 受信データ配列
+    !> [out] 受信データ配列
     real(gdouble) :: rbuf(:)
     !> [in] 各ランクのデータ個数リスト
     integer(gint) :: rc(:)
@@ -293,13 +293,13 @@ contains
     real(gdouble) :: sbuf(:)
     !> [in] 送信データ個数
     integer(gint) :: sc
-    !> [in] 受信データ配列
+    !> [in] 各ランクのデータ格納位置リスト
     integer(gint) :: disp(:)
-    !> [in] データを格納する MPI ランク
+    !> [out] 受信データ配列
     real(gdouble) :: rbuf(:)
     !> [in] 各ランクのデータ個数リスト
     integer(gint) :: rc(:)
-    !> [in] 各ランクのデータ格納位置リスト
+    !> [in] データを格納する MPI ランク
     integer(gint) :: root
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
@@ -318,7 +318,7 @@ contains
     implicit none
     !> [in] 送信データ
     integer(gint) :: sval
-    !> [in] 受信データ
+    !> [out] 受信データ
     integer(gint) :: rbuf
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
