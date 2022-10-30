@@ -3,7 +3,6 @@ module mod_gedatsu_mpi
   use mod_gedatsu_prm
   use mod_gedatsu_mpi_util
   implicit none
-  private
 
   !> MPI 演算タグ（和）
   integer(gint), parameter :: gedatsu_mpi_sum = 1
@@ -319,14 +318,13 @@ contains
     !> [in] 送信データ
     integer(gint) :: sval
     !> [out] 受信データ
-    integer(gint) :: rbuf
+    integer(gint) :: rbuf(:)
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
-    integer(gint) :: ierr, out(1)
+    integer(gint) :: ierr
 
 #ifndef WITH_NOMPI
-    call MPI_allgather(sval, 1, MPI_INTEGER, out, 1, MPI_INTEGER, comm, ierr)
-    rbuf = out(1)
+    call MPI_allgather(sval, 1, MPI_INTEGER, rbuf, 1, MPI_INTEGER, comm, ierr)
 #else
     rbuf(1) = sval
 #endif

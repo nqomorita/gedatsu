@@ -6,6 +6,7 @@ module mod_gedatsu_communicator
   use mod_gedatsu_std
   use mod_gedatsu_util
   use mod_gedatsu_alloc
+  use mod_gedatsu_mpi
   use mod_gedatsu_mpi_util
   use mod_gedatsu_graph_handler
   implicit none
@@ -32,11 +33,11 @@ contains
     integer(gint) :: comm
     !> [out] 各領域の内部節点数リスト
     integer(gint) :: vtxdist(:)
-    integer(gint) :: n_size, i, ierr
+    integer(gint) :: n_size, i
 
     n_size = gedatsu_mpi_local_comm_size(comm)
 
-    call mpi_allgather(n_internal_vertex, 1, MPI_INTEGER, vtxdist(2:n_size + 1), 1, MPI_INTEGER, comm, ierr)
+    call gedatsu_allgather_I1(n_internal_vertex, vtxdist(2:n_size + 1), comm)
 
     do i = 1, n_size
       vtxdist(i + 1) = vtxdist(i + 1) + vtxdist(i)
@@ -44,14 +45,19 @@ contains
   end subroutine gedatsu_comm_n_vertex_list
 
   !> グラフの通信テーブルを作成
-  subroutine gedatsu_comm_get_comm_table_on_serial(graph, n_domain, comms)
+  subroutine gedatsu_comm_get_comm_table_on_serial(graph, subgraphs, n_domain, comms)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+    !> [in] 分割後の graph 構造体
+    type(gedatsu_graph) :: subgraphs(:)
     !> [in] 分割数
     integer(gint) :: n_domain
     !> [out] 分割領域に対応する comm 構造体
-    type(gedatsu_comm), allocatable :: comms(:)
+    type(gedatsu_comm) :: comms(:)
+    integer(gint) :: i
+
+
 
   end subroutine gedatsu_comm_get_comm_table_on_serial
 
