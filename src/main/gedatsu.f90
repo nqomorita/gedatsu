@@ -7,7 +7,11 @@ module mod_gedatsu
   use mod_gedatsu_util
   use mod_gedatsu_io
   use mod_gedatsu_io_arg
+  use mod_gedatsu_io_file_name
   use mod_gedatsu_alloc
+  use mod_gedatsu_mpi
+  use mod_gedatsu_mpi_util
+  use mod_gedatsu_std
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis
   use mod_gedatsu_graph_part
@@ -15,6 +19,8 @@ module mod_gedatsu
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
   use mod_gedatsu_communicator
+  use mod_gedatsu_wrapper_metis
+  use mod_gedatsu_wrapper_parmetis
 
   !> @defgroup group_init 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ

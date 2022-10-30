@@ -5,7 +5,7 @@ module mod_gedatsu_graph_repart
   use mod_gedatsu_util
   use mod_gedatsu_alloc
   use mod_gedatsu_graph_handler
-  use mod_gedatsu_comm
+  use mod_gedatsu_communicator
   use mod_gedatsu_wrapper_parmetis
   implicit none
 
