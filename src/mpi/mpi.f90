@@ -25,7 +25,7 @@ contains
     elseif(tag == gedatsu_mpi_max)then
       call MPI_allreduce(in, out, n, MPI_INTEGER, MPI_MAX, comm, ierr)
     elseif(tag == gedatsu_mpi_min)then
-      call MPI_allreduce(in, out, n, MPI_INTEGER, MPI_MIn, comm, ierr)
+      call MPI_allreduce(in, out, n, MPI_INTEGER, MPI_MIN, comm, ierr)
     endif
     val = out(1)
 #endif
@@ -43,7 +43,7 @@ contains
     elseif(tag == gedatsu_mpi_max)then
       call MPI_allreduce(val, temp, n, MPI_INTEGER, MPI_MAX, comm, ierr)
     elseif(tag == gedatsu_mpi_min)then
-      call MPI_allreduce(val, temp, n, MPI_INTEGER, MPI_MIn, comm, ierr)
+      call MPI_allreduce(val, temp, n, MPI_INTEGER, MPI_MIN, comm, ierr)
     endif
     val = temp
 #endif
@@ -64,7 +64,7 @@ contains
     elseif(tag == gedatsu_mpi_max)then
       call MPI_allreduce(in, out, n, MPI_REAL8, MPI_MAX, comm, ierr)
     elseif(tag == gedatsu_mpi_min)then
-      call MPI_allreduce(in, out, n, MPI_REAL8, MPI_MIn, comm, ierr)
+      call MPI_allreduce(in, out, n, MPI_REAL8, MPI_MIN, comm, ierr)
     endif
     val = out(1)
 #endif
@@ -83,7 +83,7 @@ contains
     elseif(tag == gedatsu_mpi_max)then
       call MPI_allreduce(val, temp, n, MPI_REAL8, MPI_MAX, comm, ierr)
     elseif(tag == gedatsu_mpi_min)then
-      call MPI_allreduce(val, temp, n, MPI_REAL8, MPI_MIn, comm, ierr)
+      call MPI_allreduce(val, temp, n, MPI_REAL8, MPI_MIN, comm, ierr)
     endif
     val = temp
 #endif
@@ -216,10 +216,10 @@ contains
 
   subroutine gedatsu_SendRecv_R(send_n_neib, send_neib_pe, recv_n_neib, recv_neib_pe, &
     & send_index, send_item, recv_index, recv_item, &
-    & ws, wr, val, ndof, comm)
+    & val, ndof, comm)
     implicit none
     integer(gint) :: send_n_neib, recv_n_neib
-    integer(gint) :: iS, in, j, k, ierr
+    integer(gint) :: iS, in, j, k, ierr, ns, nr
     integer(gint) :: i, ndof, comm
     integer(gint) :: send_neib_pe(:)
     integer(gint) :: send_index(:)
@@ -231,9 +231,18 @@ contains
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
     integer(gint) :: req2(recv_n_neib)
-    real(gdouble) :: val(:), ws(:), wr(:)
+    real(gdouble) :: val(:)
+    real(gdouble), allocatable :: ws(:)
+    real(gdouble), allocatable :: wr(:)
 
 #ifndef WITH_NOMPI
+
+    ns = send_index(send_n_neib)
+    nr = recv_index(recv_n_neib)
+
+    allocate(ws(ndof*ns))
+    allocate(wr(ndof*nr))
+
     do i = 1, send_n_neib
       iS = send_index(i - 1)
       in = send_index(i  ) - iS
@@ -271,10 +280,10 @@ contains
 
   subroutine gedatsu_SendRecv_I(send_n_neib, send_neib_pe, recv_n_neib, recv_neib_pe, &
     & send_index, send_item, recv_index, recv_item, &
-    & ws, wr, val, ndof, comm)
+    & val, ndof, comm)
     implicit none
     integer(gint) :: send_n_neib, recv_n_neib
-    integer(gint) :: iS, in, j, k, ierr
+    integer(gint) :: iS, in, j, k, ierr, ns, nr
     integer(gint) :: i, ndof, comm
     integer(gint) :: send_neib_pe(:)
     integer(gint) :: send_index(:)
@@ -286,9 +295,17 @@ contains
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
     integer(gint) :: req2(recv_n_neib)
-    integer(gint) :: val(:), ws(:), wr(:)
+    integer(gint) :: val(:)
+    integer(gint), allocatable :: ws(:)
+    integer(gint), allocatable :: wr(:)
 
 #ifndef WITH_NOMPI
+    ns = send_index(send_n_neib)
+    nr = recv_index(recv_n_neib)
+
+    allocate(ws(ndof*ns))
+    allocate(wr(ndof*nr))
+
     do i = 1, send_n_neib
       iS = send_index(i-1)
       in = send_index(i  ) - iS
