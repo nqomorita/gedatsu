@@ -221,12 +221,12 @@ contains
     integer(gint) :: send_n_neib, recv_n_neib
     integer(gint) :: iS, in, j, k, ierr
     integer(gint) :: i, ndof, comm
-    integer(gint), pointer :: send_neib_pe(:)
-    integer(gint), pointer :: send_index(:)
-    integer(gint), pointer :: send_item (:)
-    integer(gint), pointer :: recv_neib_pe(:)
-    integer(gint), pointer :: recv_index(:)
-    integer(gint), pointer :: recv_item (:)
+    integer(gint) :: send_neib_pe(:)
+    integer(gint) :: send_index(:)
+    integer(gint) :: send_item (:)
+    integer(gint) :: recv_neib_pe(:)
+    integer(gint) :: recv_index(:)
+    integer(gint) :: recv_item (:)
     integer(gint) :: sta1(gedatsu_mpi_status_size, send_n_neib)
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
@@ -276,12 +276,12 @@ contains
     integer(gint) :: send_n_neib, recv_n_neib
     integer(gint) :: iS, in, j, k, ierr
     integer(gint) :: i, ndof, comm
-    integer(gint), pointer :: send_neib_pe(:)
-    integer(gint), pointer :: send_index(:)
-    integer(gint), pointer :: send_item (:)
-    integer(gint), pointer :: recv_neib_pe(:)
-    integer(gint), pointer :: recv_index(:)
-    integer(gint), pointer :: recv_item (:)
+    integer(gint) :: send_neib_pe(:)
+    integer(gint) :: send_index(:)
+    integer(gint) :: send_item (:)
+    integer(gint) :: recv_neib_pe(:)
+    integer(gint) :: recv_index(:)
+    integer(gint) :: recv_item (:)
     integer(gint) :: sta1(gedatsu_mpi_status_size, send_n_neib)
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
