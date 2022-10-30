@@ -244,8 +244,8 @@ contains
     allocate(wr(ndof*nr))
 
     do i = 1, send_n_neib
-      iS = send_index(i - 1)
-      in = send_index(i  ) - iS
+      iS = send_index(i)
+      in = send_index(i + 1) - iS
       if(in == 0) cycle
       do j = iS + 1, iS + in
         do k = 1, ndof
@@ -256,8 +256,8 @@ contains
     enddo
 
     do i = 1, recv_n_neib
-      iS = recv_index(i - 1)
-      in = recv_index(i  ) - iS
+      iS = recv_index(i)
+      in = recv_index(i + 1) - iS
       if(in == 0) cycle
       call gedatsu_Irecv_R(ndof*in, ws(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
     enddo
@@ -265,8 +265,8 @@ contains
     call MPI_waitall(recv_n_neib, req2, sta2, ierr)
 
     do i = 1, recv_n_neib
-      iS = recv_index(i - 1)
-      in = recv_index(i  ) - iS
+      iS = recv_index(i)
+      in = recv_index(i + 1) - iS
       do j = iS + 1, iS + in
         do k = 1, ndof
           val(ndof*(recv_item(j) - 1) + k) = wr(ndof*(j - 1) + k)
@@ -307,8 +307,8 @@ contains
     allocate(wr(ndof*nr))
 
     do i = 1, send_n_neib
-      iS = send_index(i-1)
-      in = send_index(i  ) - iS
+      iS = send_index(i)
+      in = send_index(i + 1) - iS
       if(in == 0) cycle
       do j = iS + 1, iS + in
         do k = 1, ndof
@@ -319,8 +319,8 @@ contains
     enddo
 
     do i = 1, recv_n_neib
-      iS = recv_index(i-1)
-      in = recv_index(i  ) - iS
+      iS = recv_index(i)
+      in = recv_index(i + 1) - iS
       if(in == 0) cycle
       call gedatsu_Irecv_I(ndof*in, ws(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
     enddo
@@ -328,8 +328,8 @@ contains
     call MPI_waitall(recv_n_neib, req2, sta2, ierr)
 
     do i = 1, recv_n_neib
-      iS = recv_index(i - 1)
-      in = recv_index(i  ) - iS
+      iS = recv_index(i)
+      in = recv_index(i + 1) - iS
       do j = iS + 1, iS + in
         do k = 1, ndof
           val(ndof*(recv_item(j) - 1) + k) = wr(ndof*(j - 1) + k)

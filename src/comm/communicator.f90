@@ -1,7 +1,9 @@
 !> グラフ分割モジュール（通信テーブル作成）
-module mod_gedatsu_comm
+module mod_gedatsu_communicator
   use mod_gedatsu_prm
   use mod_gedatsu_graph
+  use mod_gedatsu_comm
+  use mod_gedatsu_std
   use mod_gedatsu_util
   use mod_gedatsu_alloc
   use mod_gedatsu_mpi_util
@@ -11,6 +13,7 @@ module mod_gedatsu_comm
 
   public :: gedatsu_comm_n_vertex_list
   public :: gedatsu_comm_get_comm_table
+  public :: gedatsu_comm_get_comm_table_on_serial
 
   type dedatsu_comm_node_list
     integer(gint) :: nnode = 0
@@ -39,6 +42,18 @@ contains
       vtxdist(i + 1) = vtxdist(i + 1) + vtxdist(i)
     enddo
   end subroutine gedatsu_comm_n_vertex_list
+
+  !> グラフの通信テーブルを作成
+  subroutine gedatsu_comm_get_comm_table_on_serial(graph, n_domain, comms)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+    !> [in] 分割数
+    integer(gint) :: n_domain
+    !> [out] 分割領域に対応する comm 構造体
+    type(gedatsu_comm), allocatable :: comms(:)
+
+  end subroutine gedatsu_comm_get_comm_table_on_serial
 
   !> グラフの通信テーブルを作成
   subroutine gedatsu_comm_get_comm_table(graph, n_internal_vertex, comm)
@@ -186,7 +201,7 @@ contains
         if(recv_rank == id)then
           n_data = n_data + 1
           global_id = outer_node_id_all(j)
-          call monolis_bsearch_int(temp, 1, NP, global_id, idx)
+          call gedatsu_bsearch_int(temp, 1, NP, global_id, idx)
           recv_list(i)%local_nid(n_data) = local_nid(idx)
         endif
       enddo
@@ -301,4 +316,4 @@ contains
 !      monolis%COM%send_item(i) = local_nid(id)
 !    enddo
   end subroutine gedatsu_comm_get_comm_table
-end module mod_gedatsu_comm
+end module mod_gedatsu_communicator

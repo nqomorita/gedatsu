@@ -3,6 +3,7 @@
 module mod_gedatsu
   use mod_gedatsu_prm
   use mod_gedatsu_graph
+  use mod_gedatsu_comm
   use mod_gedatsu_util
   use mod_gedatsu_io
   use mod_gedatsu_io_arg
@@ -13,6 +14,7 @@ module mod_gedatsu
   use mod_gedatsu_graph_repart
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
+  use mod_gedatsu_communicator
 
   !> @defgroup group_init 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ

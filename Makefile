@@ -69,6 +69,7 @@ SRC_LIST_UTIL2 = \
   util.f90 \
   alloc.f90 \
   def_graph.f90 \
+  def_comm.f90 \
   std.f90 \
   wrapper_metis.f90 \
   wrapper_parmetis.f90 \
@@ -86,7 +87,7 @@ SRC_LIST_GRAPH = \
   graph_part.f90
 
 SRC_LIST_COMM = \
-  comm.f90
+  communicator.f90
 
 SRC_LIST_DLB = \
   graph_repart.f90
