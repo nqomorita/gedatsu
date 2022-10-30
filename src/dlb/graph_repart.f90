@@ -43,15 +43,12 @@ contains
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    !!> [out] 分割後の graph 構造体
-    !type(gedatsu_graph), allocatable :: subgraphs(:)
+    integer(gint) :: n_part
+    integer(gint) :: comm
+    integer(gint), allocatable :: vtxdist(:)
+    integer(gint), allocatable :: vertex_domain_id(:)
 
-!    call gedatsu_alloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
-!
-!    call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
-!
-!    allocate(subgraphs(n_domain))
-!
-!    call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
+    call gedatsu_repart_graph_parmetis(graph%n_vertex, graph%vertex_id, &
+      & vtxdist, graph%index, graph%item, n_part, vertex_domain_id, comm)
   end subroutine gedatsu_graph_repartition_with_weight
 end module mod_gedatsu_graph_repart

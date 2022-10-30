@@ -128,6 +128,20 @@ contains
   end subroutine gedatsu_output_node_id
 
   !> @ingroup group_io
+  !> gedatsu 内部節点自由度数の入力
+  subroutine gedatsu_input_internal_node_number(fname, graph)
+    implicit none
+    !> [in] 出力ファイル名
+    character(gedatsu_charlen) :: fname
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+
+    open(20, file = trim(fname), status = "old")
+      read(20,*) graph%n_internal_vertex
+    close(20)
+  end subroutine gedatsu_input_internal_node_number
+
+  !> @ingroup group_io
   !> gedatsu 内部節点自由度数の出力
   subroutine gedatsu_output_internal_node_number(fname, graph)
     implicit none
@@ -135,7 +149,6 @@ contains
     character(gedatsu_charlen) :: fname
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    integer(gint) :: i
 
     open(20, file = trim(fname), status = "replace")
       write(20,"(i0)") graph%n_internal_vertex

@@ -19,7 +19,6 @@ contains
     type(gedatsu_graph) :: graph
     !> [in] グラフのノード数
     integer(gint) :: n_vertex
-    integer(gint) :: i
 
     if(graph%n_vertex > 0)then
       call gedatsu_error_string("gedatsu_graph_set_n_vertex")
@@ -43,7 +42,7 @@ contains
     type(gedatsu_graph) :: graph
     !> [in] グラフに追加するノード数
     integer(gint) :: n_vertex_add
-    integer(gint) :: n_vertex_all, i
+    integer(gint) :: n_vertex_all
 
     n_vertex_all = graph%n_vertex + n_vertex_add
 
@@ -266,7 +265,7 @@ contains
     !> [out] グラフのエッジ配列
     integer(gint) :: edge(:,:)
 
-    integer(gint) :: i, nid, local_id, idx, j, jS, jE
+    integer(gint) :: i, nid, idx, j, jS, jE
     integer(gint) :: n_vertex, n_edge, e1, e2
     integer(gint), allocatable :: ids(:)
     integer(gint), allocatable :: perm(:)

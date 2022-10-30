@@ -1,7 +1,7 @@
 #> gedatsu Makefile
 FC     = mpif90
 #FFLAGS = -O2 -std=legacy -mtune=native -march=native
-FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow
+FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wall -ffpe-trap=invalid,zero,overflow
 
 CC     = mpic++
 CFLAGS = -O2

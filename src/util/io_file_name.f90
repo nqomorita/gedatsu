@@ -19,14 +19,13 @@ contains
     character(*) :: fname
     !> [in] 領域番号
     integer(gint) :: domain_id
-    integer(gint) :: comm_size, myrank
+    integer(gint) :: comm_size
     character(gedatsu_charlen) :: cid
 
-    myrank = gedatsu_mpi_global_my_rank()
     comm_size = gedatsu_mpi_global_comm_size()
 
     if(comm_size > 1)then
-      write(cid,"(i0)") myrank
+      write(cid,"(i0)") domain_id
       gedatsu_get_input_file_name = trim(dirname)//"/"//trim(fname)//"."//trim(cid)
     else
       gedatsu_get_input_file_name = trim(fname)

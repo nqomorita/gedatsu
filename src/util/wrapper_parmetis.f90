@@ -67,7 +67,7 @@ vtxdist(3) = 6
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
-    integer(c_int) :: ncon, objval, nz, nflag, wflag, i
+    integer(c_int) :: ncon, nz, nflag, wflag, i
     integer(c_int), pointer :: vtxdist_c(:) => null()
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
@@ -139,8 +139,8 @@ vtxdist(3) = 6
 
       allocate(itr(1), source = 0.1)
 
-      tpwgts(1) = 1.0d0/n_part
-      tpwgts(2) = 1.0d0/n_part
+      tpwgts(1) = 1.0/n_part
+      tpwgts(2) = 1.0/n_part
 
 !write(*,*)"vtxdist_c", vtxdist_c
 write(*,*)"index_c", index_c
