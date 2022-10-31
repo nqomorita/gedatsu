@@ -82,6 +82,33 @@ contains
   end subroutine gedatsu_realloc_int_1d
 
   !> @ingroup group_dev_alloc
+  !> 1 次元整数配列の末尾にデータ配列を追加
+  subroutine gedatsu_append_int_1d(var, n_add, var_add)
+    implicit none
+    !> [in,out] 元の配列
+    integer(gint), allocatable :: var(:)
+    !> [in] 追加する配列サイズ
+    integer(gint) :: n_add
+    !> [in] 追加する配列
+    integer(gint) :: var_add(:)
+    integer(gint) :: n_all, n_old, i
+
+    if(.not. allocated(var))then
+      n_old = 0
+    else
+      n_old = size(var)
+    endif
+
+    n_all = n_old + n_add
+
+    call gedatsu_realloc_int_1d(var, n_all)
+
+    do i = n_old + 1, n_all
+      var(i) = var_add(i - n_old)
+    enddo
+  end subroutine gedatsu_append_int_1d
+
+  !> @ingroup group_dev_alloc
   !> 2 次元整数配列のメモリ確保
   !> @details 配列サイズは var(i,j) として確保される。
   subroutine gedatsu_alloc_int_2d(var, i, j)

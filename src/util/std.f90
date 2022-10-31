@@ -204,4 +204,27 @@ contains
     enddo
   end subroutine gedatsu_get_sequence_array_int
 
+  !> @ingroup std
+  !> 整数配列の重複要素の削除
+  subroutine gedatsu_get_uniq_int(array, len, newlen)
+    implicit none
+    !> [in,out] 整数配列
+    integer(gint), intent(inout) :: array(:)
+    !> [in] 整数配列のサイズ
+    integer(gint), intent(in) :: len
+    !> [out] 重複を省いた要素数
+    integer(gint), intent(out) :: newlen
+    integer(gint) :: i, ndup
+
+    ndup = 0
+    do i = 2, len
+      if(array(i) == array(i - 1 - ndup))then
+        ndup = ndup + 1
+      elseif(ndup > 0)then
+        array(i - ndup) = array(i)
+      endif
+    end do
+    newlen = len - ndup
+  end subroutine gedatsu_get_uniq_int
+
 end module mod_gedatsu_std

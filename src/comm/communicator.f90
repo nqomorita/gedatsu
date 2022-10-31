@@ -50,9 +50,11 @@ contains
     !> [out] 分割領域に対応する comm 構造体
     type(gedatsu_comm) :: comms(:)
 
-    call gedatsu_comm_get_neib_domain_serial(graph, subgraphs, n_domain, comms)
+    call gedatsu_comm_get_recv_neib_domain_serial(graph, subgraphs, n_domain, comms)
 
     call gedatsu_comm_get_recv_serial(graph, subgraphs, n_domain, comms)
+
+    call gedatsu_comm_get_send_neib_domain_serial(n_domain, comms)
 
     call gedatsu_comm_get_send_serial(graph, subgraphs, n_domain, comms)
   end subroutine gedatsu_comm_get_comm_table_serial
