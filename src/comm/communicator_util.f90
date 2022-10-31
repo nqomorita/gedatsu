@@ -256,6 +256,7 @@ contains
       do k = 1, send_list(i)%n_node
         nid = send_list(i)%global_id(k)
         call gedatsu_bsearch_int(global_id, 1, n_vertex, nid, idx)
+        if(idx < 1) cycle
         comms(i)%send_item(k) = perm(idx)
       enddo
 

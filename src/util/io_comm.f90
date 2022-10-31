@@ -58,7 +58,7 @@ contains
         write(20,"(i0)")index(i)
       enddo
 
-      do i = 1, index(n_neib)
+      do i = 1, index(n_neib + 1)
         write(20,"(i0)")item(i)
       enddo
     close(20)
