@@ -39,16 +39,19 @@ program gedatsu_graph_partitioner
 
   do i = 1, n_domain
     foname = gedatsu_get_output_file_name(fdname, finame, i - 1)
-
     call gedatsu_output_graph(foname, subgraphs(i))
 
     foname = gedatsu_get_output_file_name(fdname, "node.id", i - 1)
-
     call gedatsu_output_node_id(foname, subgraphs(i))
 
     foname = gedatsu_get_output_file_name(fdname, "internal_node", i - 1)
-
     call gedatsu_output_internal_node_number(foname, subgraphs(i))
+
+    foname = gedatsu_get_output_file_name(fdname, "gedatsu.send", i - 1)
+    call gedatsu_output_send_comm_table(foname, comms(i))
+
+    foname = gedatsu_get_output_file_name(fdname, "gedatsu.recv", i - 1)
+    call gedatsu_output_recv_comm_table(foname, comms(i))
   enddo
 
   call gedatsu_global_finalize()

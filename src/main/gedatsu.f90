@@ -7,6 +7,7 @@ module mod_gedatsu
   use mod_gedatsu_util
   use mod_gedatsu_io
   use mod_gedatsu_io_arg
+  use mod_gedatsu_io_comm
   use mod_gedatsu_io_file_name
   use mod_gedatsu_alloc
   use mod_gedatsu_mpi

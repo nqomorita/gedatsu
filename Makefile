@@ -75,6 +75,7 @@ SRC_LIST_UTIL2 = \
   wrapper_parmetis.f90 \
   io_file_name.f90 \
   io.f90 \
+  io_comm.f90 \
   io_arg.f90
 
 SRC_LIST_MPI = \
