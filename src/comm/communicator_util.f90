@@ -14,7 +14,6 @@ module mod_gedatsu_communicator_util
 
   type dedatsu_comm_node_list
     integer(gint) :: n_node = 0
-    !integer(gint), allocatable :: domid(:)
     integer(gint), allocatable :: global_id(:)
   end type dedatsu_comm_node_list
 
@@ -29,8 +28,10 @@ contains
     type(gedatsu_comm) :: comms(:)
     integer(gint) :: i, j, did, n_neib, add(1)
     type(dedatsu_comm_node_list), allocatable :: send_list(:)
+    integer(gint), allocatable :: domain(:)
 
     allocate(send_list(n_domain))
+    call gedatsu_alloc_int_1d(domain, n_domain)
 
     do i = 1, n_domain
       do j = 1, comms(i)%recv_n_neib
@@ -42,10 +43,25 @@ contains
     enddo
 
     do i = 1, n_domain
+      domain = 0
+      do j = 1, send_list(i)%n_node
+        did = send_list(i)%global_id(j)
+        domain(did) = domain(did) + 1
+      enddo
+
       call gedatsu_get_uniq_int(send_list(i)%global_id, send_list(i)%n_node, n_neib)
       call gedatsu_comm_alloc_comm_index(n_neib, comms(i)%send_n_neib, &
         & comms(i)%send_neib_pe, comms(i)%send_index)
       call gedatsu_dealloc_int_1d(send_list(i)%global_id)
+
+      did = 0
+      do j = 1, n_domain
+        if(domain(j) /= 0)then
+          did = did + 1
+          comms(i)%send_neib_pe(did) = j
+          comms(i)%send_index(did + 1) = comms(i)%send_index(did) + domain(j)
+        endif
+      enddo
     enddo
   end subroutine gedatsu_comm_get_send_neib_domain_serial
 
