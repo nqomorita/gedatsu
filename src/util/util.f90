@@ -26,6 +26,14 @@ contains
     call gedatsu_mpi_finalize()
   end subroutine gedatsu_global_finalize
 
+  !> 通常ログ出力関数
+  subroutine gedatsu_log_string(fname)
+    implicit none
+    !> [in] 入力ファイル名
+    character(*) :: fname
+    write(*,"(a,a)")"** GEDATSU: ", trim(fname)
+  end subroutine gedatsu_log_string
+
   !> エラーストップ関数
   subroutine gedatsu_error_stop()
     implicit none
