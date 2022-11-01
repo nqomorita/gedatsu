@@ -89,11 +89,6 @@ contains
 
       nflag = 0
 
-      wflag = 0 !> No weight
-      !wflag = 1 !> Only edge weight
-      !wflag = 2 !> Only node weight
-      !wflag = 3 !> Both weight
-
       !> allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
       vtxdist_c = vtxdist
@@ -109,7 +104,10 @@ contains
 
       allocate(part_id_c(n_vertex), source = 0)
 
+      wflag = 0 !> No weight
+
       if(allocated(node_wgt))then
+        wflag = 2 !> Only node weight
         allocate(node_wgt_c(n_vertex), source = 0)
         node_wgt_c = node_wgt
       else
@@ -117,6 +115,11 @@ contains
       endif
 
       if(allocated(edge_wgt))then
+        if(wflag == 2)then
+          wflag = 3 !> Both weight
+        else
+          wflag = 1 !> Only edge weight
+        endif
         allocate(edge_wgt_c(nz), source = 0)
         edge_wgt_c = edge_wgt
       else
