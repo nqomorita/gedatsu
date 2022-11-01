@@ -24,8 +24,6 @@ program parmetis_test
   foname = gedatsu_get_input_file_name(fdname, finame, gedatsu_mpi_global_my_rank())
   call gedatsu_input_graph(foname, subgraph)
 
-call gedatsu_graph_debug_write(subgraph)
-
   foname = gedatsu_get_input_file_name(fdname, "node.id", gedatsu_mpi_global_my_rank())
   call gedatsu_input_node_id(foname, subgraph)
 

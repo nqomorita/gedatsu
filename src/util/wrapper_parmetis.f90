@@ -94,9 +94,6 @@ contains
       !wflag = 2 !> Only node weight
       !wflag = 3 !> Both weight
 
-write(100+gedatsu_mpi_global_my_rank(),*)"index", index
-write(100+gedatsu_mpi_global_my_rank(),*)"item", item
-
       !> allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
       vtxdist_c = vtxdist
@@ -106,8 +103,8 @@ write(100+gedatsu_mpi_global_my_rank(),*)"item", item
 
       nz = index(n_vertex+1)
       allocate(item_c(nz), source = 0)
-      do i = 1, n_vertex
-        item_c(i) = vertex_id(item(i) + 1)
+      do i = 1, nz
+        item_c(i) = vertex_id(item(i) + 1) - 1
       enddo
 
       allocate(part_id_c(n_vertex), source = 0)
@@ -141,18 +138,10 @@ write(100+gedatsu_mpi_global_my_rank(),*)"item", item
       tpwgts(1) = 1.0/n_part
       tpwgts(2) = 1.0/n_part
 
-write(100+gedatsu_mpi_global_my_rank(),*)"n_vertex", n_vertex
-write(100+gedatsu_mpi_global_my_rank(),*)"vtxdist_c", vtxdist_c
-write(100+gedatsu_mpi_global_my_rank(),*)"index_c", index_c
-write(100+gedatsu_mpi_global_my_rank(),*)"item_c", item_c
-
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
         & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
-
-write(100+gedatsu_mpi_global_my_rank(),*)"edgecut", edgecut
-write(100+gedatsu_mpi_global_my_rank(),*)"part_id", part_id_c
 
       part_id = part_id_c + 1
 

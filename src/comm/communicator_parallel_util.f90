@@ -33,12 +33,8 @@ contains
       vertex_id(i) = origin + i
     enddo
 
-    write(*,*)vertex_id
-
     call gedatsu_SendRecv_I(comm%send_n_neib, comm%send_neib_pe, comm%recv_n_neib, comm%recv_neib_pe, &
     & comm%send_index, comm%send_item, comm%recv_index, comm%recv_item, &
     & vertex_id, 1, gedatsu_mpi_global_comm())
-
-    write(*,*)vertex_id
   end subroutine gedatsu_generate_global_vertex_id
 end module mod_gedatsu_communicator_parallel_util
