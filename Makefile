@@ -89,6 +89,7 @@ SRC_LIST_GRAPH = \
 
 SRC_LIST_COMM = \
   communicator_serial_util.f90 \
+  communicator_parallel_util.f90 \
   communicator.f90
 
 SRC_LIST_DLB = \

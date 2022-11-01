@@ -353,8 +353,8 @@ contains
 
 #ifndef WITH_NOMPI
 
-    ns = send_index(send_n_neib)
-    nr = recv_index(recv_n_neib)
+    ns = send_index(send_n_neib + 1)
+    nr = recv_index(recv_n_neib + 1)
 
     allocate(ws(ndof*ns))
     allocate(wr(ndof*nr))
@@ -375,7 +375,7 @@ contains
       iS = recv_index(i)
       in = recv_index(i + 1) - iS
       if(in == 0) cycle
-      call gedatsu_Irecv_R(ndof*in, ws(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
+      call gedatsu_Irecv_R(ndof*in, wr(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
     enddo
 
     call MPI_waitall(recv_n_neib, req2, sta2, ierr)
@@ -416,8 +416,8 @@ contains
     integer(gint), allocatable :: wr(:)
 
 #ifndef WITH_NOMPI
-    ns = send_index(send_n_neib)
-    nr = recv_index(recv_n_neib)
+    ns = send_index(send_n_neib + 1)
+    nr = recv_index(recv_n_neib + 1)
 
     allocate(ws(ndof*ns))
     allocate(wr(ndof*nr))
@@ -438,7 +438,7 @@ contains
       iS = recv_index(i)
       in = recv_index(i + 1) - iS
       if(in == 0) cycle
-      call gedatsu_Irecv_I(ndof*in, ws(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
+      call gedatsu_Irecv_I(ndof*in, wr(ndof*iS + 1:ndof*iS + ndof*in), recv_neib_pe(i), comm, req2(i))
     enddo
 
     call MPI_waitall(recv_n_neib, req2, sta2, ierr)

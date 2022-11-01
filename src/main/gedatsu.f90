@@ -20,6 +20,8 @@ module mod_gedatsu
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
   use mod_gedatsu_communicator
+  use mod_gedatsu_communicator_serial_util
+  use mod_gedatsu_communicator_parallel_util
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis
 

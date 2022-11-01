@@ -1,4 +1,4 @@
-!> グラフ分割モジュール（通信テーブル作成）
+!> 通信テーブル作成モジュール（逐次実行版）
 module mod_gedatsu_communicator_serial_util
   use mod_gedatsu_prm
   use mod_gedatsu_graph
