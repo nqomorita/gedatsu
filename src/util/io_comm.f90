@@ -37,13 +37,13 @@ contains
     implicit none
     !> [in] 出力ファイル名
     character(gedatsu_charlen) :: fname
-    !> [in] 出力ファイル名
+    !> [in] 隣接領域数
     integer(gint) :: n_neib
-    !> [in] 出力ファイル名
+    !> [in] 隣接領域 id
     integer(gint) :: neib_pe(:)
-    !> [in] 出力ファイル名
+    !> [in] 通信テーブルの index 配列
     integer(gint) :: index(:)
-    !> [in] 出力ファイル名
+    !> [in] 通信テーブルの item 配列
     integer(gint) :: item(:)
     integer(gint) :: i
 
@@ -51,7 +51,7 @@ contains
       write(20,"(i0,x,i0)")n_neib, index(n_neib + 1)
 
       do i = 1, n_neib
-        write(20,"(i0)")neib_pe(i)
+        write(20,"(i0)")neib_pe(i) - 1
       enddo
 
       do i = 1, n_neib + 1

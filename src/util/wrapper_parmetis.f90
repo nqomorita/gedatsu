@@ -150,7 +150,7 @@ write(*,*)"item_c", item_c
 write(*,*)"edgecut", edgecut
 write(*,*)"part_id", part_id_c
 
-      part_id = part_id_c
+      part_id = part_id_c + 1
 
       !> deallocate section
       deallocate(vtxdist_c)

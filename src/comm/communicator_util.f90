@@ -40,7 +40,7 @@ contains
       domain = 0
       do j = 1, subgraphs(i)%n_vertex
         nid = subgraphs(i)%vertex_id(j)
-        did = graph%vertex_domain_id(nid) + 1
+        did = graph%vertex_domain_id(nid)
         if(did /= i)then
           domain(did) = domain(did) + 1
         endif
@@ -109,7 +109,7 @@ contains
 
       do j = subgraphs(i)%n_internal_vertex + 1, subgraphs(i)%n_vertex
         nid = subgraphs(i)%vertex_id(j)
-        did = graph%vertex_domain_id(nid) + 1
+        did = graph%vertex_domain_id(nid)
         call gedatsu_bsearch_int(comms(i)%recv_neib_pe, 1, n_neib, did, idx)
         id = add_count(idx) + 1
         comms(i)%recv_item(id) = local_node_id_on_each_domain(nid)
