@@ -4,5 +4,7 @@ make clean
 
 make 
 
-mpirun -np 2 ./a.out 
+../../bin/gedatsu_graph_partitioner -n 2
+
+mpirun -np 2 ./a.out
 

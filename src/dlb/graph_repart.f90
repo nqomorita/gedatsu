@@ -23,7 +23,6 @@ contains
     integer(gint) :: mpi_comm
     integer(gint) :: n_part
     integer(gint), allocatable :: vtxdist(:)
-    integer(gint), allocatable :: vertex_domain_id(:)
     integer(gint), allocatable :: vertex_id(:)
 
     mpi_comm = gedatsu_mpi_global_comm()
@@ -31,7 +30,7 @@ contains
     n_part = gedatsu_mpi_global_comm_size()
 
     call gedatsu_alloc_int_1d(vertex_id, graph%n_vertex)
-    call gedatsu_alloc_int_1d(vertex_domain_id, graph%n_vertex)
+    call gedatsu_realloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
     call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, mpi_comm, vtxdist)
@@ -39,7 +38,7 @@ contains
     call gedatsu_generate_global_vertex_id(graph%n_vertex, vtxdist, vertex_id, comm)
 
     call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
-      & vtxdist, graph%index, graph%item, n_part, vertex_domain_id, mpi_comm)
+      & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, mpi_comm)
   end subroutine gedatsu_graph_repartition
 
   !> @ingroup group_dlb
@@ -53,7 +52,6 @@ contains
     integer(gint) :: mpi_comm
     integer(gint) :: n_part
     integer(gint), allocatable :: vtxdist(:)
-    integer(gint), allocatable :: vertex_domain_id(:)
     integer(gint), allocatable :: vertex_id(:)
 
     mpi_comm = gedatsu_mpi_global_comm()
@@ -61,7 +59,7 @@ contains
     n_part = gedatsu_mpi_global_comm_size()
 
     call gedatsu_alloc_int_1d(vertex_id, graph%n_vertex)
-    call gedatsu_alloc_int_1d(vertex_domain_id, graph%n_vertex)
+    call gedatsu_realloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
     call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, mpi_comm, vtxdist)
@@ -69,6 +67,6 @@ contains
     call gedatsu_generate_global_vertex_id(graph%n_vertex, vtxdist, vertex_id, comm)
 
     call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
-      & vtxdist, graph%index, graph%item, n_part, vertex_domain_id, mpi_comm)
+      & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, mpi_comm)
   end subroutine gedatsu_graph_repartition_with_weight
 end module mod_gedatsu_graph_repart
