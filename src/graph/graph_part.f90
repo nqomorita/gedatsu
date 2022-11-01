@@ -119,11 +119,11 @@ contains
 
     call gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, OVL_vertex_id)
 
+    call gedatsu_graph_add_n_vertex_with_vertex_id(subgraph, n_vertex, OVL_vertex_id)
+
     call gedatsu_alloc_int_2d(edge, 2, n_edge)
 
-    call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
-
-    call gedatsu_graph_add_n_vertex_with_vertex_id(subgraph, n_vertex, OVL_vertex_id)
+    call gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
 
     call gedatsu_graph_add_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_add_overlapping_nodes

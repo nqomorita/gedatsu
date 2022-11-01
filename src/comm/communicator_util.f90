@@ -78,24 +78,6 @@ contains
     type(gedatsu_comm) :: comms(:)
     integer(gint) :: i, j, nid, did, idx, n_recv, n_neib, id, jS, jE
     integer(gint), allocatable :: add_count(:)
-    integer(gint), allocatable :: local_node_id_on_each_domain(:)
-
-    call gedatsu_alloc_int_1d(local_node_id_on_each_domain, graph%n_vertex)
-
-    do i = 1, n_domain
-      do j = 1, subgraphs(i)%n_internal_vertex
-        nid = subgraphs(i)%vertex_id(j)
-        local_node_id_on_each_domain(nid) = j
-      enddo
-    enddo
-
-    do i = 1, graph%n_vertex
-      if(local_node_id_on_each_domain(i) == 0)then
-        call gedatsu_error_string("gedatsu_comm_get_recv_serial")
-        call gedatsu_error_string("local node id is not set")
-        call gedatsu_error_stop()
-      endif
-    enddo
 
     do i = 1, n_domain
       n_neib = comms(i)%recv_n_neib
@@ -112,7 +94,7 @@ contains
         did = graph%vertex_domain_id(nid)
         call gedatsu_bsearch_int(comms(i)%recv_neib_pe, 1, n_neib, did, idx)
         id = add_count(idx) + 1
-        comms(i)%recv_item(id) = local_node_id_on_each_domain(nid)
+        comms(i)%recv_item(id) = j
         add_count(idx) = add_count(idx) + 1
       enddo
 

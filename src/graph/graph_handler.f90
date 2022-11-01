@@ -304,16 +304,30 @@ contains
 
   !> @ingroup group_graph_1
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
-  subroutine gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
+  subroutine gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+    !> [in] subgraph 構造体
+    type(gedatsu_graph) :: subgraph
     !> [in] 領域番号
     integer(gint) :: domain_id
     !> [out] グラフエッジ
     integer(gint) :: edge(:,:)
-    integer(gint) :: i, j, jS, jE, nid
+    integer(gint) :: i, j, jS, jE, nid, idx1, idx2
     integer(gint) :: n_edge
+    integer(gint), allocatable :: ids(:)
+    integer(gint), allocatable :: perm(:)
+
+    call gedatsu_alloc_int_1d(ids, subgraph%n_vertex)
+
+    call gedatsu_alloc_int_1d(perm, subgraph%n_vertex)
+
+    ids = subgraph%vertex_id
+
+    call gedatsu_get_sequence_array_int(perm, subgraph%n_vertex, 1, 1)
+
+    call gedatsu_qsort_int_1d_with_perm(ids, 1, subgraph%n_vertex, perm)
 
     n_edge = 0
     do i = 1, graph%n_vertex
@@ -324,11 +338,14 @@ contains
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) /= domain_id)then
           n_edge = n_edge + 1
-          edge(1,n_edge) = i
-          edge(2,n_edge) = nid
+          call gedatsu_bsearch_int(ids, 1, subgraph%n_vertex, i, idx1)
+          call gedatsu_bsearch_int(ids, 1, subgraph%n_vertex, nid, idx2)
+          edge(1,n_edge) = perm(idx1)
+          edge(2,n_edge) = perm(idx2)
+
           n_edge = n_edge + 1
-          edge(1,n_edge) = nid
-          edge(2,n_edge) = i
+          edge(1,n_edge) = perm(idx2)
+          edge(2,n_edge) = perm(idx1)
         endif
       enddo
     enddo
