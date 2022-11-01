@@ -9,7 +9,7 @@ module mod_gedatsu_communicator
   use mod_gedatsu_mpi
   use mod_gedatsu_mpi_util
   use mod_gedatsu_graph_handler
-  use mod_gedatsu_communicator_util
+  use mod_gedatsu_communicator_serial_util
   implicit none
 
   public :: gedatsu_comm_n_vertex_list

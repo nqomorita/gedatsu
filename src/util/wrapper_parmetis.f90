@@ -17,15 +17,15 @@ contains
     !> [in] グラフのノード id
     integer(gint) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
-    integer(gint), allocatable :: vtxdist(:)
+    integer(gint) :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(gint), allocatable :: index(:)
+    integer(gint) :: index(:)
     !> [in] graph の CSR 圧縮形式の item 配列
-    integer(gint), allocatable :: item(:)
+    integer(gint) :: item(:)
     !> [in] 分割数
     integer(gint) :: n_part
     !> [in] 領域番号
-    integer(gint), allocatable :: part_id(:)
+    integer(gint) :: part_id(:)
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
@@ -47,11 +47,11 @@ contains
     !> [in] グラフのノード id
     integer(gint) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
-    integer(gint), allocatable :: vtxdist(:)
+    integer(gint) :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(gint), allocatable :: index(:)
+    integer(gint) :: index(:)
     !> [in] graph の CSR 圧縮形式の item 配列
-    integer(gint), allocatable :: item(:)
+    integer(gint) :: item(:)
     !> [in] ノード重み
     integer(gint), allocatable :: node_wgt(:)
     !> [in] エッジ重み
@@ -59,7 +59,7 @@ contains
     !> [in] 分割数
     integer(gint) :: n_part
     !> [in] 領域番号
-    integer(gint), allocatable :: part_id(:)
+    integer(gint) :: part_id(:)
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
@@ -93,6 +93,9 @@ contains
       !wflag = 1 !> Only edge weight
       !wflag = 2 !> Only node weight
       !wflag = 3 !> Both weight
+
+write(100+gedatsu_mpi_global_my_rank(),*)"index", index
+write(100+gedatsu_mpi_global_my_rank(),*)"item", item
 
       !> allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
@@ -138,17 +141,18 @@ contains
       tpwgts(1) = 1.0/n_part
       tpwgts(2) = 1.0/n_part
 
-write(*,*)"vtxdist_c", vtxdist_c
-write(*,*)"index_c", index_c
-write(*,*)"item_c", item_c
+write(100+gedatsu_mpi_global_my_rank(),*)"n_vertex", n_vertex
+write(100+gedatsu_mpi_global_my_rank(),*)"vtxdist_c", vtxdist_c
+write(100+gedatsu_mpi_global_my_rank(),*)"index_c", index_c
+write(100+gedatsu_mpi_global_my_rank(),*)"item_c", item_c
 
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
         & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
 
-write(*,*)"edgecut", edgecut
-write(*,*)"part_id", part_id_c
+write(100+gedatsu_mpi_global_my_rank(),*)"edgecut", edgecut
+write(100+gedatsu_mpi_global_my_rank(),*)"part_id", part_id_c
 
       part_id = part_id_c + 1
 

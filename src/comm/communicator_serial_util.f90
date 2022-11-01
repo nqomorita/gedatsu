@@ -1,5 +1,5 @@
 !> グラフ分割モジュール（通信テーブル作成）
-module mod_gedatsu_communicator_util
+module mod_gedatsu_communicator_serial_util
   use mod_gedatsu_prm
   use mod_gedatsu_graph
   use mod_gedatsu_comm
@@ -256,4 +256,4 @@ contains
     enddo
   end subroutine gedatsu_comm_get_send_serial
 
-end module mod_gedatsu_communicator_util
+end module mod_gedatsu_communicator_serial_util
