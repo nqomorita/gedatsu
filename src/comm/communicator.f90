@@ -38,7 +38,7 @@ contains
     enddo
   end subroutine gedatsu_comm_n_vertex_list
 
-  !> グラフの通信テーブルを作成
+  !> グラフの通信テーブルを作成（逐次実行版）
   subroutine gedatsu_comm_get_comm_table_serial(graph, subgraphs, n_domain, comms)
     implicit none
     !> [in] graph 構造体

@@ -103,6 +103,7 @@ contains
   !> MPI バリア関数
   subroutine gedatsu_mpi_barrier_(comm)
     implicit none
+    !> [in] MPI コミュニケータ
     integer(gint) :: comm
     integer(gint) :: ierr
 #ifndef WITH_NOMPI

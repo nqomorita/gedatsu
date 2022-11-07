@@ -9,7 +9,7 @@ module mod_gedatsu_io_comm
 
 contains
 
-  !> gedatsu 通信テーブルの出力
+  !> gedatsu 通信テーブル send の出力
   subroutine gedatsu_output_send_comm_table(fname, comm)
     implicit none
     !> [in] 出力ファイル名
@@ -21,7 +21,7 @@ contains
       & comm%send_n_neib, comm%send_neib_pe, comm%send_index, comm%send_item)
   end subroutine gedatsu_output_send_comm_table
 
-  !> gedatsu 通信テーブルの出力
+  !> gedatsu 通信テーブル recv の出力
   subroutine gedatsu_output_recv_comm_table(fname, comm)
     implicit none
     !> [in] 出力ファイル名
@@ -33,7 +33,7 @@ contains
       & comm%recv_n_neib, comm%recv_neib_pe, comm%recv_index, comm%recv_item)
   end subroutine gedatsu_output_recv_comm_table
 
-  !> gedatsu 通信テーブルの出力
+  !> gedatsu 通信テーブルの出力（メイン関数）
   subroutine gedatsu_output_comm_table_main(fname, n_neib, neib_pe, index, item)
     implicit none
     !> [in] 出力ファイル名
@@ -65,7 +65,7 @@ contains
     close(20)
   end subroutine gedatsu_output_comm_table_main
 
-  !> gedatsu 通信テーブルの入力
+  !> gedatsu 通信テーブル send の入力
   subroutine gedatsu_input_send_comm_table(fname, comm)
     implicit none
     !> [in] 出力ファイル名
@@ -77,7 +77,7 @@ contains
       & comm%send_n_neib, comm%send_neib_pe, comm%send_index, comm%send_item)
   end subroutine gedatsu_input_send_comm_table
 
-  !> gedatsu 通信テーブルの入力
+  !> gedatsu 通信テーブル recv の入力
   subroutine gedatsu_input_recv_comm_table(fname, comm)
     implicit none
     !> [in] 出力ファイル名
@@ -89,7 +89,7 @@ contains
       & comm%recv_n_neib, comm%recv_neib_pe, comm%recv_index, comm%recv_item)
   end subroutine gedatsu_input_recv_comm_table
 
-  !> gedatsu 通信テーブルの入力
+  !> gedatsu 通信テーブルの入力（汎用関数）
   subroutine gedatsu_input_comm_table_main(fname, n_neib, neib_pe, index, item)
     implicit none
     !> [in] 入力ファイル名

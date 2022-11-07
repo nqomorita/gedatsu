@@ -330,24 +330,39 @@ contains
 #endif
   end subroutine gedatsu_allgather_I1
 
+  !> @ingroup mpi
+  !> 通信テーブルを用いた send recv 関数（浮動小数点型）
   subroutine gedatsu_SendRecv_R(send_n_neib, send_neib_pe, recv_n_neib, recv_neib_pe, &
     & send_index, send_item, recv_index, recv_item, &
     & val, ndof, comm)
     implicit none
-    integer(gint) :: send_n_neib, recv_n_neib
-    integer(gint) :: iS, in, j, k, ierr, ns, nr
-    integer(gint) :: i, ndof, comm
+    !> [in] send する隣接領域数
+    integer(gint) :: send_n_neib
+    !> [in] send する隣接領域 id
     integer(gint) :: send_neib_pe(:)
-    integer(gint) :: send_index(:)
-    integer(gint) :: send_item (:)
+    !> [in] recv する隣接領域数
+    integer(gint) :: recv_n_neib
+    !> [in] recv する隣接領域 id
     integer(gint) :: recv_neib_pe(:)
+    !> [in] send の index 配列
+    integer(gint) :: send_index(:)
+    !> [in] send の item 配列（送信する節点番号データ）
+    integer(gint) :: send_item (:)
+    !> [in] recv の index 配列
     integer(gint) :: recv_index(:)
+    !> [in] recv の item 配列（受信する節点番号データ）
     integer(gint) :: recv_item (:)
+    !> [in] 送信データ配列
+    real(gdouble) :: val(:)
+    !> [in] 節点番号の自由度数
+    integer(gint) :: ndof
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    integer(gint) :: i, iS, in, j, k, ierr, ns, nr
     integer(gint) :: sta1(gedatsu_mpi_status_size, send_n_neib)
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
     integer(gint) :: req2(recv_n_neib)
-    real(gdouble) :: val(:)
     real(gdouble), allocatable :: ws(:)
     real(gdouble), allocatable :: wr(:)
 
@@ -394,24 +409,39 @@ contains
 #endif
   end subroutine gedatsu_SendRecv_R
 
+  !> @ingroup mpi
+  !> 通信テーブルを用いた send recv 関数（整数型）
   subroutine gedatsu_SendRecv_I(send_n_neib, send_neib_pe, recv_n_neib, recv_neib_pe, &
     & send_index, send_item, recv_index, recv_item, &
     & val, ndof, comm)
     implicit none
-    integer(gint) :: send_n_neib, recv_n_neib
-    integer(gint) :: iS, in, j, k, ierr, ns, nr
-    integer(gint) :: i, ndof, comm
+    !> [in] send する隣接領域数
+    integer(gint) :: send_n_neib
+    !> [in] send する隣接領域 id
     integer(gint) :: send_neib_pe(:)
-    integer(gint) :: send_index(:)
-    integer(gint) :: send_item (:)
+    !> [in] recv する隣接領域数
+    integer(gint) :: recv_n_neib
+    !> [in] recv する隣接領域 id
     integer(gint) :: recv_neib_pe(:)
+    !> [in] send の index 配列
+    integer(gint) :: send_index(:)
+    !> [in] send の item 配列（送信する節点番号データ）
+    integer(gint) :: send_item (:)
+    !> [in] recv の index 配列
     integer(gint) :: recv_index(:)
+    !> [in] recv の item 配列（受信する節点番号データ）
     integer(gint) :: recv_item (:)
+    !> [in] 送信データ配列
+    integer(gint) :: val(:)
+    !> [in] 節点番号の自由度数
+    integer(gint) :: ndof
+    !> [in] MPI コミュニケータ
+    integer(gint) :: comm
+    integer(gint) :: i, iS, in, j, k, ierr, ns, nr
     integer(gint) :: sta1(gedatsu_mpi_status_size, send_n_neib)
     integer(gint) :: sta2(gedatsu_mpi_status_size, recv_n_neib)
     integer(gint) :: req1(send_n_neib)
     integer(gint) :: req2(recv_n_neib)
-    integer(gint) :: val(:)
     integer(gint), allocatable :: ws(:)
     integer(gint), allocatable :: wr(:)
 
