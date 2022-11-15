@@ -1,3 +1,4 @@
+!> comm モジュール
 module mod_gedatsu_comm
   use mod_gedatsu_prm
   use mod_gedatsu_alloc

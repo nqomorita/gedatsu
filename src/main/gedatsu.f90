@@ -24,6 +24,7 @@ module mod_gedatsu
   use mod_gedatsu_communicator_parallel_util
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis
+  use mod_gedatsu_dlb
 
   !> @defgroup group_init 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ
