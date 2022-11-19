@@ -74,17 +74,15 @@ contains
     integer(gint), allocatable :: outer_domain_id_all(:)
     !> 全ての外部節点配列の各領域に属する節点数
     integer(gint), allocatable :: displs(:)
+    type(dedatsu_comm_node_list), allocatable :: recv_list(:)
+    type(dedatsu_comm_node_list), allocatable :: send_list(:)
 
     call gedatsu_comm_get_all_external_node(graph, comm, outer_node_id_all, displs)
 
     call gedatsu_comm_get_all_external_node_domain_id(graph, comm, outer_node_id_all, outer_domain_id_all, displs)
 
-    !call gedatsu_comm_get_recv_neib_domain_parallel(graph, subgraphs, n_domain, comms)
+    call gedatsu_comm_get_recv_parallel(graph, comm, outer_node_id_all, outer_domain_id_all, displs, recv_list)
 
-    !call gedatsu_comm_get_recv_parallel(graph, subgraphs, n_domain, comms)
-
-    !call gedatsu_comm_get_send_list_parallel(subgraphs, n_domain, comms, send_list)
-
-    !call gedatsu_comm_get_send_parallel(subgraphs, n_domain, comms, send_list)
+    call gedatsu_comm_get_send_parallel(graph, comm, outer_node_id_all, outer_domain_id_all, displs, recv_list, send_list)
   end subroutine gedatsu_comm_get_comm_table_parallel
 end module mod_gedatsu_communicator
