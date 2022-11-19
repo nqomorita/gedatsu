@@ -9,6 +9,8 @@ module mod_gedatsu_dlb
   type gedatsu_dlb
     !> comm 構造体
     type(gedatsu_comm) :: comm
+    !> 負荷分散の実行判定
+    logical :: should_update
   end type gedatsu_dlb
 
 contains
