@@ -374,7 +374,7 @@ contains
     !> local_nid に変換
     in = comm%send_index(n_neib_send)
     do i = 1, in
-      call monolis_bsearch_int(temp, 1, NP, wr(i), id)
+      !call monolis_bsearch_int(temp, 1, NP, wr(i), id)
       comm%send_item(i) = local_nid(id)
     enddo
   end subroutine gedatsu_comm_get_send_parallel
