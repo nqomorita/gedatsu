@@ -214,8 +214,9 @@ contains
       enddo
 
       recv_list(i)%n_node = n_data
+      call gedatsu_alloc_int_1d(recv_list(i)%domid, 1)
+      call gedatsu_alloc_int_1d(recv_list(i)%global_id, n_data)
       recv_list(i)%domid = recv_rank
-      allocate(recv_list(i)%global_id(n_data), source = 0)
 
       n_data = 0
       do j = jS, jE
@@ -312,10 +313,12 @@ contains
     do i = 1, comm_size
       if(send_n_list(i) > 0)then
         n_neib_send = n_neib_send + 1
-        send_list(n_neib_send)%domid = i - 1
+        call gedatsu_alloc_int_1d(send_list(n_neib_send)%domid, 1)
+        send_list(n_neib_send)%domid(1) = i - 1
+
         n_data = send_n_list(i)
+        call gedatsu_alloc_int_1d(send_list(n_neib_send)%global_id, n_data)
         send_list(n_neib_send)%n_node = n_data
-        allocate(send_list(n_neib_send)%global_id(n_data), source = 0)
       endif
     enddo
 
@@ -325,9 +328,9 @@ contains
     do i = 1, n_neib_send
       comm%send_neib_pe(i) = send_list(i)%domid(1)
     enddo
-    allocate(comm%send_index(0:n_neib_send), source = 0)
+    allocate(comm%send_index(n_neib_send + 1), source = 0)
     do i = 1, n_neib_send
-      comm%send_index(i) = comm%send_index(i-1) + send_list(i)%n_node
+      comm%send_index(i + 1) = comm%send_index(i) + send_list(i)%n_node
     enddo
     in = comm%send_index(n_neib_send)
     allocate(comm%send_item(in), source = 0)
@@ -338,14 +341,14 @@ contains
     allocate(req1(comm%recv_n_neib))
     allocate(req2(comm%send_n_neib))
 
-    in = comm%recv_index(n_neib_recv)
+    in = comm%recv_index(n_neib_recv + 1)
     allocate(ws(in), source = 0)
 
     do i = 1, comm%recv_n_neib
       id = recv_list(i)%domid(1)
       in = recv_list(i)%n_node
-      jS = comm%recv_index(i-1) + 1
-      jE = comm%recv_index(i)
+      jS = comm%recv_index(i) + 1
+      jE = comm%recv_index(i + 1)
       do j = jS, jE
         idx = comm%recv_item(j)
         ws(j) = graph%vertex_id(idx)
@@ -353,13 +356,13 @@ contains
       call MPI_Isend(ws(jS:jE), in, MPI_INTEGER, id, 0, comm%comm, req1(i), ierr)
     enddo
 
-    in = comm%send_index(n_neib_send)
+    in = comm%send_index(n_neib_send + 1)
     allocate(wr(in), source = 0)
     do i = 1, comm%send_n_neib
       id = send_list(i)%domid(1)
       in = send_list(i)%n_node
-      jS = comm%send_index(i-1) + 1
-      jE = comm%send_index(i)
+      jS = comm%send_index(i) + 1
+      jE = comm%send_index(i + 1)
       call MPI_Irecv(wr(jS:jE), in, MPI_INTEGER, id, 0, comm%comm, req2(i), ierr)
     enddo
 
@@ -367,6 +370,7 @@ contains
     call MPI_waitall(comm%send_n_neib, req1, sta1, ierr)
 
     !> local_nid に変換
+    NP = graph%n_vertex
     call gedatsu_alloc_int_1d(local_nid, NP)
     call gedatsu_alloc_int_1d(temp, NP)
 
