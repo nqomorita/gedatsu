@@ -83,6 +83,6 @@ contains
 
     call gedatsu_comm_get_recv_parallel(graph, comm, outer_node_id_all, outer_domain_id_all, displs, recv_list)
 
-    call gedatsu_comm_get_send_parallel(graph, comm, outer_node_id_all, outer_domain_id_all, displs, recv_list, send_list)
+    call gedatsu_comm_get_send_parallel(graph, comm, recv_list, send_list)
   end subroutine gedatsu_comm_get_comm_table_parallel
 end module mod_gedatsu_communicator

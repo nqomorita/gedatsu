@@ -260,30 +260,22 @@ contains
   end subroutine gedatsu_comm_get_recv_parallel
 
   !> データ通信する send 隣接領域の取得（並列実行版）
-  subroutine gedatsu_comm_get_send_parallel(graph, comm, outer_node_id_all, outer_domain_id_all, displs, recv_list, send_list)
+  subroutine gedatsu_comm_get_send_parallel(graph, comm, recv_list, send_list)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in,out] 分割領域に対応する comm 構造体
     type(gedatsu_comm) :: comm
-    !> [in] 全ての外部節点番号
-    integer(gint) :: outer_node_id_all(:)
-    !> [in] 全ての外部節点が属する領域番号
-    integer(gint) :: outer_domain_id_all(:)
-    !> [in] 全ての外部節点配列の各領域に属する節点数
-    integer(gint) :: displs(:)
     !> [out] 分割領域に対応する send list 構造体
     type(dedatsu_comm_node_list) :: recv_list(:)
     !> [out] 分割領域に対応する send list 構造体
     type(dedatsu_comm_node_list), allocatable :: send_list(:)
 
-    integer(gint) :: i, in, j, jS, jE, id, comm_size, my_rank
-    integer(gint) :: NP, n_neib_recv, recv_rank, n_data, global_id, idx, ierr
+    integer(gint) :: i, in, j, jS, jE, id, comm_size
+    integer(gint) :: NP, n_neib_recv, n_data, idx, ierr
     integer(gint) :: n_neib_send
     integer(gint), allocatable :: send_n_list(:)
-    integer(gint), allocatable :: is_neib(:)
     integer(gint), allocatable :: local_nid(:)
-    integer(gint), allocatable :: neib_id(:)
     integer(gint), allocatable :: temp(:)
     integer(gint), allocatable :: sta1(:,:)
     integer(gint), allocatable :: sta2(:,:)
@@ -294,7 +286,10 @@ contains
 
     !> send の作成
     !> slave から master に個数を送信
+    comm_size = gedatsu_mpi_local_comm_size(comm%comm)
     allocate(send_n_list(comm_size), source = 0)
+
+    n_neib_recv = comm%recv_n_neib
 
     do i = 1, n_neib_recv
       id = recv_list(i)%domid(1)
@@ -372,9 +367,19 @@ contains
     call MPI_waitall(comm%send_n_neib, req1, sta1, ierr)
 
     !> local_nid に変換
+    call gedatsu_alloc_int_1d(local_nid, NP)
+    call gedatsu_alloc_int_1d(temp, NP)
+
+    temp(:) = graph%vertex_id(:)
+    do i = 1, NP
+      local_nid(i) = i
+    enddo
+
+    call gedatsu_qsort_int_1d_with_perm(temp, 1, NP, local_nid)
+
     in = comm%send_index(n_neib_send)
     do i = 1, in
-      !call monolis_bsearch_int(temp, 1, NP, wr(i), id)
+      call gedatsu_bsearch_int(temp, 1, NP, wr(i), id)
       comm%send_item(i) = local_nid(id)
     enddo
   end subroutine gedatsu_comm_get_send_parallel
