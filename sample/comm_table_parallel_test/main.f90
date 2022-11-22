@@ -32,5 +32,7 @@ program main
 
   call gedatsu_comm_get_comm_table_parallel(graph, comm)
 
+  call gedatsu_comm_debug_write(comm)
+
   call gedatsu_global_finalize()
 end program main

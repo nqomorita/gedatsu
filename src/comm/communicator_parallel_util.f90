@@ -288,7 +288,7 @@ contains
     !> send の作成
     !> slave から master に個数を送信
     comm_size = gedatsu_mpi_local_comm_size(comm%comm)
-    allocate(send_n_list(comm_size), source = 0)
+    call gedatsu_alloc_int_1d(send_n_list, comm_size)
 
     n_neib_recv = comm%recv_n_neib
 
@@ -324,22 +324,22 @@ contains
 
     !> send
     comm%send_n_neib = n_neib_send
-    allocate(comm%send_neib_pe(n_neib_send), source = 0)
+    call gedatsu_alloc_int_1d(comm%send_neib_pe, n_neib_send)
     do i = 1, n_neib_send
       comm%send_neib_pe(i) = send_list(i)%domid(1)
     enddo
-    allocate(comm%send_index(n_neib_send + 1), source = 0)
+    call gedatsu_alloc_int_1d(comm%send_index, n_neib_send + 1)
     do i = 1, n_neib_send
       comm%send_index(i + 1) = comm%send_index(i) + send_list(i)%n_node
     enddo
-    in = comm%send_index(n_neib_send)
-    allocate(comm%send_item(in), source = 0)
+    in = comm%send_index(n_neib_send + 1)
+    call gedatsu_alloc_int_1d(comm%send_item, in)
 
     !> slave から master に global_nid を送信
-    allocate(sta1(gedatsu_mpi_status_size,comm%recv_n_neib))
-    allocate(sta2(gedatsu_mpi_status_size,comm%send_n_neib))
-    allocate(req1(comm%recv_n_neib))
-    allocate(req2(comm%send_n_neib))
+    call gedatsu_alloc_int_2d(sta1, gedatsu_mpi_status_size, comm%recv_n_neib)
+    call gedatsu_alloc_int_2d(sta2, gedatsu_mpi_status_size, comm%send_n_neib)
+    call gedatsu_alloc_int_1d(req1, comm%recv_n_neib)
+    call gedatsu_alloc_int_1d(req2, comm%send_n_neib)
 
     in = comm%recv_index(n_neib_recv + 1)
     allocate(ws(in), source = 0)
@@ -381,7 +381,7 @@ contains
 
     call gedatsu_qsort_int_1d_with_perm(temp, 1, NP, local_nid)
 
-    in = comm%send_index(n_neib_send)
+    in = comm%send_index(n_neib_send + 1)
     do i = 1, in
       call gedatsu_bsearch_int(temp, 1, NP, wr(i), id)
       comm%send_item(i) = local_nid(id)

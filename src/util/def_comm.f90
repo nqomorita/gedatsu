@@ -65,4 +65,29 @@ contains
     call gedatsu_dealloc_int_1d(comm%send_index)
     call gedatsu_dealloc_int_1d(comm%send_item)
   end subroutine gedatsu_comm_finalize
+
+  !> comm 構造体のデバッグ用データ書き出し
+  subroutine gedatsu_comm_debug_write(comm)
+    implicit none
+    !> [in] comm 構造体
+    type(gedatsu_comm) :: comm
+
+    write(*,*)"--- gedatsu_comm_debug_write"
+    write(*,*)"comm%recv_n_neib"
+    write(*,*)comm%recv_n_neib
+    write(*,*)"comm%recv_neib_pe"
+    write(*,*)comm%recv_neib_pe
+    write(*,*)"comm%recv_index"
+    write(*,*)comm%recv_index
+    write(*,*)"comm%recv_item"
+    write(*,*)comm%recv_item
+    write(*,*)"comm%send_n_neib"
+    write(*,*)comm%send_n_neib
+    write(*,*)"comm%send_neib_pe"
+    write(*,*)comm%send_neib_pe
+    write(*,*)"comm%send_index"
+    write(*,*)comm%send_index
+    write(*,*)"comm%send_item"
+    write(*,*)comm%send_item
+  end subroutine gedatsu_comm_debug_write
 end module mod_gedatsu_comm
