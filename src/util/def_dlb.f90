@@ -30,4 +30,14 @@ contains
     type(gedatsu_dlb) :: dlb
 
   end subroutine gedatsu_dlb_finalize
+
+  !> dlb 構造体の初期化関数
+  subroutine gedatsu_dlb_should_update(dlb, should_update)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb) :: dlb
+    !> [out] 負荷分散の実行判定
+    logical :: should_update
+    should_update = dlb%should_update
+  end subroutine gedatsu_dlb_should_update
 end module mod_gedatsu_dlb

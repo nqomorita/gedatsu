@@ -95,6 +95,7 @@ SRC_LIST_COMM = \
 
 SRC_LIST_DLB = \
   graph_repart.f90 \
+  dlb_comm.f90 \
   dlb_handler.f90
 
 SRC_ALL_LIST = \

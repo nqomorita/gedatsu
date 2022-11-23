@@ -5,6 +5,7 @@ module mod_gedatsu_dlb_handler
   use mod_gedatsu_dlb
   use mod_gedatsu_util
   use mod_gedatsu_graph_repart
+  use mod_gedatsu_dlb_comm
   implicit none
 
 contains
@@ -23,10 +24,21 @@ contains
 
     call gedatsu_graph_repartition(graph, comm)
 
-    !call gedatsu_dlb_update_check(dlb, graph)
+    call gedatsu_dlb_update_check(dlb, graph)
 
-    !call gedatsu_dlb_get_comm_table(dlb, graph)
+    call gedatsu_dlb_get_comm_table(dlb, graph)
   end subroutine gedatsu_dlb_analysis
+
+  !> @ingroup group_dlb
+  !> 負荷分散：負荷分散の実行チェック
+  subroutine gedatsu_dlb_update_check(dlb, graph)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph
+
+  end subroutine gedatsu_dlb_update_check
 
   !> @ingroup group_dlb
   !> 負荷分散：グラフ情報のアップデート（配列のメモリ再確保）
