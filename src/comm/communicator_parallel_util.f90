@@ -39,6 +39,18 @@ contains
     & vertex_id, 1, gedatsu_mpi_global_comm())
   end subroutine gedatsu_generate_global_vertex_id
 
+  subroutine gedatsu_update_vertex_domain_id(vertex_domain_id, comm)
+    implicit none
+    !> [out] グローバルノード番号配列
+    integer(gint) :: vertex_domain_id(:)
+    !> [in] comm 構造体
+    type(gedatsu_comm) :: comm
+
+    call gedatsu_SendRecv_I(comm%send_n_neib, comm%send_neib_pe, comm%recv_n_neib, comm%recv_neib_pe, &
+    & comm%send_index, comm%send_item, comm%recv_index, comm%recv_item, &
+    & vertex_domain_id, 1, gedatsu_mpi_global_comm())
+  end subroutine gedatsu_update_vertex_domain_id
+
   !> 全ての外部節点を取得
   subroutine gedatsu_comm_get_all_external_node(graph, comm, outer_node_id_all, displs)
     implicit none

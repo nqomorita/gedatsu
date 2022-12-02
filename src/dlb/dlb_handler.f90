@@ -18,11 +18,10 @@ contains
     type(gedatsu_dlb) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    type(gedatsu_comm) :: comm
 
-    call gedatsu_comm_get_comm_table_parallel(graph, comm)
+    call gedatsu_comm_get_comm_table_parallel(graph, dlb%comm)
 
-    call gedatsu_graph_repartition(graph, comm)
+    call gedatsu_graph_repartition(graph, dlb%comm)
 
     call gedatsu_dlb_update_check(dlb, graph)
 

@@ -39,6 +39,8 @@ contains
 
     call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
       & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, mpi_comm)
+
+    call gedatsu_update_vertex_domain_id(graph%vertex_domain_id, comm)
   end subroutine gedatsu_graph_repartition
 
   !> @ingroup group_dlb

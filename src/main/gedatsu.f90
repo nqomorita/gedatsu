@@ -5,26 +5,31 @@ module mod_gedatsu
   use mod_gedatsu_graph
   use mod_gedatsu_comm
   use mod_gedatsu_util
+  use mod_gedatsu_alloc
+  use mod_gedatsu_std
+  !> IO section
   use mod_gedatsu_io
   use mod_gedatsu_io_arg
   use mod_gedatsu_io_comm
   use mod_gedatsu_io_file_name
-  use mod_gedatsu_alloc
-  use mod_gedatsu_mpi
-  use mod_gedatsu_mpi_util
-  use mod_gedatsu_std
-  use mod_gedatsu_wrapper_metis
-  use mod_gedatsu_wrapper_parmetis
+  !> graph section
   use mod_gedatsu_graph_part
   use mod_gedatsu_graph_repart
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
+  !> MPI section
+  use mod_gedatsu_mpi
+  use mod_gedatsu_mpi_util
   use mod_gedatsu_communicator
   use mod_gedatsu_communicator_serial_util
   use mod_gedatsu_communicator_parallel_util
+  !> wrapper section
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis
+  !> DBL section
   use mod_gedatsu_dlb
+  use mod_gedatsu_dlb_handler
+  use mod_gedatsu_dlb_comm
 
   !> @defgroup group_init 初期化・終了処理
   !> 初期化・終了処理に関連する関数グループ
