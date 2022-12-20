@@ -19,11 +19,11 @@ contains
     integer(gint), allocatable :: item(:)
     !> [in] 分割数
     integer(gint) :: n_part
-    !> [in] 領域番号
+    !> [out] 領域番号
     integer(gint), allocatable :: part_id(:)
 
-    integer(gint), allocatable :: node_wgt(:)
-    integer(gint), allocatable :: edge_wgt(:)
+    integer(gint), allocatable :: node_wgt(:,:)
+    integer(gint), allocatable :: edge_wgt(:,:)
 
     call gedatsu_part_graph_metis_with_weight(n_vertex, index, item, node_wgt, edge_wgt, n_part, part_id)
   end subroutine gedatsu_part_graph_metis
@@ -40,12 +40,12 @@ contains
     !> [in] graph の CSR 圧縮形式の item 配列
     integer(gint), allocatable :: item(:)
     !> [in] ノード重み
-    integer(gint), allocatable :: node_wgt(:)
+    integer(gint), allocatable :: node_wgt(:,:)
     !> [in] エッジ重み
-    integer(gint), allocatable :: edge_wgt(:)
+    integer(gint), allocatable :: edge_wgt(:,:)
     !> [in] 分割数
     integer(gint) :: n_part
-    !> [in] 領域番号
+    !> [out] 領域番号
     integer(gint), allocatable  :: part_id(:)
 
     integer(gint) :: ncon, objval, nz
@@ -79,14 +79,14 @@ contains
 
       if(allocated(node_wgt))then
         allocate(node_wgt_c(n_vertex), source = 0)
-        node_wgt_c = node_wgt
+        node_wgt_c = node_wgt(1,:)
       else
         node_wgt_c => null()
       endif
 
       if(allocated(edge_wgt))then
         allocate(edge_wgt_c(nz), source = 0)
-        edge_wgt_c = edge_wgt
+        edge_wgt_c = edge_wgt(1,:)
       else
         edge_wgt_c => null()
       endif

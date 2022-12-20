@@ -30,18 +30,23 @@ contains
 
   !> @ingroup group_graph_4
   !> グラフを分割する（節点重みあり）
-  subroutine gedatsu_graph_partition_with_weight(graph, n_domain, subgraphs)
+  subroutine gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 分割数
     integer(gint) :: n_domain
+    !> [in] ノード重み
+    integer(gint), allocatable :: node_wgt(:,:)
+    !> [in] エッジ重み
+    integer(gint), allocatable :: edge_wgt(:,:)
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), allocatable :: subgraphs(:)
 
     call gedatsu_alloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
 
-    call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
+    call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
+      & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
 
     allocate(subgraphs(n_domain))
 
