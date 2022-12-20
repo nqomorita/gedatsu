@@ -55,8 +55,8 @@ contains
     integer(gint) :: n_part
     integer(gint), allocatable :: vtxdist(:)
     integer(gint), allocatable :: vertex_id(:)
-    integer(gint), allocatable :: node_wgt(:)
-    integer(gint), allocatable :: edge_wgt(:)
+    integer(gint), allocatable :: node_wgt(:,:)
+    integer(gint), allocatable :: edge_wgt(:,:)
 
     mpi_comm = gedatsu_mpi_global_comm()
 

@@ -29,8 +29,8 @@ contains
     !> [in] MPI コミュニケータ
     integer(gint) :: comm
 
-    integer(gint), allocatable :: node_wgt(:)
-    integer(gint), allocatable :: edge_wgt(:)
+    integer(gint), allocatable :: node_wgt(:,:)
+    integer(gint), allocatable :: edge_wgt(:,:)
 
     call gedatsu_repart_graph_parmetis_with_weight(n_vertex, vertex_id, &
       & vtxdist, index, item, node_wgt, edge_wgt, n_part, part_id, comm)
@@ -53,9 +53,9 @@ contains
     !> [in] graph の CSR 圧縮形式の item 配列
     integer(gint) :: item(:)
     !> [in] ノード重み
-    integer(gint), allocatable :: node_wgt(:)
+    integer(gint), allocatable :: node_wgt(:,:)
     !> [in] エッジ重み
-    integer(gint), allocatable :: edge_wgt(:)
+    integer(gint), allocatable :: edge_wgt(:,:)
     !> [in] 分割数
     integer(gint) :: n_part
     !> [in] 領域番号
@@ -109,7 +109,7 @@ contains
       if(allocated(node_wgt))then
         wflag = 2 !> Only node weight
         allocate(node_wgt_c(n_vertex), source = 0)
-        node_wgt_c = node_wgt
+        node_wgt_c = node_wgt(1,:)
       else
         node_wgt_c => null()
       endif
@@ -121,7 +121,7 @@ contains
           wflag = 1 !> Only edge weight
         endif
         allocate(edge_wgt_c(nz), source = 0)
-        edge_wgt_c = edge_wgt
+        edge_wgt_c = edge_wgt(1,:)
       else
         edge_wgt_c => null()
       endif
