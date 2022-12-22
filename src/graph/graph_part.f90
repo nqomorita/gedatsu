@@ -48,8 +48,6 @@ contains
     call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
       & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
 
-    allocate(subgraphs(n_domain))
-
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition_with_weight
 
