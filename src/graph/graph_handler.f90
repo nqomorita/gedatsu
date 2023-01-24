@@ -120,16 +120,25 @@ contains
     !> [out] グラフのノード数
     integer(gint) :: n_vertex
     integer(gint) :: i, j, jS, jE, nid
+    integer(gint), allocatable :: is_used(:)
 
-    n_vertex = 0
+    call gedatsu_alloc_int_1d(is_used, graph%n_vertex)
+
     do i = 1, graph%n_vertex
       if(graph%vertex_domain_id(i) /= domain_id) cycle
       jS = graph%index(i) + 1
       jE = graph%index(i + 1)
       do j = jS, jE
         nid = graph%item(j)
-        if(graph%vertex_domain_id(nid) /= domain_id) n_vertex = n_vertex + 1
+        if(graph%vertex_domain_id(nid) /= domain_id)then
+          is_used(nid) = 1
+        endif
       enddo
+    enddo
+
+    n_vertex = 0
+    do i = 1, graph%n_vertex
+      if(is_used(i) == 1) n_vertex = n_vertex + 1
     enddo
   end subroutine gedatsu_graph_get_n_vertex_in_overlap_region
 
@@ -166,8 +175,10 @@ contains
     integer(gint) :: ids(:)
     integer(gint) :: n_vertex
     integer(gint) :: i, j, jS, jE, nid
+    integer(gint), allocatable :: is_used(:)
 
-    n_vertex = 0
+    call gedatsu_alloc_int_1d(is_used, graph%n_vertex)
+
     do i = 1, graph%n_vertex
       if(graph%vertex_domain_id(i) /= domain_id) cycle
       jS = graph%index(i) + 1
@@ -175,10 +186,17 @@ contains
       do j = jS, jE
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) /= domain_id)then
-          n_vertex = n_vertex + 1
-          ids(n_vertex) = graph%vertex_id(nid)
+          is_used(nid) = 1
         endif
       enddo
+    enddo
+
+    n_vertex = 0
+    do i = 1, graph%n_vertex
+      if(is_used(i) == 1)then
+        n_vertex = n_vertex + 1
+        ids(n_vertex) = graph%vertex_id(i)
+      endif
     enddo
   end subroutine gedatsu_graph_get_vertex_id_in_overlap_region
 
