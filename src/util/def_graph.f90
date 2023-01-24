@@ -9,9 +9,9 @@ module mod_gedatsu_graph
   !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
   type gedatsu_graph
     !> ノード数
-    integer(gint) :: n_vertex
+    integer(gint) :: n_vertex = 0
     !> 領域分割における内部ノード数
-    integer(gint) :: n_internal_vertex
+    integer(gint) :: n_internal_vertex = 0
     !> ノード id 配列
     integer(gint), allocatable :: vertex_id(:)
     !> 領域番号配列
