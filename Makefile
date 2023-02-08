@@ -106,8 +106,8 @@ DRV_OBJS1   = $(DRV_OBJSt:.c=.o) ./obj/gedatsu_graph_partitioner.o
 
 ##> target
 all: \
-	$(LIB_TARGET)
-#$(TEST_TARGET) \
+	$(LIB_TARGET) \
+	$(TEST_TARGET)
 #$(DRIVE1)
 
 lib: \
@@ -117,7 +117,8 @@ $(LIB_TARGET): $(LIB_OBJS)
 	$(AR) $@ $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
-	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lmonolis_utils
+	$(FC) $(FFLAGS) -o $@ $(TST_OBJS)
+#-L./lib -lmonolis_utils
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -138,7 +139,8 @@ $(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
-	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lmonolis_utils
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1)
+#-L./lib -lmonolis_utils
 
 clean:
 	$(RM) \
