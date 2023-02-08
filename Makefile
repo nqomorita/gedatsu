@@ -65,11 +65,6 @@ SRC_GRAPH = \
   graph_convert.f90 \
   graph_part.f90
 
-SRC_COMM = \
-  communicator_serial_util.f90 \
-  communicator_parallel_util.f90 \
-  communicator.f90
-
 SRC_DLB = \
   graph_repart.f90 \
   dlb_comm.f90 \
@@ -78,7 +73,6 @@ SRC_DLB = \
 SRC_ALL = \
 $(addprefix util/, $(SRC_UTIL)) \
 $(addprefix graph/, $(SRC_GRAPH)) \
-$(addprefix comm/, $(SRC_COMM)) \
 $(addprefix dlb/, $(SRC_DLB)) \
 gedatsu.f90
 

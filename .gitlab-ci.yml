@@ -7,18 +7,18 @@ stages:
 build_doxygen:
   stage: build
   script:
-    - cd doc
+    - cd manual
     - doxygen
   artifacts:
     paths:
-      - doc
+      - manual
 
 pages:
   stage: deploy
   dependencies:
     - build_doxygen
   script:
-    - mv doc/docs public
+    - mv manual/docs public
   artifacts:
     paths:
       - public
