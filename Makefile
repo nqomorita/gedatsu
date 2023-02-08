@@ -1,26 +1,25 @@
 #> gedatsu Makefile
+
+##> compiler setting
 FC     = mpif90
-#FFLAGS = -O2 -std=legacy -mtune=native -march=native -Wno-missing-include-dirs
-FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wall -Wno-unused-function -Wno-missing-include-dirs -ffpe-trap=invalid,zero,overflow
+#FFLAGS = -fPIC -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
+FFLAGS = -fPIC -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow -Wno-missing-include-dirs
+CC     = mpicc
+CFLAGS = -fPIC -O2
 
-CC     = mpic++
-CFLAGS = -O2
+##> directory setting
+MOD_DIR = -J ./include
+INCLUDE = -I /usr/include -I ./include
+BIN_DIR = ./bin
+SRC_DIR = ./src
+OBJ_DIR = ./obj
+LIB_DIR = ./lib
+TST_DIR = ./test
+DRV_DIR = ./driver
+LIBRARY = libgedatsu.a
+CPP     = -cpp $(FLAG_DEBUG)
 
-MAKE     = make
-CD       = cd
-RM       = rm -r
-AR       = - ar ruv
-
-#> library setting
-METIS_DIR  = .
-METIS_INC  = -I $(METIS_DIR)/include
-METIS_LIB  = -L$(METIS_DIR)/lib -lmetis -lGKlib
-
-PARMETIS_DIR  = .
-PARMETIS_INC  = -I $(METIS_DIR)/include
-PARMETIS_LIB  = -L$(METIS_DIR)/lib -lparmetis
-
-#> option setting
+##> option setting
 ifdef FLAGS
 	comma:= ,
 	empty:=
@@ -28,14 +27,14 @@ ifdef FLAGS
 	DFLAGS = $(subst $(comma), $(space), $(FLAGS))
 
 	ifeq ($(findstring DEBUG, $(DFLAGS)), DEBUG)
-		FFLAGS  = -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow
+		FFLAGS  = -fPIC -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow -Wno-missing-include-dirs
 	endif
 
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
 		FC      = mpiifort
-		FFLAGS  = -O2 -align array64byte
-		CC      = mpiicpc
-		CFLAGS  = -O2
+		FFLAGS  = -fPIC -O2 -align array64byte
+		CC      = mpiicc
+		CFLAGS  = -fPIC -O2 -no-multibyte-chars
 		MOD_DIR = -module ./include
 	endif
 
@@ -44,97 +43,118 @@ ifdef FLAGS
 	endif
 endif
 
-#> compilation directories
-INCLUDE  = -I /usr/include -I ./include $(METIS_INC)
-BIN_DIR  = ./bin
-SRC_DIR  = ./src
-OBJ_DIR  = ./obj
-LIB_DIR  = ./lib
-MOD_DIR  = -J ./include
-LIB_LIST = libgedatsu.a
-GEDATSU_LIB = -L$(LIB_DIR) -lgedatsu $(METIS_LIB)
-CPP      = -cpp $(FLAG_INT64)
+##> other commands
+MAKE = make
+CD   = cd
+RM   = rm -r
+AR   = - ar ruv
 
-#> bin target
-PRT_G_TGT = $(BIN_DIR)/gedatsu_graph_partitioner
+##> **********
+##> target (1)
+LIB_TARGET = $(LIB_DIR)/$(LIBRARY)
 
-#> library target
-LIB_TGT = \
-$(addprefix $(LIB_DIR)/, $(LIB_LIST))
-
-SRC_LIST_UTIL1 = \
-  def_prm.f90 \
-
-SRC_LIST_UTIL2 = \
-  util.f90 \
-  alloc.f90 \
+##> source file define
+SRC_UTIL = \
   def_graph.f90 \
-  def_comm.f90 \
   def_dlb.f90 \
-  std.f90 \
   wrapper_metis.f90 \
-  wrapper_parmetis.f90 \
-  io_file_name.f90 \
-  io.f90 \
-  io_comm.f90 \
-  io_arg.f90
+  wrapper_parmetis.f90
 
-SRC_LIST_MPI = \
-  mpi_util.f90 \
-  mpi.f90
-
-SRC_LIST_GRAPH = \
+SRC_GRAPH = \
   graph_handler.f90 \
   graph_convert.f90 \
   graph_part.f90
 
-SRC_LIST_COMM = \
+SRC_COMM = \
   communicator_serial_util.f90 \
   communicator_parallel_util.f90 \
   communicator.f90
 
-SRC_LIST_DLB = \
+SRC_DLB = \
   graph_repart.f90 \
   dlb_comm.f90 \
   dlb_handler.f90
 
-SRC_ALL_LIST = \
-$(addprefix util/, $(SRC_LIST_UTIL1)) \
-$(addprefix mpi/, $(SRC_LIST_MPI)) \
-$(addprefix util/, $(SRC_LIST_UTIL2)) \
-$(addprefix graph/, $(SRC_LIST_GRAPH)) \
-$(addprefix comm/, $(SRC_LIST_COMM)) \
-$(addprefix dlb/, $(SRC_LIST_DLB)) \
-main/gedatsu.f90
+SRC_ALL = \
+$(addprefix util/, $(SRC_UTIL)) \
+$(addprefix graph/, $(SRC_GRAPH)) \
+$(addprefix comm/, $(SRC_COMM)) \
+$(addprefix dlb/, $(SRC_DLB)) \
+gedatsu.f90
 
-SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL_LIST))
-OBJS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.f90=.o))
+##> lib objs
+LIB_SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL))
+LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
+LIB_OBJS    = $(LIB_OBJSt:.c=.o)
 
-#> compilation
-all: $(LIB_TGT) $(PRT_G_TGT)
+##> **********
+##> target (2)
+TEST_TARGET = $(TST_DIR)/gedatsu_test
 
-$(LIB_TGT): $(OBJS)
-	$(AR) $@ $(OBJS)
+##> lib objs
+TST_SOURCES = $(addprefix $(TST_DIR)/, $(SRC_ALL))
+TST_OBJSt   = $(subst $(TST_DIR), $(OBJ_DIR), $(TST_SOURCES:.f90=_test.o))
+TST_OBJS    = $(TST_OBJSt:.c=_test.o)
+
+##> **********
+##> target (3)
+DRIVE1 = $(BIN_DIR)/gedatsu_graph_partitioner
+
+#SRC_DRIVE = \
+driver_util.f90 \
+extract_util.f90 \
+refiner_util.f90
+
+#DRV_SOURCES = $(addprefix $(DRV_DIR)/, $(SRC_DRIVE))
+#DRV_OBJSt   = $(subst $(DRV_DIR), $(OBJ_DIR), $(DRV_SOURCES:.f90=.o))
+
+DRV_OBJS1   = $(DRV_OBJSt:.c=.o) ./obj/gedatsu_graph_partitioner.o
+
+##> target
+all: \
+	$(LIB_TARGET)
+#$(TEST_TARGET) \
+#$(DRIVE1)
+
+lib: \
+	$(LIB_TARGET)
+
+$(LIB_TARGET): $(LIB_OBJS)
+	$(AR) $@ $(LIB_OBJS)
+
+$(TEST_TARGET): $(TST_OBJS)
+	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lmonolis_utils
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(INCLUDE) $(FLAG_METIS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
-$(PRT_G_TGT): driver/gedatsu_graph_partitioner.f90
-	$(FC) $(FFLAGS) $(INCLUDE) -o $@ $< $(GEDATSU_LIB)
+$(OBJ_DIR)/%.o: $(TST_DIR)/%.f90
+	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
 
-#> clean
+$(OBJ_DIR)/%.o: $(TST_DIR)/%.c
+	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
+
+$(OBJ_DIR)/%.o: $(DRV_DIR)/%.f90
+	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
+
+$(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
+	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
+
+$(DRIVE1): $(DRV_OBJS1)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lmonolis_utils
+
 clean:
-	$(RM) $(OBJS) $(LIB_TGT) ./include/*.mod \
-	$(PRT_G_TGT)
-
-distclean:
-	$(RM) $(OBJS) $(LIB_TGT) /include/*.mod \
-	$(PRT_G_TGT)
-
-binclean:
-	$(RM) $(PRT_G_TGT)
+	$(RM) \
+	$(LIB_OBJS) \
+	$(TST_OBJS) \
+	$(DRV_OBJS1) \
+	$(LIB_TARGET) \
+	$(TEST_TARGET) \
+	$(DRIVE1)
+	./include/*.mod \
+	./bin/*
 
 .PHONY: clean
