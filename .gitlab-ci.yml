@@ -18,7 +18,7 @@ pages:
   dependencies:
     - build_doxygen
   script:
-    - mv manual/docs public
+    - mv manual/html public
   artifacts:
     paths:
       - public
