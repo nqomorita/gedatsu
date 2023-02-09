@@ -138,8 +138,9 @@ contains
 
       allocate(itr(1), source = 0.1)
 
-      tpwgts(1) = 1.0/n_part
-      tpwgts(2) = 1.0/n_part
+      do i = 1, n_part
+        tpwgts(i) = 1.0/n_part
+      enddo
 
       !> parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
