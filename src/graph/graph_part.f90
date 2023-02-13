@@ -1,23 +1,21 @@
 !> グラフ分割モジュール
 module mod_gedatsu_graph_part
-  use mod_gedatsu_prm
+  use mod_monolis_utils
   use mod_gedatsu_graph
-  use mod_gedatsu_util
-  use mod_gedatsu_alloc
   use mod_gedatsu_graph_handler
   use mod_gedatsu_wrapper_metis
   implicit none
 
 contains
 
-  !> @ingroup group_graph_4
+  !> @ingroup graph_part
   !> グラフを分割する（節点重みなし）
   subroutine gedatsu_graph_partition(graph, n_domain, subgraphs)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 分割数
-    integer(gint) :: n_domain
+    integer(kint) :: n_domain
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), allocatable :: subgraphs(:)
 
@@ -28,18 +26,18 @@ contains
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition
 
-  !> @ingroup group_graph_4
+  !> @ingroup graph_part
   !> グラフを分割する（節点重みあり）
   subroutine gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 分割数
-    integer(gint) :: n_domain
+    integer(kint) :: n_domain
     !> [in] ノード重み
-    integer(gint), allocatable :: node_wgt(:,:)
+    integer(kint), allocatable :: node_wgt(:,:)
     !> [in] エッジ重み
-    integer(gint), allocatable :: edge_wgt(:,:)
+    integer(kint), allocatable :: edge_wgt(:,:)
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), allocatable :: subgraphs(:)
 
@@ -51,16 +49,17 @@ contains
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition_with_weight
 
+  !> @ingroup dev_graph_part
   !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
   subroutine gedatsu_get_parted_graph(graph, n_domain, subgraphs)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 分割数
-    integer(gint) :: n_domain
+    integer(kint) :: n_domain
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), allocatable :: subgraphs(:)
-    integer(gint) :: i
+    integer(kint) :: i
 
     do i = 1, n_domain
       call gedatsu_get_parted_graph_main(graph, i, subgraphs(i))
@@ -69,17 +68,18 @@ contains
     enddo
   end subroutine gedatsu_get_parted_graph
 
+  !> @ingroup dev_graph_part
   !> 領域番号 domain_id に属するオーバーラップ領域を含めない分割グラフを取得
   subroutine gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] 領域番号 domain_id に属する分割 graph 構造体
     type(gedatsu_graph) :: subgraph
-    integer(gint) :: n_vertex, n_edge
-    integer(gint), allocatable :: edge(:,:)
+    integer(kint) :: n_vertex, n_edge
+    integer(kint), allocatable :: edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
 
@@ -102,17 +102,18 @@ contains
     call gedatsu_graph_set_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_get_parted_graph_main
 
+  !> @ingroup dev_graph_part
   !> 領域番号 domain_id に属するオーバーラップ領域をグラフ構造体に追加
   subroutine gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] 領域番号 domain_id に属する分割 graph 構造体
     type(gedatsu_graph) :: subgraph
-    integer(gint) :: n_vertex, n_edge
-    integer(gint), allocatable :: OVL_vertex_id(:), edge(:,:)
+    integer(kint) :: n_vertex, n_edge
+    integer(kint), allocatable :: OVL_vertex_id(:), edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
 

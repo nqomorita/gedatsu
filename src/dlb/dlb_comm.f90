@@ -1,9 +1,8 @@
 !> 動的負荷分散モジュール
 module mod_gedatsu_dlb_comm
-  use mod_gedatsu_prm
+  use mod_monolis_utils
   use mod_gedatsu_graph
   use mod_gedatsu_dlb
-  use mod_gedatsu_util
   use mod_gedatsu_graph_repart
   !use mod_gedatsu_comm
   implicit none
@@ -12,18 +11,20 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成
-  subroutine gedatsu_dlb_get_comm_table(dlb, graph)
+  subroutine gedatsu_dlb_get_comm_table(dlb, graph, comm)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    integer(gint) :: i, n_internal_vertex, n_move_vertex, my_rank
-    integer(gint) :: n_neib_domain
-    integer(gint), allocatable :: move_vertex_domain_id(:)
-    integer(gint), allocatable :: neib_domain_id(:)
+    !> [in] MPI コミュニケータ
+    integer(kint) :: comm
+    integer(kint) :: i, n_internal_vertex, n_move_vertex, my_rank
+    integer(kint) :: n_neib_domain
+    integer(kint), allocatable :: move_vertex_domain_id(:)
+    integer(kint), allocatable :: neib_domain_id(:)
 
-    my_rank = gedatsu_mpi_global_my_rank()
+    my_rank = monolis_mpi_local_my_rank(comm)
 
     !> 内点が自分の領域番号でない場合、その節点数を取得
     n_internal_vertex = 0
@@ -67,5 +68,4 @@ contains
 
     !call gedatsu_dlb_get_new_neib_domain_id()
   end subroutine gedatsu_dlb_get_comm_table
-
 end module mod_gedatsu_dlb_comm

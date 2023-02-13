@@ -1,10 +1,8 @@
 !> 動的負荷分散モジュール
 module mod_gedatsu_dlb_handler
-  use mod_gedatsu_prm
   use mod_gedatsu_graph
-  use mod_gedatsu_dlb
-  use mod_gedatsu_util
   use mod_gedatsu_graph_repart
+  use mod_gedatsu_dlb
   use mod_gedatsu_dlb_comm
   implicit none
 
@@ -19,13 +17,13 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
 
-    call gedatsu_comm_get_comm_table_parallel(graph, dlb%comm)
+    call gedatsu_comm_get_comm_table_parallel(graph, dlb%COM)
 
-    call gedatsu_graph_repartition(graph, dlb%comm)
+    call gedatsu_graph_repartition(graph, dlb%COM)
 
     call gedatsu_dlb_update_check(dlb, graph)
 
-    call gedatsu_dlb_get_comm_table(dlb, graph)
+    call gedatsu_dlb_get_comm_table(dlb, graph, dlb%COM%comm)
   end subroutine gedatsu_dlb_analysis
 
   !> @ingroup group_dlb
@@ -57,9 +55,9 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in,out] アップデートする配列
-    integer(gint), allocatable :: var(:)
+    integer(kint), allocatable :: var(:)
 
   end subroutine gedatsu_dlb_update_int_1d
 
@@ -70,9 +68,9 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in,out] アップデートする配列
-    real(gdouble), allocatable :: var(:)
+    real(kdouble), allocatable :: var(:)
 
   end subroutine gedatsu_dlb_update_real_1d
 
@@ -83,7 +81,7 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in,out] アップデートする配列
     logical, allocatable :: var(:)
 
@@ -109,11 +107,11 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in] 元の配列
-    integer(gint) :: var_send(:)
+    integer(kint) :: var_send(:)
     !> [out] 負荷分散後の配列
-    integer(gint) :: var_recv(:)
+    integer(kint) :: var_recv(:)
 
   end subroutine gedatsu_dlb_SendRecv_int_1d
 
@@ -124,11 +122,11 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in] 元の配列
-    real(gdouble) :: var_send(:)
+    real(kdouble) :: var_send(:)
     !> [out] 負荷分散後の配列
-    real(gdouble) :: var_recv(:)
+    real(kdouble) :: var_recv(:)
 
   end subroutine gedatsu_dlb_SendRecv_real_1d
 
@@ -139,7 +137,7 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
-    integer(gint) :: ndof
+    integer(kint) :: ndof
     !> [in] 元の配列
     logical :: var_send(:)
     !> [out] 負荷分散後の配列

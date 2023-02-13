@@ -1,8 +1,7 @@
 !> グラフデータ変換モジュール
 module mod_gedatsu_graph_convert
-  use mod_gedatsu_prm
+  use mod_monolis_utils
   use mod_gedatsu_graph
-  use mod_gedatsu_util
 
   implicit none
 

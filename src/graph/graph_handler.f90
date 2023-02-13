@@ -1,16 +1,13 @@
 !> グラフ操作モジュール
 module mod_gedatsu_graph_handler
-  use mod_gedatsu_prm
+  use mod_monolis_utils
   use mod_gedatsu_graph
-  use mod_gedatsu_util
-  use mod_gedatsu_alloc
-  use mod_gedatsu_std
 
   implicit none
 
 contains
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフのノード数を指定
   !> @details 既にノードが設定されている場合はエラー終了する。
   subroutine gedatsu_graph_set_n_vertex(graph, n_vertex)
@@ -18,7 +15,7 @@ contains
     !> [inout] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] グラフのノード数
-    integer(gint) :: n_vertex
+    integer(kint) :: n_vertex
 
     if(graph%n_vertex > 0)then
       call gedatsu_error_string("gedatsu_graph_set_n_vertex")
@@ -33,7 +30,7 @@ contains
     graph%n_vertex = n_vertex
   end subroutine gedatsu_graph_set_n_vertex
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフにノードを追加
   !> @details 追加されたノードに対応する節点番号、領域番号は 0 初期化される。
   subroutine gedatsu_graph_add_n_vertex(graph, n_vertex_add)
@@ -41,8 +38,8 @@ contains
     !> [inout] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] グラフに追加するノード数
-    integer(gint) :: n_vertex_add
-    integer(gint) :: n_vertex_all
+    integer(kint) :: n_vertex_add
+    integer(kint) :: n_vertex_all
 
     n_vertex_all = graph%n_vertex + n_vertex_add
 
@@ -53,7 +50,7 @@ contains
     graph%n_vertex = n_vertex_all
   end subroutine gedatsu_graph_add_n_vertex
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフにノードを追加
   !> @details 追加されたノードに対応する節点番号は引数で初期化され、領域番号は 0 初期化される。
   subroutine gedatsu_graph_add_n_vertex_with_vertex_id(graph, n_vertex_add, vertex_id)
@@ -61,10 +58,10 @@ contains
     !> [inout] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] グラフに追加するノード数
-    integer(gint) :: n_vertex_add
+    integer(kint) :: n_vertex_add
     !> [in] グラフに追加するノードに対応する節点番号
-    integer(gint) :: vertex_id(:)
-    integer(gint) :: n_vertex_all, i
+    integer(kint) :: vertex_id(:)
+    integer(kint) :: n_vertex_all, i
 
     n_vertex_all = graph%n_vertex + n_vertex_add
 
@@ -80,28 +77,28 @@ contains
     graph%n_vertex = n_vertex_all
   end subroutine gedatsu_graph_add_n_vertex_with_vertex_id
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフのノード数を取得
   subroutine gedatsu_graph_get_n_vertex(graph, n_vertex)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [out] グラフのノード数
-    integer(gint) :: n_vertex
+    integer(kint) :: n_vertex
     n_vertex = graph%n_vertex
   end subroutine gedatsu_graph_get_n_vertex
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id に属するノード数を取得
   subroutine gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフのノード数
-    integer(gint) :: n_vertex
-    integer(gint) :: i
+    integer(kint) :: n_vertex
+    integer(kint) :: i
 
     n_vertex = 0
     do i = 1, graph%n_vertex
@@ -109,18 +106,18 @@ contains
     enddo
   end subroutine gedatsu_graph_get_n_vertex_in_subdomain
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するノード数を取得
   subroutine gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフのノード数
-    integer(gint) :: n_vertex
-    integer(gint) :: i, j, jS, jE, nid
-    integer(gint), allocatable :: is_used(:)
+    integer(kint) :: n_vertex
+    integer(kint) :: i, j, jS, jE, nid
+    integer(kint), allocatable :: is_used(:)
 
     call gedatsu_alloc_int_1d(is_used, graph%n_vertex)
 
@@ -142,17 +139,17 @@ contains
     enddo
   end subroutine gedatsu_graph_get_n_vertex_in_overlap_region
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id に属するノード番号を取得
   subroutine gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] 領域番号 domain_id に属する節点番号
-    integer(gint) :: ids(:)
-    integer(gint) :: i, n_vertex
+    integer(kint) :: ids(:)
+    integer(kint) :: i, n_vertex
 
     n_vertex = 0
     do i = 1, graph%n_vertex
@@ -163,19 +160,19 @@ contains
     enddo
   end subroutine gedatsu_graph_get_vertex_id_in_subdomain
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するノード番号を取得
   subroutine gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] 領域番号 domain_id に属する節点番号
-    integer(gint) :: ids(:)
-    integer(gint) :: n_vertex
-    integer(gint) :: i, j, jS, jE, nid
-    integer(gint), allocatable :: is_used(:)
+    integer(kint) :: ids(:)
+    integer(kint) :: n_vertex
+    integer(kint) :: i, j, jS, jE, nid
+    integer(kint), allocatable :: is_used(:)
 
     call gedatsu_alloc_int_1d(is_used, graph%n_vertex)
 
@@ -200,7 +197,7 @@ contains
     enddo
   end subroutine gedatsu_graph_get_vertex_id_in_overlap_region
 
-!!  !> @ingroup group_graph_1
+!!  !> @ingroup graph_basic
 !!  !> グラフの i 番目のノードを削除
 !!  !> @details i 番目のノードに関連するエッジも削除される。
 !!  subroutine gedatsu_graph_delete_vertex(graph, vertex_id)
@@ -208,31 +205,31 @@ contains
 !!    !> [in] graph 構造体
 !!    type(gedatsu_graph) :: graph
 !!    !> [in] ノード番号 i
-!!    integer(gint) :: vertex_id
+!!    integer(kint) :: vertex_id
 !!  end subroutine gedatsu_graph_delete_vertex
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフのエッジ数を取得
   subroutine gedatsu_graph_get_n_edge(graph, n_edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [out] グラフのエッジ数
-    integer(gint) :: n_edge
+    integer(kint) :: n_edge
     n_edge = graph%index(graph%n_vertex + 1)
   end subroutine gedatsu_graph_get_n_edge
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id に属するグラフのエッジ数を取得
   subroutine gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフのエッジ数
-    integer(gint) :: n_edge
-    integer(gint) :: i, j, jS, jE, nid
+    integer(kint) :: n_edge
+    integer(kint) :: i, j, jS, jE, nid
 
     n_edge = 0
     do i = 1, graph%n_vertex
@@ -246,17 +243,17 @@ contains
     enddo
   end subroutine gedatsu_graph_get_n_edge_in_subdomain
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジ数を取得
   subroutine gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフのエッジ数
-    integer(gint) :: n_edge
-    integer(gint) :: i, j, jS, jE, nid
+    integer(kint) :: n_edge
+    integer(kint) :: i, j, jS, jE, nid
 
     n_edge = 0
     do i = 1, graph%n_vertex
@@ -271,7 +268,7 @@ contains
     enddo
   end subroutine gedatsu_graph_get_n_edge_in_overlap_region
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id に属するグラフのエッジを取得
   !> @details エッジの組はローカル節点番号で表現される
   subroutine gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
@@ -279,14 +276,14 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフのエッジ配列
-    integer(gint) :: edge(:,:)
+    integer(kint) :: edge(:,:)
 
-    integer(gint) :: i, nid, idx, j, jS, jE
-    integer(gint) :: n_vertex, n_edge, e1, e2
-    integer(gint), allocatable :: ids(:)
-    integer(gint), allocatable :: perm(:)
+    integer(kint) :: i, nid, idx, j, jS, jE
+    integer(kint) :: n_vertex, n_edge, e1, e2
+    integer(kint), allocatable :: ids(:)
+    integer(kint), allocatable :: perm(:)
 
     call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
 
@@ -320,7 +317,7 @@ contains
     enddo
   end subroutine gedatsu_graph_get_edge_in_subdomain
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
   subroutine gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
     implicit none
@@ -329,13 +326,13 @@ contains
     !> [in] subgraph 構造体
     type(gedatsu_graph) :: subgraph
     !> [in] 領域番号
-    integer(gint) :: domain_id
+    integer(kint) :: domain_id
     !> [out] グラフエッジ
-    integer(gint) :: edge(:,:)
-    integer(gint) :: i, j, jS, jE, nid, idx1, idx2
-    integer(gint) :: n_edge
-    integer(gint), allocatable :: ids(:)
-    integer(gint), allocatable :: perm(:)
+    integer(kint) :: edge(:,:)
+    integer(kint) :: i, j, jS, jE, nid, idx1, idx2
+    integer(kint) :: n_edge
+    integer(kint), allocatable :: ids(:)
+    integer(kint), allocatable :: perm(:)
 
     call gedatsu_alloc_int_1d(ids, subgraph%n_vertex)
 
@@ -369,7 +366,7 @@ contains
     enddo
   end subroutine gedatsu_graph_get_edge_in_overlap_region
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフのエッジを設定
   !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。
   subroutine gedatsu_graph_set_edge(graph, n_edge, edge)
@@ -377,11 +374,11 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] グラフのエッジ数
-    integer(gint) :: n_edge
+    integer(kint) :: n_edge
     !> [in] グラフエッジ
-    integer(gint) :: edge(:,:)
-    integer(gint) :: i, e1, e2, jS, jE
-    integer(gint), allocatable :: temp(:,:)
+    integer(kint) :: edge(:,:)
+    integer(kint) :: i, e1, e2, jS, jE
+    integer(kint), allocatable :: temp(:,:)
 
     call gedatsu_alloc_int_2d(temp, 2, n_edge)
 
@@ -415,7 +412,7 @@ contains
     enddo
   end subroutine gedatsu_graph_set_edge
 
-  !> @ingroup group_graph_1
+  !> @ingroup graph_basic
   !> グラフのエッジを追加
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
   subroutine gedatsu_graph_add_edge(graph, n_edge, edge)
@@ -423,11 +420,11 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
     !> [in] グラフのエッジ数
-    integer(gint) :: n_edge
+    integer(kint) :: n_edge
     !> [in] グラフエッジ
-    integer(gint) :: edge(:,:)
-    integer(gint) :: n_edge_all, n_edge_cur, i, j, jS, jE
-    integer(gint), allocatable :: edge_all(:,:)
+    integer(kint) :: edge(:,:)
+    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
+    integer(kint), allocatable :: edge_all(:,:)
 
     n_edge_cur = graph%index(graph%n_vertex + 1)
 

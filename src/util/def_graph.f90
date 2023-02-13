@@ -1,25 +1,25 @@
 !> graph モジュール
 module mod_gedatsu_graph
-  use mod_gedatsu_prm
-  use mod_gedatsu_alloc
+  use mod_monolis_utils
   implicit none
 
+  !> @ingroup graph_basic
   !> graph 構造体
   !> @note gedatsu IO では gedatsu グラフ形式フォーマットを入出力するが、
   !> プログラム内部では CSR 圧縮形式によってグラフを保持する。
   type gedatsu_graph
     !> ノード数
-    integer(gint) :: n_vertex = 0
+    integer(kint) :: n_vertex = 0
     !> 領域分割における内部ノード数
-    integer(gint) :: n_internal_vertex = 0
+    integer(kint) :: n_internal_vertex = 0
     !> ノード id 配列
-    integer(gint), allocatable :: vertex_id(:)
+    integer(kint), allocatable :: vertex_id(:)
     !> 領域番号配列
-    integer(gint), allocatable :: vertex_domain_id(:)
+    integer(kint), allocatable :: vertex_domain_id(:)
     !> graph の CSR 圧縮形式の index 配列
-    integer(gint), allocatable :: index(:)
+    integer(kint), allocatable :: index(:)
     !> graph の CSR 圧縮形式の index 配列
-    integer(gint), allocatable :: item(:)
+    integer(kint), allocatable :: item(:)
   end type gedatsu_graph
 
 contains
@@ -33,11 +33,11 @@ contains
 
     graph%n_vertex = 0
 
-    call gedatsu_dealloc_int_1d(graph%vertex_domain_id)
+    call monolis_dealloc_I_1d(graph%vertex_domain_id)
 
-    call gedatsu_dealloc_int_1d(graph%index)
+    call monolis_dealloc_I_1d(graph%index)
 
-    call gedatsu_dealloc_int_1d(graph%item)
+    call monolis_dealloc_I_1d(graph%item)
   end subroutine gedatsu_graph_initialize
 
   !> @ingroup group_init
@@ -49,11 +49,11 @@ contains
 
     graph%n_vertex = 0
 
-    call gedatsu_dealloc_int_1d(graph%vertex_domain_id)
+    call monolis_dealloc_I_1d(graph%vertex_domain_id)
 
-    call gedatsu_dealloc_int_1d(graph%index)
+    call monolis_dealloc_I_1d(graph%index)
 
-    call gedatsu_dealloc_int_1d(graph%item)
+    call monolis_dealloc_I_1d(graph%item)
   end subroutine gedatsu_graph_finalize
 
   !> graph 構造体のデバッグ用データ書き出し

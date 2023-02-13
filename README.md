@@ -1,11 +1,11 @@
-# Gedatsu
+# gedatsu
 
 - Gedatsu: graphs with embedded data subdivision utilities
 
-## Manual
+## manual
 
-- [Doxygen](https://morita.gitlab.io/gedatsu/)
+- [doxygen manual](https://morita.gitlab.io/gedatsu/)
 
-## License
+## license
 
 - MIT

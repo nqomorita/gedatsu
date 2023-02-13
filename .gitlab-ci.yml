@@ -1,11 +1,30 @@
-image: hrektts/doxygen:latest
+image: nqoki709/monolis_build:latest
 
 stages:
-  - build
+  - lib_build
+  - test
+  - doxy_build
   - deploy
 
-build_doxygen:
-  stage: build
+build_gedatsu:
+  stage: lib_build
+  script:
+    - make FLAGS=DEBUG
+  artifacts:
+    paths:
+      - bin
+      - test
+
+test_gedatsu:
+  stage: test
+  script:
+    - cd test
+    - ./run.CI.sh
+  dependencies:
+    - build_gedatsu
+
+doxygen_gedatsu:
+  stage: doxy_build
   script:
     - cd manual
     - doxygen
@@ -16,7 +35,7 @@ build_doxygen:
 pages:
   stage: deploy
   dependencies:
-    - build_doxygen
+    - doxygen_gedatsu
   script:
     - mv manual/html public
   artifacts:
