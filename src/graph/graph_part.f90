@@ -1,6 +1,7 @@
 !> グラフ分割モジュール
 module mod_gedatsu_graph_part
   use mod_gedatsu_prm
+  use mod_gedatsu_std
   use mod_gedatsu_graph
   use mod_gedatsu_util
   use mod_gedatsu_alloc
@@ -25,6 +26,8 @@ contains
 
     call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
 
+    call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
+
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition
 
@@ -48,8 +51,30 @@ contains
     call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
       & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
 
+    call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
+
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition_with_weight
+
+  !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
+  subroutine gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
+    implicit none
+    !> [in] ノード数
+    integer(gint) :: n_vertex
+    !> [in] 分割数
+    integer(gint) :: n_domain
+    !> [in] 領域分割番号
+    integer(gint) :: vertex_domain_id(:)
+    integer(gint) :: newlen
+
+    call gedatsu_qsort_int_1d(vertex_domain_id, 1, n_vertex)
+
+    call gedatsu_get_uniq_int(vertex_domain_id, n_vertex, newlen)
+
+    if(newlen /= n_domain)then
+      stop "gedatsu_check_vertex_domain_id: domain which not has the vertex is found"
+    endif
+  end subroutine gedatsu_check_vertex_domain_id
 
   !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
   subroutine gedatsu_get_parted_graph(graph, n_domain, subgraphs)
