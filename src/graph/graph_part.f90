@@ -23,6 +23,8 @@ contains
 
     call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
 
+    call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
+
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition
 
@@ -46,8 +48,32 @@ contains
     call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
       & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
 
+    call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
+
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition_with_weight
+
+  !> @ingroup dev_graph_part
+  !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
+  subroutine gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
+    implicit none
+    !> [in] ノード数
+    integer(kint) :: n_vertex
+    !> [in] 分割数
+    integer(kint) :: n_domain
+    !> [in] 領域分割番号
+    integer(kint) :: vertex_domain_id(:)
+    integer(kint) :: newlen
+
+    call monolis_qsort_I_1d(vertex_domain_id, 1, n_vertex)
+
+    call monolis_get_uniq_array_I(vertex_domain_id, n_vertex, newlen)
+
+    if(newlen /= n_domain)then
+      call monolis_std_error_string("gedatsu_check_vertex_domain_id")
+      call monolis_std_error_string("domain which not has the vertex is found")
+    endif
+  end subroutine gedatsu_check_vertex_domain_id
 
   !> @ingroup dev_graph_part
   !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
