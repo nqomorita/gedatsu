@@ -33,6 +33,10 @@ contains
 
     graph%n_vertex = 0
 
+    graph%n_internal_vertex = 0
+
+    call monolis_dealloc_I_1d(graph%vertex_id)
+
     call monolis_dealloc_I_1d(graph%vertex_domain_id)
 
     call monolis_dealloc_I_1d(graph%index)
@@ -48,6 +52,10 @@ contains
     type(gedatsu_graph) :: graph
 
     graph%n_vertex = 0
+
+    graph%n_internal_vertex = 0
+
+    call monolis_dealloc_I_1d(graph%vertex_id)
 
     call monolis_dealloc_I_1d(graph%vertex_domain_id)
 
