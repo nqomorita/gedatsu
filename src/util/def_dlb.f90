@@ -20,6 +20,8 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
 
+    call monolis_com_initialize(dlb%COM)
+    dlb%should_update = .false.
   end subroutine gedatsu_dlb_initialize
 
   !> @ingroup graph_init
@@ -29,6 +31,8 @@ contains
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
 
+    call monolis_com_finalize(dlb%COM)
+    dlb%should_update = .false.
   end subroutine gedatsu_dlb_finalize
 
   !> @ingroup graph_dlb
