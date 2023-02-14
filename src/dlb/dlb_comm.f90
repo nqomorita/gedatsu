@@ -52,8 +52,11 @@ contains
     enddo
 
     call gedatsu_qsort_int_1d(move_vertex_domain_id, 1, n_move_vertex)
+
     call gedatsu_get_uniq_int(move_vertex_domain_id, n_move_vertex, n_neib_domain)
+
     call gedatsu_alloc_int_1d(neib_domain_id, n_neib_domain)
+
     neib_domain_id = move_vertex_domain_id(1:n_neib_domain)
 
     write(*,*)"n_neib_domain: ", n_neib_domain

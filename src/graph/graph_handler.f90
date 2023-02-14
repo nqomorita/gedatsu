@@ -7,12 +7,11 @@
 !# gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
 !# gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids)
 !# gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids)
-!# gedatsu_graph_delete_vertex(graph, vertex_id)
 !# gedatsu_graph_get_n_edge(graph, n_edge)
 !# gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 !# gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
 !# gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
-!# gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
+!# gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 !# gedatsu_graph_set_edge(graph, n_edge, edge)
 !# gedatsu_graph_add_edge(graph, n_edge, edge)
 module mod_gedatsu_graph_handler
@@ -236,17 +235,6 @@ contains
       endif
     enddo
   end subroutine gedatsu_graph_get_vertex_id_in_overlap_region
-
-!!  !> @ingroup graph_basic
-!!  !> グラフの i 番目のノードを削除
-!!  !> @details i 番目のノードに関連するエッジも削除される。
-!!  subroutine gedatsu_graph_delete_vertex(graph, vertex_id)
-!!    implicit none
-!!    !> [in] graph 構造体
-!!    type(gedatsu_graph) :: graph
-!!    !> [in] ノード番号 i
-!!    integer(kint) :: vertex_id
-!!  end subroutine gedatsu_graph_delete_vertex
 
   !> @ingroup graph_basic
   !> グラフのエッジ数を取得
@@ -519,5 +507,4 @@ contains
 
     call gedatsu_graph_set_edge(graph, n_edge_all, edge_all)
   end subroutine gedatsu_graph_add_edge
-
 end module mod_gedatsu_graph_handler

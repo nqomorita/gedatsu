@@ -119,6 +119,7 @@ contains
     call gedatsu_graph_set_n_vertex(subgraph, n_vertex)
 
     call monolis_alloc_I_1d(subgraph%item, n_edge)
+
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, subgraph%vertex_id)

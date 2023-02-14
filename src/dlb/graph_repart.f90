@@ -23,7 +23,9 @@ contains
     n_part = monolis_mpi_local_comm_size(COM%comm)
 
     call gedatsu_alloc_int_1d(vertex_id, graph%n_vertex)
+
     call gedatsu_realloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
+
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
     call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
@@ -53,7 +55,9 @@ contains
     n_part = monolis_mpi_local_comm_size(COM%comm)
 
     call gedatsu_alloc_int_1d(vertex_id, graph%n_vertex)
+
     call gedatsu_realloc_int_1d(graph%vertex_domain_id, graph%n_vertex)
+
     call gedatsu_alloc_int_1d(vtxdist, n_part + 1)
 
     call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
