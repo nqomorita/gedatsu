@@ -153,7 +153,7 @@ contains
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
-    call gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
+    call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 
     call gedatsu_graph_add_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_add_overlapping_nodes

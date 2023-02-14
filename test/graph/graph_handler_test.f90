@@ -160,7 +160,7 @@ contains
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4)
+    integer(kint) :: n_vertex, n_edge, edge(2,8)
 
     call monolis_std_log_string("gedatsu_graph_get_n_vertex_in_overlap_region_test")
 
@@ -174,12 +174,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -196,7 +200,7 @@ contains
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4)
+    integer(kint) :: n_vertex, n_edge, edge(2,8)
     integer(kint) :: ids(2)
 
     call monolis_std_log_string("gedatsu_graph_get_vertex_id_in_internal_region_test")
@@ -217,12 +221,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -241,7 +249,7 @@ contains
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4), ids(1)
+    integer(kint) :: n_vertex, n_edge, edge(2,8), ids(1)
 
     call monolis_std_log_string("gedatsu_graph_get_vertex_id_in_overlap_region_test")
 
@@ -261,12 +269,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -283,7 +295,7 @@ contains
   subroutine gedatsu_graph_get_n_edge_test()
     implicit none
     type(gedatsu_graph) :: graph
-    integer(kint) :: n_vertex, n_edge, edge(2,4)
+    integer(kint) :: n_vertex, n_edge, edge(2,8)
 
     call monolis_std_log_string("gedatsu_graph_get_n_edge_test")
 
@@ -291,12 +303,16 @@ contains
 
     call gedatsu_graph_set_n_vertex(graph, n_vertex)
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -304,14 +320,14 @@ contains
 
     call gedatsu_graph_get_n_edge(graph, n_edge)
 
-    call monolis_test_check_eq_I1("gedatsu_graph_get_n_edge_test case 1", n_edge, 4)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_n_edge_test case 1", n_edge, 8)
   end subroutine gedatsu_graph_get_n_edge_test
 
   subroutine gedatsu_graph_get_n_edge_in_internal_region_test()
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4)
+    integer(kint) :: n_vertex, n_edge, edge(2,8)
 
     call monolis_std_log_string("gedatsu_graph_get_n_edge_in_internal_region_test")
 
@@ -325,12 +341,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -340,14 +360,14 @@ contains
 
     call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
-    call monolis_test_check_eq_I1("gedatsu_graph_get_n_edge_in_internal_region_test case 1", n_edge, 1)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_n_edge_in_internal_region_test case 1", n_edge, 2)
   end subroutine gedatsu_graph_get_n_edge_in_internal_region_test
 
   subroutine gedatsu_graph_get_n_edge_in_overlap_region_test()
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4)
+    integer(kint) :: n_vertex, n_edge, edge(2,8)
 
     call monolis_std_log_string("gedatsu_graph_get_n_edge_in_overlap_region_test")
 
@@ -361,12 +381,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -383,7 +407,7 @@ contains
     implicit none
     type(gedatsu_graph) :: graph
     integer(kint) :: domain_id
-    integer(kint) :: n_vertex, n_edge, edge(2,4), new(2,1)
+    integer(kint) :: n_vertex, n_edge, edge(2,8), new(2,2)
 
     call monolis_std_log_string("gedatsu_graph_get_edge_in_internal_region_test")
 
@@ -403,12 +427,16 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
@@ -420,14 +448,15 @@ contains
 
     call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 1", new(1,1), 1)
     call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 2", new(2,1), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 2", new(1,2), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 2", new(2,2), 1)
   end subroutine gedatsu_graph_get_edge_in_internal_region_test
 
   subroutine gedatsu_graph_get_edge_in_overlap_region_test()
     implicit none
     type(gedatsu_graph) :: graph
-    type(gedatsu_graph) :: subgraph
     integer(kint) :: n_vertex, n_edge, domain_id
-    integer(kint) :: edge(2,4)
+    integer(kint) :: edge(2,8), ovl_edge(2,2)
 
     call monolis_std_log_string("gedatsu_graph_get_edge_in_overlap_region_test")
 
@@ -447,44 +476,107 @@ contains
     graph%vertex_domain_id(4) = 1
     graph%vertex_domain_id(5) = 1
 
-    n_edge = 4
+    n_edge = 8
 
     edge(1,1) = 1; edge(2,1) = 2
-    edge(1,2) = 2; edge(2,2) = 3
-    edge(1,3) = 3; edge(2,3) = 4
-    edge(1,4) = 4; edge(2,4) = 5
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
 
     call gedatsu_graph_set_edge(graph, n_edge, edge)
 
     domain_id = 0
 
+    n_edge = 0
+
     call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
-    !call gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
+    call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, ovl_edge)
 
-    !call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 1", new(1,1), 1)
-    !call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 2", new(2,1), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 1", ovl_edge(1,1), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 2", ovl_edge(2,1), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 3", ovl_edge(1,2), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_get_edge_in_internal_region_test case 4", ovl_edge(2,2), 2)
   end subroutine gedatsu_graph_get_edge_in_overlap_region_test
 
   subroutine gedatsu_graph_set_edge_test()
     implicit none
     type(gedatsu_graph) :: graph
-    integer(kint) :: n_edge
-    integer(kint) :: edge(2,4)
+    integer(kint) :: n_edge, n_vertex
+    integer(kint) :: edge(2,8)
 
-    call monolis_std_log_string("gedatsu_graph_set_edge")
+    call monolis_std_log_string("gedatsu_graph_set_edge_test")
 
-    !call gedatsu_graph_set_edge(graph, n_edge, edge)
+    n_vertex = 5
+
+    call gedatsu_graph_set_n_vertex(graph, n_vertex)
+
+    n_edge = 8
+
+    edge(1,1) = 1; edge(2,1) = 2
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 2; edge(2,3) = 3
+    edge(1,4) = 3; edge(2,4) = 2
+    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,6) = 4; edge(2,6) = 3
+    edge(1,7) = 4; edge(2,7) = 5
+    edge(1,8) = 5; edge(2,8) = 4
+
+    call gedatsu_graph_set_edge(graph, n_edge, edge)
+
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 1", size(graph%item), 8)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 2", graph%item(1), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 3", graph%item(2), 1)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 4", graph%item(3), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 5", graph%item(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 6", graph%item(5), 4)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 7", graph%item(6), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 8", graph%item(7), 5)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge_test case 9", graph%item(8), 4)
   end subroutine gedatsu_graph_set_edge_test
 
   subroutine gedatsu_graph_add_edge_test()
     implicit none
     type(gedatsu_graph) :: graph
-    integer(kint) :: n_edge
-    integer(kint) :: edge(2,4)
+    integer(kint) :: n_edge, n_add_edge, n_vertex
+    integer(kint) :: edge(2,6), add(2,2)
 
     call monolis_std_log_string("gedatsu_graph_add_edge_test")
 
-    !call gedatsu_graph_add_edge(graph, n_edge, edge)
+    n_vertex = 5
+
+    call gedatsu_graph_set_n_vertex(graph, n_vertex)
+
+    n_edge = 6
+
+    edge(1,1) = 1; edge(2,1) = 2
+    edge(1,2) = 2; edge(2,2) = 1
+    edge(1,3) = 3; edge(2,3) = 4
+    edge(1,4) = 4; edge(2,4) = 3
+    edge(1,5) = 4; edge(2,5) = 5
+    edge(1,6) = 5; edge(2,6) = 4
+
+    call gedatsu_graph_set_edge(graph, n_edge, edge)
+
+    n_add_edge = 2
+
+    add(1,1) = 2; add(2,1) = 3
+    add(1,2) = 3; add(2,2) = 2
+
+    call gedatsu_graph_add_edge(graph, n_add_edge, add)
+
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 1", size(graph%item), 8)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 2", graph%item(1), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 3", graph%item(2), 1)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 4", graph%item(3), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 5", graph%item(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 6", graph%item(5), 4)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 7", graph%item(6), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 8", graph%item(7), 5)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge_test case 9", graph%item(8), 4)
   end subroutine gedatsu_graph_add_edge_test
 end module mod_gedatsu_graph_handler_test

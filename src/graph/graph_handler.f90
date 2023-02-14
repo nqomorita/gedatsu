@@ -359,30 +359,37 @@ contains
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
-  subroutine gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
+  !> @details エッジの組はローカル節点番号で表現される
+  subroutine gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-    !> [in] subgraph 構造体
-    type(gedatsu_graph) :: subgraph
     !> [in] 領域番号
     integer(kint) :: domain_id
     !> [out] グラフエッジ
     integer(kint) :: edge(:,:)
     integer(kint) :: i, j, jS, jE, nid, idx1, idx2
-    integer(kint) :: n_edge
+    integer(kint) :: n_edge, n1, n2, n_vertex
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
 
-    call monolis_alloc_I_1d(ids, subgraph%n_vertex)
+    call gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n1)
 
-    call monolis_alloc_I_1d(perm, subgraph%n_vertex)
+    call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n2)
 
-    ids = subgraph%vertex_id
+    n_vertex = n1 + n2
 
-    call monolis_get_sequence_array_I(perm, subgraph%n_vertex, 1, 1)
+    call monolis_alloc_I_1d(ids, n_vertex)
 
-    call monolis_qsort_I_2d(ids, perm, 1, subgraph%n_vertex)
+    call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids(1:n1))
+
+    call gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids(n1+1:n_vertex))
+
+    call monolis_alloc_I_1d(perm, n_vertex)
+
+    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+
+    call monolis_qsort_I_2d(ids, perm, 1, n_vertex)
 
     n_edge = 0
     do i = 1, graph%n_vertex
@@ -393,8 +400,8 @@ contains
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) /= domain_id)then
           n_edge = n_edge + 1
-          call monolis_bsearch_I(ids, 1, subgraph%n_vertex, i, idx1)
-          call monolis_bsearch_I(ids, 1, subgraph%n_vertex, nid, idx2)
+          call monolis_bsearch_I(ids, 1, n_vertex, i, idx1)
+          call monolis_bsearch_I(ids, 1, n_vertex, nid, idx2)
           edge(1,n_edge) = perm(idx1)
           edge(2,n_edge) = perm(idx2)
 
@@ -450,6 +457,8 @@ contains
     enddo
 
     in = graph%index(graph%n_vertex + 1)
+
+    call monolis_dealloc_I_1d(graph%item)
 
     call monolis_alloc_I_1d(graph%item, in)
 
