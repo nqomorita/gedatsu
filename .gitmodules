@@ -1,0 +1,3 @@
+[submodule "submodule/monolis_utils"]
+	path = submodule/monolis_utils
+	url = git@gitlab.com:morita/monolis_utils.git
