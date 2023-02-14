@@ -3,15 +3,15 @@
 !# gedatsu_graph_add_n_vertex(graph, n_vertex_add)
 !# gedatsu_graph_add_n_vertex_with_vertex_id(graph, n_vertex_add, vertex_id)
 !# gedatsu_graph_get_n_vertex(graph, n_vertex)
-!# gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+!# gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
 !# gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
-!# gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+!# gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids)
 !# gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids)
 !# gedatsu_graph_delete_vertex(graph, vertex_id)
 !# gedatsu_graph_get_n_edge(graph, n_edge)
-!# gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
+!# gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 !# gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
-!# gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
+!# gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
 !# gedatsu_graph_get_edge_in_overlap_region(graph, subgraph, domain_id, edge)
 !# gedatsu_graph_set_edge(graph, n_edge, edge)
 !# gedatsu_graph_add_edge(graph, n_edge, edge)
@@ -39,6 +39,12 @@ contains
       call monolis_std_error_stop()
     endif
 
+    if(n_vertex < 1)then
+      call monolis_std_warning_string("gedatsu_graph_set_n_vertex")
+      call monolis_std_warning_string("n_vertex is less than 1")
+      return
+    endif
+
     call monolis_alloc_I_1d(graph%vertex_id, n_vertex)
     call monolis_alloc_I_1d(graph%vertex_domain_id, n_vertex)
     call monolis_alloc_I_1d(graph%index, n_vertex + 1)
@@ -56,6 +62,12 @@ contains
     !> [in] グラフに追加するノード数
     integer(kint) :: n_vertex_add
     integer(kint) :: n_vertex_all
+
+    if(n_vertex_add < 1)then
+      call monolis_std_warning_string("gedatsu_graph_add_n_vertex")
+      call monolis_std_warning_string("n_vertex is less than 1")
+      return
+    endif
 
     n_vertex_all = graph%n_vertex + n_vertex_add
 
@@ -78,6 +90,12 @@ contains
     !> [in] グラフに追加するノードに対応する節点番号
     integer(kint) :: vertex_id(:)
     integer(kint) :: n_vertex_all, i
+
+    if(n_vertex_add < 1)then
+      call monolis_std_warning_string("gedatsu_graph_add_n_vertex_with_vertex_id")
+      call monolis_std_warning_string("n_vertex is less than 1")
+      return
+    endif
 
     n_vertex_all = graph%n_vertex + n_vertex_add
 
@@ -106,7 +124,7 @@ contains
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id に属するノード数を取得
-  subroutine gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+  subroutine gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
@@ -120,7 +138,7 @@ contains
     do i = 1, graph%n_vertex
       if(graph%vertex_domain_id(i) == domain_id) n_vertex = n_vertex + 1
     enddo
-  end subroutine gedatsu_graph_get_n_vertex_in_subdomain
+  end subroutine gedatsu_graph_get_n_vertex_in_internal_region
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するノード数を取得
@@ -157,7 +175,7 @@ contains
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id に属するノード番号を取得
-  subroutine gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+  subroutine gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
@@ -174,7 +192,7 @@ contains
         ids(n_vertex) = graph%vertex_id(i)
       endif
     enddo
-  end subroutine gedatsu_graph_get_vertex_id_in_subdomain
+  end subroutine gedatsu_graph_get_vertex_id_in_internal_region
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するノード番号を取得
@@ -237,7 +255,7 @@ contains
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id に属するグラフのエッジ数を取得
-  subroutine gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
+  subroutine gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
@@ -257,7 +275,7 @@ contains
         if(graph%vertex_domain_id(nid) == domain_id) n_edge = n_edge + 1
       enddo
     enddo
-  end subroutine gedatsu_graph_get_n_edge_in_subdomain
+  end subroutine gedatsu_graph_get_n_edge_in_internal_region
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジ数を取得
@@ -287,7 +305,7 @@ contains
   !> @ingroup graph_basic
   !> 領域番号 domain_id に属するグラフのエッジを取得
   !> @details エッジの組はローカル節点番号で表現される
-  subroutine gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
+  subroutine gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
@@ -301,11 +319,11 @@ contains
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
 
-    call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+    call gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
 
     call monolis_alloc_I_1d(ids, n_vertex)
 
-    call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, ids)
+    call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids)
 
     call monolis_alloc_I_1d(perm, n_vertex)
 
@@ -331,7 +349,7 @@ contains
         endif
       enddo
     enddo
-  end subroutine gedatsu_graph_get_edge_in_subdomain
+  end subroutine gedatsu_graph_get_edge_in_internal_region
 
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
@@ -393,7 +411,7 @@ contains
     integer(kint) :: n_edge
     !> [in] グラフエッジ
     integer(kint) :: edge(:,:)
-    integer(kint) :: i, e1, e2, jS, jE
+    integer(kint) :: i, e1, e2, jS, jE, in
     integer(kint), allocatable :: temp(:,:)
 
     call monolis_alloc_I_2d(temp, 2, n_edge)
@@ -409,16 +427,23 @@ contains
     endif
 
     graph%index = 0
-    graph%item = 0
     do i = 1, n_edge
       e1 = temp(1,i)
       e2 = temp(2,i)
-      graph%index(e1+1) = graph%index(e1+1) + 1
-      graph%item(i) = e2
+      graph%index(e1 + 1) = graph%index(e1 + 1) + 1
     enddo
 
     do i = 1, graph%n_vertex
-      graph%index(i+1) = graph%index(i+1) + graph%index(i)
+      graph%index(i + 1) = graph%index(i + 1) + graph%index(i)
+    enddo
+
+    in = graph%index(graph%n_vertex + 1)
+
+    call monolis_alloc_I_1d(graph%item, in)
+
+    do i = 1, n_edge
+      e2 = temp(2,i)
+      graph%item(i) = e2
     enddo
 
     do i = 1, graph%n_vertex

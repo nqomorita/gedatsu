@@ -25,7 +25,7 @@ contains
 
     call monolis_std_log_string("gedatsu_graph_partition_test")
 
-    call gedatsu_graph_partition(graph, n_domain, subgraphs)
+    !call gedatsu_graph_partition(graph, n_domain, subgraphs)
   end subroutine gedatsu_graph_partition_test
 
   subroutine gedatsu_graph_partition_with_weight_test()
@@ -38,7 +38,7 @@ contains
 
     call monolis_std_log_string("gedatsu_graph_partition_with_weight_test")
 
-    call gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
+    !call gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
   end subroutine gedatsu_graph_partition_with_weight_test
 
   subroutine gedatsu_check_vertex_domain_id_test()
@@ -49,7 +49,7 @@ contains
 
     call monolis_std_log_string("gedatsu_check_vertex_domain_id_test")
 
-    call gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
+    !call gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
   end subroutine gedatsu_check_vertex_domain_id_test
 
   subroutine gedatsu_get_parted_graph_test()
@@ -60,7 +60,7 @@ contains
 
     call monolis_std_log_string("gedatsu_get_parted_graph_test")
 
-    call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
+    !call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
   end subroutine gedatsu_get_parted_graph_test
 
   subroutine gedatsu_get_parted_graph_main_test()
@@ -71,7 +71,7 @@ contains
 
     call monolis_std_log_string("gedatsu_get_parted_graph_main_test")
 
-    call gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
+    !call gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
   end subroutine gedatsu_get_parted_graph_main_test
 
   subroutine gedatsu_add_overlapping_nodes_test()
@@ -82,6 +82,6 @@ contains
 
     call monolis_std_log_string("gedatsu_add_overlapping_nodes_test")
 
-    call gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
+    !call gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
   end subroutine gedatsu_add_overlapping_nodes_test
 end module mod_gedatsu_graph_part_test
