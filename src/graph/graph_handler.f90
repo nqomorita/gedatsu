@@ -97,6 +97,12 @@ contains
       return
     endif
 
+    if(size(vertex_id) /= n_vertex_add)then
+      call monolis_std_warning_string("gedatsu_graph_add_n_vertex_with_vertex_id")
+      call monolis_std_warning_string("size of vertex_id is not equal to n_vertex_add")
+      return
+    endif
+
     n_vertex_all = graph%n_vertex + n_vertex_add
 
     call monolis_realloc_I_1d(graph%vertex_id, n_vertex_all)
@@ -414,13 +420,19 @@ contains
     integer(kint) :: i, e1, e2, jS, jE, in
     integer(kint), allocatable :: temp(:,:)
 
+    if(n_edge < 1)then
+      call monolis_std_error_string("gedatsu_graph_set_edge")
+      call monolis_std_error_string("n_edge is less than 1")
+      call monolis_std_error_stop()
+    endif
+
     call monolis_alloc_I_2d(temp, 2, n_edge)
 
     temp = edge
 
     call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
 
-    if(graph%n_vertex < maxval(edge))then
+    if(graph%n_vertex < maxval(edge(:,1:n_edge)))then
       call monolis_std_error_string("gedatsu_graph_set_edge")
       call monolis_std_error_string("edge node number is greater than the number of vertex")
       call monolis_std_error_stop()
@@ -466,6 +478,12 @@ contains
     integer(kint) :: edge(:,:)
     integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
     integer(kint), allocatable :: edge_all(:,:)
+
+    if(n_edge < 1)then
+      call monolis_std_error_string("gedatsu_graph_add_edge")
+      call monolis_std_error_string("n_edge is less than 1")
+      call monolis_std_error_stop()
+    endif
 
     n_edge_cur = graph%index(graph%n_vertex + 1)
 
