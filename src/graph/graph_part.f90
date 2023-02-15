@@ -1,4 +1,10 @@
 !> グラフ分割モジュール
+!# gedatsu_graph_partition(graph, n_domain, subgraphs)
+!# gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
+!# gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
+!# gedatsu_get_parted_graph(graph, n_domain, subgraphs)
+!# gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
+!# gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
 module mod_gedatsu_graph_part
   use mod_monolis_utils
   use mod_gedatsu_graph
@@ -17,7 +23,7 @@ contains
     !> [in] 分割数
     integer(kint) :: n_domain
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph), allocatable :: subgraphs(:)
+    type(gedatsu_graph) :: subgraphs(:)
 
     call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
 
@@ -41,7 +47,7 @@ contains
     !> [in] エッジ重み
     integer(kint), allocatable :: edge_wgt(:,:)
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph), allocatable :: subgraphs(:)
+    type(gedatsu_graph) :: subgraphs(:)
 
     call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
 
@@ -84,7 +90,7 @@ contains
     !> [in] 分割数
     integer(kint) :: n_domain
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph), allocatable :: subgraphs(:)
+    type(gedatsu_graph) :: subgraphs(:)
     integer(kint) :: i
 
     do i = 1, n_domain
@@ -107,24 +113,26 @@ contains
     integer(kint) :: n_vertex, n_edge
     integer(kint), allocatable :: edge(:,:)
 
-    call gedatsu_graph_get_n_vertex_in_subdomain(graph, domain_id, n_vertex)
+    call gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
 
     if(n_vertex == 0) call monolis_std_warning_string("gedatsu_get_parted_graph_main")
     if(n_vertex == 0) call monolis_std_warning_string("n_vertex equals zero")
 
     subgraph%n_internal_vertex = n_vertex
 
-    call gedatsu_graph_get_n_edge_in_subdomain(graph, domain_id, n_edge)
-
     call gedatsu_graph_set_n_vertex(subgraph, n_vertex)
+
+    !call gedatsu_graph_get_vertex_domain_id_in_internal_region(graph, domain_id, subgraph%vertex_domain_id)
+
+    call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
     call monolis_alloc_I_1d(subgraph%item, n_edge)
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
-    call gedatsu_graph_get_vertex_id_in_subdomain(graph, domain_id, subgraph%vertex_id)
+    call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, subgraph%vertex_id)
 
-    call gedatsu_graph_get_edge_in_subdomain(graph, domain_id, edge)
+    call gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
 
     call gedatsu_graph_set_edge(subgraph, n_edge, edge)
   end subroutine gedatsu_get_parted_graph_main

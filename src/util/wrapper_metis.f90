@@ -14,13 +14,13 @@ contains
     !> [in] グラフのノード数
     integer(kint) :: n_vertex
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(kint), allocatable :: index(:)
+    integer(kint) :: index(:)
     !> [in] graph の CSR 圧縮形式の item 配列
-    integer(kint), allocatable :: item(:)
+    integer(kint) :: item(:)
     !> [in] 分割数
     integer(kint) :: n_part
     !> [out] 領域番号
-    integer(kint), allocatable :: part_id(:)
+    integer(kint) :: part_id(:)
     integer(kint), allocatable :: node_wgt(:,:)
     integer(kint), allocatable :: edge_wgt(:,:)
 
@@ -36,9 +36,9 @@ contains
     !> [in] グラフのノード数
     integer(kint) :: n_vertex
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(kint), allocatable :: index(:)
+    integer(kint) :: index(:)
     !> [in] graph の CSR 圧縮形式の item 配列
-    integer(kint), allocatable :: item(:)
+    integer(kint) :: item(:)
     !> [in] ノード重み
     integer(kint), allocatable :: node_wgt(:,:)
     !> [in] エッジ重み
@@ -46,7 +46,7 @@ contains
     !> [in] 分割数
     integer(kint) :: n_part
     !> [out] 領域番号
-    integer(kint), allocatable  :: part_id(:)
+    integer(kint) :: part_id(:)
     integer(kint) :: ncon, objval, nz
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
