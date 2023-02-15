@@ -17,13 +17,13 @@ contains
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
 
-    call gedatsu_comm_get_comm_table_parallel(graph, dlb%COM)
+    !call gedatsu_comm_get_comm_table_parallel(graph, dlb%COM)
 
-    call gedatsu_graph_repartition(graph, dlb%COM)
+    !call gedatsu_graph_repartition(graph, dlb%COM)
 
-    call gedatsu_dlb_update_check(dlb, graph)
+    !call gedatsu_dlb_update_check(dlb, graph)
 
-    call gedatsu_dlb_get_comm_table(dlb, graph, dlb%COM%comm)
+    !call gedatsu_dlb_get_comm_table(dlb, graph, dlb%COM%comm)
   end subroutine gedatsu_dlb_analysis
 
   !> @ingroup group_dlb
