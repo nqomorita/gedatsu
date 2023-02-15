@@ -9,6 +9,7 @@ CFLAGS = -fPIC -O2
 ##> directory setting
 MOD_DIR = -J ./include
 INCLUDE = -I /usr/include -I ./include -I ./submodule/monolis_utils/include
+USE_LIB = -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 BIN_DIR = ./bin
 SRC_DIR = ./src
 OBJ_DIR = ./obj
@@ -91,7 +92,15 @@ TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 
 ##> **********
 ##> target (3)
-DRIVE1 = $(BIN_DIR)/gedatsu_graph_partitioner
+DRIVE1 = $(BIN_DIR)/gedatsu_convertor_simple_mesh2graph
+DRIVE2 = $(BIN_DIR)/gedatsu_partitioner_bc
+DRIVE3 = $(BIN_DIR)/gedatsu_partitioner_connectivity_graph
+DRIVE4 = $(BIN_DIR)/gedatsu_partitioner_connectivity_val_i
+DRIVE5 = $(BIN_DIR)/gedatsu_partitioner_connectivity_val_r
+DRIVE6 = $(BIN_DIR)/gedatsu_partitioner_nodal_graph
+DRIVE7 = $(BIN_DIR)/gedatsu_partitioner_nodal_val_i
+DRIVE8 = $(BIN_DIR)/gedatsu_partitioner_nodal_val_r
+DRIVE9 = $(BIN_DIR)/gedatsu_partitioner_simple_mesh
 
 #SRC_DRIVE = \
 driver_util.f90 \
@@ -101,13 +110,29 @@ refiner_util.f90
 #DRV_SOURCES = $(addprefix $(DRV_DIR)/, $(SRC_DRIVE))
 #DRV_OBJSt   = $(subst $(DRV_DIR), $(OBJ_DIR), $(DRV_SOURCES:.f90=.o))
 
-DRV_OBJS1   = $(DRV_OBJSt:.c=.o) ./obj/gedatsu_graph_partitioner.o
+DRV_OBJS1   = $(DRV_OBJSt:.c=.o) ./obj/convert_simple_mesh2graph.o
+DRV_OBJS2   = $(DRV_OBJSt:.c=.o) ./obj/part_bc.o
+DRV_OBJS3   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_graph.o
+DRV_OBJS4   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_val_i.o
+DRV_OBJS5   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_val_r.o
+DRV_OBJS6   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_graph.o
+DRV_OBJS7   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_i.o
+DRV_OBJS8   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_r.o
+DRV_OBJS9   = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
 
 ##> target
 all: \
 	$(LIB_TARGET) \
-	$(TEST_TARGET)
-#$(DRIVE1)
+	$(TEST_TARGET) \
+	$(DRIVE1) \
+	$(DRIVE2) \
+	$(DRIVE3) \
+	$(DRIVE4) \
+	$(DRIVE5) \
+	$(DRIVE6) \
+	$(DRIVE7) \
+	$(DRIVE8) \
+	$(DRIVE9)
 
 lib: \
 	$(LIB_TARGET)
@@ -116,7 +141,7 @@ $(LIB_TARGET): $(LIB_OBJS)
 	$(AR) $@ $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
-	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
+	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) $(USE_LIB)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -137,7 +162,31 @@ $(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
-	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) $(USE_LIB)
+
+$(DRIVE2): $(DRV_OBJS2)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS2) $(USE_LIB)
+
+$(DRIVE3): $(DRV_OBJS3)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS3) $(USE_LIB)
+
+$(DRIVE4): $(DRV_OBJS4)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS4) $(USE_LIB)
+
+$(DRIVE5): $(DRV_OBJS5)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS5) $(USE_LIB)
+
+$(DRIVE6): $(DRV_OBJS6)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS6) $(USE_LIB)
+
+$(DRIVE7): $(DRV_OBJS7)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS7) $(USE_LIB)
+
+$(DRIVE8): $(DRV_OBJS8)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS8) $(USE_LIB)
+
+$(DRIVE9): $(DRV_OBJS9)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)
 
 clean:
 	$(RM) \
