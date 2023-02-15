@@ -126,6 +126,8 @@ contains
 
     call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
+    if(n_edge == 0) return
+
     call monolis_alloc_I_1d(subgraph%item, n_edge)
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
@@ -152,6 +154,8 @@ contains
 
     call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
 
+    if(n_vertex == 0) return
+
     call gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
 
     call monolis_alloc_I_1d(OVL_vertex_id, n_vertex)
@@ -159,6 +163,8 @@ contains
     call gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, OVL_vertex_id)
 
     call gedatsu_graph_add_n_vertex_with_vertex_id(subgraph, n_vertex, OVL_vertex_id)
+
+    if(n_edge == 0) return
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
