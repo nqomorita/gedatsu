@@ -8,9 +8,6 @@ BASE_DIR=$(pwd)
 cd submodule/monolis_utils
 make
 #make FLAGS=INTEL
-cd ../..
-cp submodule/monolis_utils/lib/libmonolis_utils.a ./lib/
-cp submodule/monolis_utils/include/*.mod ./include/
 
 #> metis
 #cd submodule/METIS

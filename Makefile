@@ -8,7 +8,7 @@ CFLAGS = -fPIC -O2
 
 ##> directory setting
 MOD_DIR = -J ./include
-INCLUDE = -I /usr/include -I ./include
+INCLUDE = -I /usr/include -I ./include -I ./submodule/monolis_utils/include
 BIN_DIR = ./bin
 SRC_DIR = ./src
 OBJ_DIR = ./obj
@@ -116,7 +116,7 @@ $(LIB_TARGET): $(LIB_OBJS)
 	$(AR) $@ $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
-	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lgedatsu -lmonolis_utils -lmetis -lGKlib
+	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -137,7 +137,7 @@ $(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
-	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lgedatsu -lmonolis_utils -lmetis -lGKlib
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 
 clean:
 	$(RM) \
