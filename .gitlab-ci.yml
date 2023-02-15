@@ -9,6 +9,7 @@ stages:
 build_gedatsu:
   stage: lib_build
   script:
+    - ./install_lib.sh
     - make FLAGS=DEBUG
   artifacts:
     paths:

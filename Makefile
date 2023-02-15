@@ -2,14 +2,13 @@
 
 ##> compiler setting
 FC     = mpif90
-#FFLAGS = -fPIC -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
-FFLAGS = -fPIC -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow -Wno-missing-include-dirs
+FFLAGS = -fPIC -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
 CC     = mpicc
 CFLAGS = -fPIC -O2
 
 ##> directory setting
 MOD_DIR = -J ./include
-INCLUDE = -I /usr/include -I ./include -I ../monolis_utils/include
+INCLUDE = -I /usr/include -I ./include
 BIN_DIR = ./bin
 SRC_DIR = ./src
 OBJ_DIR = ./obj
@@ -117,7 +116,7 @@ $(LIB_TARGET): $(LIB_OBJS)
 	$(AR) $@ $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
-	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lgedatsu -L../monolis_utils/lib -lmonolis_utils -lmetis -lGKlib
+	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) -L./lib -lgedatsu -lmonolis_utils -lmetis -lGKlib
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -138,7 +137,7 @@ $(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
 	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
-	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lgedatsu -L../monolis_utils/lib -lmonolis_utils -lmetis -lGKlib
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) -L./lib -lgedatsu -lmonolis_utils -lmetis -lGKlib
 
 clean:
 	$(RM) \
