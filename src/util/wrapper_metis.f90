@@ -60,8 +60,9 @@ contains
 
     if(n_part /= 1)then
 #ifdef NO_METIS
-      call gedatsu_error_string("gedatsu_part_graph_metis_with_weight: METIS is NOT enabled")
-      stop
+      call monolis_std_error_string("gedatsu_part_graph_metis_with_weight")
+      call monolis_std_error_string("METIS is NOT enabled")
+      call monolis_std_error_stop()
 #else
       !> convert to 0 origin
       item = item - 1
