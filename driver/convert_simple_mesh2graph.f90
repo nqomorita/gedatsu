@@ -2,10 +2,9 @@ program gedatsu_convertor_simple_mesh2graph
   use mod_monolis_utils
   use mod_gedatsu
   implicit none
-  type(gedatsu_graph) :: graph
   integer(kint) :: n_node, n_elem, n_base
-  character(monolis_charlen) :: finname, fiename, foname
-  logical :: is_get
+  character(monolis_charlen) :: finame, foname
+  logical :: is_get, is_1_origin
   integer(kint), allocatable :: elem(:,:), vertex_id(:)
   integer(kint), allocatable :: conn_index(:), conn_item(:)
   integer(kint), allocatable :: nodal_index(:), nodal_item(:)
@@ -20,25 +19,22 @@ program gedatsu_convertor_simple_mesh2graph
     write(*,"(a)") &
     & "./gedatsu_convertor_simple_mesh2graph {options}"
     write(*,"(a)")""
-    write(*,"(a)")"-in {input node filename}: (defualt) node.dat"
-    write(*,"(a)")"-ie {input elem filename}: (defualt) elem.dat"
-    write(*,"(a)")"-o  {output graph filename}: (defualt) graph.dat"
-    write(*,"(a)")"-h  : help"
+    write(*,"(a)")"-i {input elem filename}: (defualt) elem.dat"
+    write(*,"(a)")"-o {output graph filename}: (defualt) graph.dat"
+    write(*,"(a)")"-h : help"
     stop monolis_success
   endif
 
-  finname = "node.dat"
-  call monolis_get_arg_input_in_tag(finname)
+  finame = "elem.dat"
+  call monolis_get_arg_input_ie_tag(finame)
 
-  fiename = "elem.dat"
-  call monolis_get_arg_input_ie_tag(fiename)
+  call monolis_input_elem(finame, n_elem, n_base, elem)
 
-  foname = "graph.dat"
-  call monolis_get_arg_input_o_tag(foname)
+  call monolis_check_fortran_1_origin_elem(elem, is_1_origin)
 
-  call monolis_input_node(finname, n_node, node)
+  if(.not. is_1_origin) elem = elem + 1
 
-  call monolis_input_elem(fiename, n_elem, n_base, elem)
+  n_node = maxval(elem)
 
   call gedatsu_convert_simple_elem_to_connectivity_graph(n_elem, n_base, elem, conn_index, conn_item)
 
@@ -49,11 +45,13 @@ program gedatsu_convertor_simple_mesh2graph
 
   call monolis_get_sequence_array_I(vertex_id, n_node, 1, 1)
 
-  !> for C binding
-  if(minval(elem) == 0)then
+  if(.not. is_1_origin)then
     nodal_item = nodal_item - 1
     vertex_id = vertex_id - 1
   endif
+
+  foname = "graph.dat"
+  call monolis_get_arg_input_o_tag(foname)
 
   call monolis_output_graph(foname, n_node, vertex_id, nodal_index, nodal_item)
 
