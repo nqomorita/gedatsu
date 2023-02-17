@@ -21,7 +21,7 @@ contains
     integer(kint), allocatable :: index(:)
     !> コネクティビティグラフの item 配列
     integer(kint), allocatable :: item(:)
-    integer(kint) :: i, j, nb
+    integer(kint) :: i, j
 
     call monolis_alloc_I_1d(index, n_elem + 1)
     call monolis_alloc_I_1d(item, n_elem*n_base)

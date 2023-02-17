@@ -8,7 +8,6 @@ program gedatsu_convertor_simple_mesh2graph
   integer(kint), allocatable :: elem(:,:), vertex_id(:)
   integer(kint), allocatable :: conn_index(:), conn_item(:)
   integer(kint), allocatable :: nodal_index(:), nodal_item(:)
-  real(kdouble), allocatable :: node(:,:)
 
   call monolis_mpi_initialize()
 
@@ -26,13 +25,16 @@ program gedatsu_convertor_simple_mesh2graph
   endif
 
   finame = "elem.dat"
-  call monolis_get_arg_input_ie_tag(finame)
+
+  call monolis_get_arg_input_i_tag(finame)
 
   call monolis_input_elem(finame, n_elem, n_base, elem)
 
   call monolis_check_fortran_1_origin_elem(elem, is_1_origin)
 
-  if(.not. is_1_origin) elem = elem + 1
+  if(.not. is_1_origin)then
+    elem = elem + 1
+  endif
 
   n_node = maxval(elem)
 
@@ -51,6 +53,7 @@ program gedatsu_convertor_simple_mesh2graph
   endif
 
   foname = "graph.dat"
+
   call monolis_get_arg_input_o_tag(foname)
 
   call monolis_output_graph(foname, n_node, vertex_id, nodal_index, nodal_item)
