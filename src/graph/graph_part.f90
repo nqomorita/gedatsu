@@ -185,40 +185,39 @@ contains
     type(gedatsu_graph) :: subgraphs(:)
     !> [out] 分割領域に対応する com 構造体
     type(monolis_COM) :: com(:)
-    !> 全ての外部節点番号
-    integer(kint), allocatable :: outer_node_id_all(:)
+    !> 全ての外部節点番号（グローバル番号）
+    integer(kint), allocatable :: outer_node_id_all_global(:)
     !> 全ての外部節点が属する領域番号
     integer(kint), allocatable :: outer_domain_id_all(:)
     !> 全ての外部節点配列の各領域に属する節点数
     integer(kint), allocatable :: displs(:)
     integer(kint) :: i
-    type(monolis_comm_node_list) :: recv_list
+    type(monolis_comm_node_list), allocatable :: recv_list(:)
 
-    call gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all, displs)
+    call gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
 
     call monolis_comm_get_all_external_node_domain_id_serial(graph%vertex_domain_id, n_domain, &
-      & outer_node_id_all, outer_domain_id_all, displs)
+      & outer_node_id_all_global, outer_domain_id_all, displs)
 
-!    call monolis_comm_get_recv_parallel(n_vertex, vertex_id, com, &
-!      & outer_node_id_all, outer_domain_id_all, displs, recv_list)
-
-!    call monolis_comm_get_send_parallel(n_vertex, vertex_id, com, recv_list)
+    allocate(recv_list(n_domain))
 
     do i = 1, n_domain
-!      call monolis_comm_get_recv_serial(graph, n_domain, i, subgraphs(i), com(i), recv_list)
+      call monolis_comm_get_recv_serial(n_domain, i, subgraphs(i)%n_internal_vertex, &
+        & outer_node_id_all_global, outer_domain_id_all, displs, com(i), recv_list)
 
-!      !call monolis_comm_get_send_serial(graph, n_domain, i, subgraphs(i), com(i), recv_list)
+      call monolis_comm_get_send_serial(n_domain, i, &
+        & subgraphs(i)%n_vertex, subgraphs(i)%vertex_id, com(i), recv_list(i))
     enddo
   end subroutine gedatsu_com_get_comm_table_serial
 
-  subroutine gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all, displs)
+  subroutine gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
     implicit none
     !> [in] 分割グラフ
     type(gedatsu_graph) :: subgraphs(:)
     !> [in] 領域分割数
     integer(kint) :: n_domain
     !> [in] 全ての外部節点番号
-    integer(kint), allocatable :: outer_node_id_all(:)
+    integer(kint), allocatable :: outer_node_id_all_global(:)
     !> [in] 全ての外部節点配列の各領域に属する節点数
     integer(kint), allocatable :: displs(:)
     integer(kint) :: i, j, in
@@ -229,38 +228,39 @@ contains
       displs(i + 1) = displs(i) + subgraphs(i)%n_vertex - subgraphs(i)%n_internal_vertex
     enddo
 
-    call monolis_alloc_I_1d(outer_node_id_all, displs(n_domain + 1))
+    call monolis_alloc_I_1d(outer_node_id_all_global, displs(n_domain + 1))
 
     in = 0
     do i = 1, n_domain
       do j = subgraphs(i)%n_internal_vertex + 1, subgraphs(i)%n_vertex
         in = in + 1
-        outer_node_id_all(in) = subgraphs(i)%vertex_id(j)
+        outer_node_id_all_global(in) = subgraphs(i)%vertex_id(j)
       enddo
     enddo
   end subroutine gedatsu_comm_get_all_external_node_serial
 
   subroutine monolis_comm_get_all_external_node_domain_id_serial(vertex_domain_id, n_domain, &
-    & outer_node_id_all, outer_domain_id_all, displs)
+    & outer_node_id_all_global, outer_domain_id_all, displs)
     implicit none
     !> [in] 節点の所属する領域番号（全節点数）
     integer(kint) :: vertex_domain_id(:)
     !> [in] 領域分割数
     integer(kint) :: n_domain
     !> [in] 全ての外部節点番号
-    integer(kint) :: outer_node_id_all(:)
+    integer(kint) :: outer_node_id_all_global(:)
     !> 全ての外部節点が属する領域番号
     integer(kint), allocatable :: outer_domain_id_all(:)
     !> [in] 全ての外部節点配列の各領域に属する節点数
     integer(kint) :: displs(:)
-    integer(kint) :: i, j, in, id
+    integer(kint) :: i, in, id
 
     call monolis_alloc_I_1d(outer_domain_id_all, displs(n_domain + 1))
 
     do i = 1, displs(n_domain + 1)
-      in = outer_node_id_all(i)
+      in = outer_node_id_all_global(i)
       id = vertex_domain_id(in)
       outer_domain_id_all(i) = id
     enddo
   end subroutine monolis_comm_get_all_external_node_domain_id_serial
+
 end module mod_gedatsu_graph_part
