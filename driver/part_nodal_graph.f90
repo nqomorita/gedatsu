@@ -9,8 +9,11 @@ program gedatsu_partitioner_nodal_graph
   character(monolis_charlen) :: finwname, fiewname, label
   logical :: is_get, is_inw, is_iew
   type(gedatsu_graph), allocatable :: subgraphs(:)
+  type(monolis_COM), allocatable :: com(:)
   integer(kint), allocatable :: node_wgt(:,:)
   integer(kint), allocatable :: edge_wgt(:,:)
+  integer(kint), allocatable :: id1(:)
+  integer(kint), allocatable :: id2(:,:)
 
   call monolis_mpi_initialize()
 
@@ -68,14 +71,38 @@ program gedatsu_partitioner_nodal_graph
 
   call gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
 
+  allocate(com(n_domain))
+
+  call gedatsu_com_get_comm_table_serial(graph, n_domain, subgraphs, com)
+
   dirname = "./parted.0"
   call monolis_get_arg_input_S("-d", dirname, is_get)
 
   call monolis_std_make_dir(dirname)
 
   do i = 1, n_domain
+    !> graph.dat
     foname_full = monolis_get_output_file_name(dirname, foname, i)
-    call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id, subgraphs(i)%index, subgraphs(i)%item)
+    call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
+    call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
+    call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, id1, subgraphs(i)%index, subgraphs(i)%item)
+    call monolis_dealloc_I_1d(id1)
+
+    !> internal n_vertex
+    foname_full = monolis_get_output_file_name(dirname, trim(foname)//".n_internal", i)
+    call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
+
+    !> internal vertex_id
+    foname_full = monolis_get_output_file_name(dirname, trim(foname)//".id", i)
+    call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
+
+    !> send
+    foname_full = monolis_get_output_file_name(dirname, trim(foname)//".send", i)
+    !call monolis_output_send_com_table(fname, com(i))
+
+    !> recv
+    foname_full = monolis_get_output_file_name(dirname, trim(foname)//".recv", i)
+    !call monolis_output_recv_com_table(fname, com(i))
   enddo
 
   call monolis_mpi_finalize()
