@@ -13,7 +13,6 @@ program gedatsu_partitioner_nodal_graph
   integer(kint), allocatable :: node_wgt(:,:)
   integer(kint), allocatable :: edge_wgt(:,:)
   integer(kint), allocatable :: id1(:)
-  integer(kint), allocatable :: id2(:,:)
 
   call monolis_mpi_initialize()
 
@@ -82,7 +81,7 @@ program gedatsu_partitioner_nodal_graph
 
   do i = 1, n_domain
     !> graph.dat
-    foname_full = monolis_get_output_file_name(dirname, foname, i)
+    foname_full = monolis_get_output_file_name(dirname, trim(foname), i)
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
     call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
     call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, id1, subgraphs(i)%index, subgraphs(i)%item)
@@ -98,11 +97,11 @@ program gedatsu_partitioner_nodal_graph
 
     !> send
     foname_full = monolis_get_output_file_name(dirname, trim(foname)//".send", i)
-    !call monolis_output_send_com_table(fname, com(i))
+    call monolis_output_send_com_table(foname_full, com(i))
 
     !> recv
     foname_full = monolis_get_output_file_name(dirname, trim(foname)//".recv", i)
-    !call monolis_output_recv_com_table(fname, com(i))
+    call monolis_output_recv_com_table(foname_full, com(i))
   enddo
 
   call monolis_mpi_finalize()

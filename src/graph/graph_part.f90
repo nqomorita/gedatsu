@@ -5,6 +5,8 @@
 !# gedatsu_get_parted_graph(graph, n_domain, subgraphs)
 !# gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
 !# gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
+!# gedatsu_com_get_comm_table_serial(graph, n_domain, subgraphs, com)
+!# gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
 module mod_gedatsu_graph_part
   use mod_monolis_utils
   use mod_gedatsu_graph
@@ -126,13 +128,13 @@ contains
 
     call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
+    call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, subgraph%vertex_id)
+
     if(n_edge == 0) return
 
     call monolis_alloc_I_1d(subgraph%item, n_edge)
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
-
-    call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, subgraph%vertex_id)
 
     call gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
 
@@ -238,29 +240,4 @@ contains
       enddo
     enddo
   end subroutine gedatsu_comm_get_all_external_node_serial
-
-  subroutine monolis_comm_get_all_external_node_domain_id_serial(vertex_domain_id, n_domain, &
-    & outer_node_id_all_global, outer_domain_id_all, displs)
-    implicit none
-    !> [in] 節点の所属する領域番号（全節点数）
-    integer(kint) :: vertex_domain_id(:)
-    !> [in] 領域分割数
-    integer(kint) :: n_domain
-    !> [in] 全ての外部節点番号
-    integer(kint) :: outer_node_id_all_global(:)
-    !> 全ての外部節点が属する領域番号
-    integer(kint), allocatable :: outer_domain_id_all(:)
-    !> [in] 全ての外部節点配列の各領域に属する節点数
-    integer(kint) :: displs(:)
-    integer(kint) :: i, in, id
-
-    call monolis_alloc_I_1d(outer_domain_id_all, displs(n_domain + 1))
-
-    do i = 1, displs(n_domain + 1)
-      in = outer_node_id_all_global(i)
-      id = vertex_domain_id(in)
-      outer_domain_id_all(i) = id
-    enddo
-  end subroutine monolis_comm_get_all_external_node_domain_id_serial
-
 end module mod_gedatsu_graph_part
