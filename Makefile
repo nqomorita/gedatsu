@@ -1,4 +1,6 @@
-#> gedatsu Makefile
+
+$(DRIVE9): $(DRV_OBJS9)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)#> gedatsu Makefile
 
 ##> compiler setting
 FC     = mpif90
@@ -92,15 +94,17 @@ TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 
 ##> **********
 ##> target (3)
-DRIVE1 = $(BIN_DIR)/gedatsu_convertor_simple_mesh2graph
-DRIVE2 = $(BIN_DIR)/gedatsu_partitioner_bc
-DRIVE3 = $(BIN_DIR)/gedatsu_partitioner_connectivity_graph
-DRIVE4 = $(BIN_DIR)/gedatsu_partitioner_connectivity_val_i
-DRIVE5 = $(BIN_DIR)/gedatsu_partitioner_connectivity_val_r
-DRIVE6 = $(BIN_DIR)/gedatsu_partitioner_nodal_graph
-DRIVE7 = $(BIN_DIR)/gedatsu_partitioner_nodal_val_i
-DRIVE8 = $(BIN_DIR)/gedatsu_partitioner_nodal_val_r
-DRIVE9 = $(BIN_DIR)/gedatsu_partitioner_simple_mesh
+DRIVE1 = $(BIN_DIR)/gedatsu_simple_mesh2graph_convertor
+DRIVE2 = $(BIN_DIR)/gedatsu_bc_partitioner
+DRIVE3 = $(BIN_DIR)/gedatsu_connectivity_graph_partitioner
+DRIVE4 = $(BIN_DIR)/gedatsu_connectivity_val_i_partitioner
+DRIVE5 = $(BIN_DIR)/gedatsu_connectivity_val_r_partitioner
+DRIVE6 = $(BIN_DIR)/gedatsu_connectivity_val_c_partitioner
+DRIVE7 = $(BIN_DIR)/gedatsu_nodal_graph_partitioner
+DRIVE8 = $(BIN_DIR)/gedatsu_nodal_val_i_partitioner
+DRIVE9 = $(BIN_DIR)/gedatsu_nodal_val_r_partitioner
+DRIVE10= $(BIN_DIR)/gedatsu_nodal_val_c_partitioner
+DRIVE11= $(BIN_DIR)/gedatsu_simple_mesh_partitioner
 
 #SRC_DRIVE = \
 driver_util.f90 \
@@ -115,10 +119,12 @@ DRV_OBJS2   = $(DRV_OBJSt:.c=.o) ./obj/part_bc.o
 DRV_OBJS3   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_graph.o
 DRV_OBJS4   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_val_i.o
 DRV_OBJS5   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_val_r.o
-DRV_OBJS6   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_graph.o
-DRV_OBJS7   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_i.o
-DRV_OBJS8   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_r.o
-DRV_OBJS9   = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
+DRV_OBJS6   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_val_c.o
+DRV_OBJS7   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_graph.o
+DRV_OBJS8   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_i.o
+DRV_OBJS9   = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_r.o
+DRV_OBJS10  = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_val_c.o
+DRV_OBJS11  = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
 
 ##> target
 all: \
@@ -132,7 +138,9 @@ all: \
 	$(DRIVE6) \
 	$(DRIVE7) \
 	$(DRIVE8) \
-	$(DRIVE9)
+	$(DRIVE9) \
+	$(DRIVE10) \
+	$(DRIVE11)
 
 lib: \
 	$(LIB_TARGET)
@@ -188,6 +196,12 @@ $(DRIVE8): $(DRV_OBJS8)
 $(DRIVE9): $(DRV_OBJS9)
 	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)
 
+$(DRIVE10): $(DRV_OBJS10)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS10) $(USE_LIB)
+
+$(DRIVE11): $(DRV_OBJS11)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS11) $(USE_LIB)
+
 clean:
 	$(RM) \
 	$(LIB_OBJS) \
@@ -196,6 +210,16 @@ clean:
 	$(LIB_TARGET) \
 	$(TEST_TARGET) \
 	$(DRIVE1) \
+	$(DRIVE2) \
+	$(DRIVE3) \
+	$(DRIVE4) \
+	$(DRIVE5) \
+	$(DRIVE6) \
+	$(DRIVE7) \
+	$(DRIVE8) \
+	$(DRIVE9) \
+	$(DRIVE10) \
+	$(DRIVE11) \
 	./include/*.mod \
 	./bin/*
 

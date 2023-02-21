@@ -39,10 +39,7 @@ program gedatsu_partitioner_nodal_graph
   foname = "graph.dat"
   call monolis_get_arg_input_o_tag(foname)
 
-  n_domain = 1
-  call monolis_get_arg_input_I("-n", n_domain, is_get)
-
-  call monolis_std_log_I1("[number of domains]", n_domain)
+  call monolis_get_arg_input_n_tag(n_domain)
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameters are not set")
@@ -56,6 +53,7 @@ program gedatsu_partitioner_nodal_graph
   call monolis_get_arg_input_S("-inw", finwname, is_inw)
 
   if(is_inw)then
+    call monolis_std_log_string2("[input node weight filename]", finwname)
     call monolis_input_distval_i(finwname, label, n_vertex, n_nw_dof, node_wgt)
   endif
 
@@ -63,6 +61,7 @@ program gedatsu_partitioner_nodal_graph
   call monolis_get_arg_input_S("-iew", fiewname, is_iew)
 
   if(is_iew)then
+    call monolis_std_log_string2("[input edge weight filename]", fiewname)
     call monolis_input_distval_i(fiewname, label, n_vertex, n_ew_dof, edge_wgt)
   endif
 

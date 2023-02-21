@@ -27,6 +27,8 @@ program gedatsu_partitioner_nodal_val_i
     stop monolis_success
   endif
 
+  call monolis_get_arg_input_n_tag(n_domain)
+
   finame = "node_val.dat"
   call monolis_input_distval_i(finame, label, n_node, n_dof, val)
 
