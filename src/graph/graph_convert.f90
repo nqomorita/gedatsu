@@ -118,4 +118,21 @@ contains
 #endif
   end subroutine gedatsu_convert_connectivity_graph_to_nodal_graph
 
+  !> @ingroup dev_graph_part
+  !> 節点グラフとコネクティビティグラフが有効か比較
+  subroutine gedatsu_check_connectivity_graph(node, conn, is_valid)
+    implicit none
+    !> 節点グラフ
+    type(gedatsu_graph) :: node
+    !> コネクティビティグラフ
+    type(gedatsu_graph) :: conn
+    !> コネクティビティグラフの有効フラグ
+    logical :: is_valid
+
+    is_valid = .false.
+
+
+    is_valid = .true.
+  end subroutine gedatsu_check_connectivity_graph
+
 end module mod_gedatsu_graph_convert

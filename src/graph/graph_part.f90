@@ -212,6 +212,8 @@ contains
     enddo
   end subroutine gedatsu_com_get_comm_table_serial
 
+  !> @ingroup dev_graph_part
+  !> 全ての外部節点を取得（逐次実行版）
   subroutine gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
     implicit none
     !> [in] 分割グラフ

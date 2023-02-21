@@ -41,7 +41,7 @@ program gedatsu_nodal_val_c_partitioner
   call monolis_input_distval_c(finame, label, n_node, n_dof, val)
 
   dirname = "./parted.0"
-  call monolis_get_arg_input_S("-d", dirname, is_get)
+  call monolis_get_arg_input_d_tag(dirname, is_get)
 
   do i = 1, n_domain
     foname_full = monolis_get_output_file_name(dirname, trim(fidname), i)

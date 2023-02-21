@@ -12,6 +12,7 @@ contains
 
     call gedatsu_convert_simple_elem_to_connectivity_graph_test()
     call gedatsu_convert_connectivity_graph_to_nodal_graph_test()
+    call gedatsu_check_connectivity_graph_test()
   end subroutine gedatsu_graph_convert_test
 
   subroutine gedatsu_convert_simple_elem_to_connectivity_graph_test()
@@ -86,4 +87,18 @@ contains
     call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 10", nodal_item(5), 4)
     call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 11", nodal_item(6), 3)
   end subroutine gedatsu_convert_connectivity_graph_to_nodal_graph_test
+
+  subroutine gedatsu_check_connectivity_graph_test()
+    implicit none
+    !> 節点グラフ
+    type(gedatsu_graph) :: node
+    !> コネクティビティグラフ
+    type(gedatsu_graph) :: conn
+    logical :: is_valid
+
+    call gedatsu_check_connectivity_graph(node, conn, is_valid)
+
+    stop
+  end subroutine gedatsu_check_connectivity_graph_test
+
 end module mod_gedatsu_graph_convert_test

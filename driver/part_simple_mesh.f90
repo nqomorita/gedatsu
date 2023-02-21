@@ -4,7 +4,7 @@ program gedatsu_partitioner_simple_mesh
   implicit none
   type(gedatsu_graph) :: graph
   integer(kint) :: n_node, n_elem, n_base
-  character(monolis_charlen) :: finname, fiename, foname
+  character(monolis_charlen) :: finname, fiename, foname, dirname
   logical :: is_get
   integer(kint), allocatable :: elem(:,:), vertex_id(:)
   integer(kint), allocatable :: conn_index(:), conn_item(:)
@@ -35,6 +35,9 @@ program gedatsu_partitioner_simple_mesh
 
   foname = "graph.dat"
   call monolis_get_arg_input_o_tag(foname, is_get)
+
+  dirname = "./parted.0"
+  call monolis_get_arg_input_d_tag(dirname, is_get)
 
   call monolis_input_node(finname, n_node, node)
 

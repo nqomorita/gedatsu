@@ -75,9 +75,7 @@ program gedatsu_nodal_graph_partitioner
   call gedatsu_com_get_comm_table_serial(graph, n_domain, subgraphs, com)
 
   dirname = "./parted.0"
-  call monolis_get_arg_input_S("-d", dirname, is_get)
-
-  call monolis_std_make_dir(dirname)
+  call monolis_get_arg_input_d_tag(dirname, is_get)
 
   do i = 1, n_domain
     !> graph.dat
