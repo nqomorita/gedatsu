@@ -20,21 +20,21 @@ program gedatsu_partitioner_simple_mesh
     write(*,"(a)") &
     & "./gedatsu_convertor_simple_mesh2graph {options}"
     write(*,"(a)")""
-    write(*,"(a)")"-in {input node filename}: (defualt) node.dat"
-    write(*,"(a)")"-ie {input elem filename}: (defualt) elem.dat"
-    write(*,"(a)")"-o  {output graph filename}: (defualt) graph.dat"
+    write(*,"(a)")"-in {input node filename}: (default) node.dat"
+    write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-o  {output graph filename}: (default) graph.dat"
     write(*,"(a)")"-h  : help"
     stop monolis_success
   endif
 
   finname = "node.dat"
-  call monolis_get_arg_input_in_tag(finname)
+  call monolis_get_arg_input_in_tag(finname, is_get)
 
   fiename = "elem.dat"
-  call monolis_get_arg_input_ie_tag(fiename)
+  call monolis_get_arg_input_ie_tag(fiename, is_get)
 
   foname = "graph.dat"
-  call monolis_get_arg_input_o_tag(foname)
+  call monolis_get_arg_input_o_tag(foname, is_get)
 
   call monolis_input_node(finname, n_node, node)
 

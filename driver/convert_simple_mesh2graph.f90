@@ -1,4 +1,4 @@
-program gedatsu_convertor_simple_mesh2graph
+program gedatsu_simple_mesh2graph_convertor
   use mod_monolis_utils
   use mod_gedatsu
   implicit none
@@ -16,17 +16,17 @@ program gedatsu_convertor_simple_mesh2graph
   if(is_get)then
     write(*,"(a)")"usage:"
     write(*,"(a)") &
-    & "./gedatsu_convertor_simple_mesh2graph {options}"
+    & "./gedatsu_simple_mesh2graph_convertor {options}"
     write(*,"(a)")""
-    write(*,"(a)")"-i {input elem filename}: (defualt) elem.dat"
-    write(*,"(a)")"-o {output graph filename}: (defualt) graph.dat"
+    write(*,"(a)")"-i {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-o {output graph filename}: (default) graph.dat"
     write(*,"(a)")"-h : help"
     stop monolis_success
   endif
 
   finame = "elem.dat"
 
-  call monolis_get_arg_input_i_tag(finame)
+  call monolis_get_arg_input_i_tag(finame, is_get)
 
   call monolis_input_elem(finame, n_elem, n_base, elem)
 
@@ -54,9 +54,9 @@ program gedatsu_convertor_simple_mesh2graph
 
   foname = "graph.dat"
 
-  call monolis_get_arg_input_o_tag(foname)
+  call monolis_get_arg_input_o_tag(foname, is_get)
 
   call monolis_output_graph(foname, n_node, vertex_id, nodal_index, nodal_item)
 
   call monolis_mpi_finalize()
-end program gedatsu_convertor_simple_mesh2graph
+end program gedatsu_simple_mesh2graph_convertor

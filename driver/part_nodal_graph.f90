@@ -1,4 +1,4 @@
-program gedatsu_partitioner_nodal_graph
+program gedatsu_nodal_graph_partitioner
   use mod_monolis_utils
   use mod_gedatsu
   implicit none
@@ -21,31 +21,32 @@ program gedatsu_partitioner_nodal_graph
   if(is_get)then
     write(*,"(a)")"usage:"
     write(*,"(a)") &
-    & "./gedatsu_partitioner_nodal_graph {options} -n {number of domains}"
+    & "./gedatsu_nodal_graph_partitioner {options} -n {number of domains}"
     write(*,"(a)")""
     write(*,"(a)")"-n {number of domains}: (default) 1"
-    write(*,"(a)")"-i {input node filename}: (defualt) graph.dat"
-    write(*,"(a)")"-inw {input node weight filename}: (defualt) node_weight.dat"
-    write(*,"(a)")"-iew {input edge weight filename}: (defualt) edge_weight.dat"
-    write(*,"(a)")"-o {output graph filename}: (defualt) graph.dat.{domain_id}"
-    write(*,"(a)")"-d {output directory name}: (defualt) ./parted.0"
+    write(*,"(a)")"-i {input node filename}: (default) graph.dat"
+    write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
+    write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
+    write(*,"(a)")"-o {output graph filename}: (default) graph.dat.{domain_id}"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h : help"
     stop monolis_success
   endif
 
-  finame = "graph.dat"
-  call monolis_get_arg_input_i_tag(finame)
-
-  foname = "graph.dat"
-  call monolis_get_arg_input_o_tag(foname)
-
-  call monolis_get_arg_input_n_tag(n_domain)
+  call monolis_get_arg_input_n_tag(n_domain, is_get)
 
   if(.not. is_get)then
-    call monolis_std_error_string("input parameters are not set")
-    call monolis_std_error_string("./gedatsu_partitioner_nodal_graph {options} -n {number of domains}")
+    call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)") &
+    & "./gedatsu_nodal_graph_partitioner {options} -n {number of domains}"
     stop monolis_fail
   endif
+
+  finame = "graph.dat"
+  call monolis_get_arg_input_i_tag(finame, is_get)
+
+  foname = "graph.dat"
+  call monolis_get_arg_input_o_tag(foname, is_get)
 
   call monolis_input_graph(finame, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
 
@@ -104,4 +105,4 @@ program gedatsu_partitioner_nodal_graph
   enddo
 
   call monolis_mpi_finalize()
-end program gedatsu_partitioner_nodal_graph
+end program gedatsu_nodal_graph_partitioner
