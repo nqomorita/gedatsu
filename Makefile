@@ -106,14 +106,6 @@ DRIVE9 = $(BIN_DIR)/gedatsu_nodal_val_r_partitioner
 DRIVE10= $(BIN_DIR)/gedatsu_nodal_val_c_partitioner
 DRIVE11= $(BIN_DIR)/gedatsu_simple_mesh_partitioner
 
-#SRC_DRIVE = \
-driver_util.f90 \
-extract_util.f90 \
-refiner_util.f90
-
-#DRV_SOURCES = $(addprefix $(DRV_DIR)/, $(SRC_DRIVE))
-#DRV_OBJSt   = $(subst $(DRV_DIR), $(OBJ_DIR), $(DRV_SOURCES:.f90=.o))
-
 DRV_OBJS1   = $(DRV_OBJSt:.c=.o) ./obj/convert_simple_mesh2graph.o
 DRV_OBJS2   = $(DRV_OBJSt:.c=.o) ./obj/part_bc.o
 DRV_OBJS3   = $(DRV_OBJSt:.c=.o) ./obj/part_conn_graph.o

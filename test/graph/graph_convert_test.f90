@@ -94,11 +94,70 @@ contains
     type(gedatsu_graph) :: node
     !> コネクティビティグラフ
     type(gedatsu_graph) :: conn
+    integer(kint) :: n_vertex, n_edge
+    integer(kint) :: edge(2,8)
     logical :: is_valid
+
+    call monolis_std_log_string("gedatsu_check_connectivity_graph_test")
+
+    !> node graph
+    n_vertex = 5
+
+    call gedatsu_graph_set_n_vertex(node, n_vertex)
+
+    n_edge = 8
+
+    edge(1,1) = 1; edge(2,1) = 2;
+    edge(1,2) = 2; edge(2,2) = 1;
+    edge(1,3) = 2; edge(2,3) = 3;
+    edge(1,4) = 3; edge(2,4) = 2;
+    edge(1,5) = 3; edge(2,5) = 4;
+    edge(1,6) = 4; edge(2,6) = 3;
+    edge(1,7) = 4; edge(2,7) = 5;
+    edge(1,8) = 5; edge(2,8) = 4;
+
+    call gedatsu_graph_set_edge(node, n_edge, edge)
+
+    !> conn graph case 1
+    n_vertex = 4
+
+    call gedatsu_graph_set_n_vertex(conn, n_vertex)
+
+    n_edge = 6
+
+    edge(1,1) = 1; edge(2,1) = 1;
+    edge(1,2) = 1; edge(2,2) = 2;
+    edge(1,3) = 2; edge(2,3) = 2;
+    edge(1,4) = 2; edge(2,4) = 3;
+    edge(1,5) = 3; edge(2,5) = 3;
+    edge(1,6) = 3; edge(2,6) = 4;
+
+    call gedatsu_graph_set_edge(conn, n_edge, edge)
 
     call gedatsu_check_connectivity_graph(node, conn, is_valid)
 
-    stop
-  end subroutine gedatsu_check_connectivity_graph_test
+    call monolis_test_check_eq_L1("gedatsu_check_connectivity_graph_test 1", is_valid, .true.)
 
+    !> conn graph case 2
+    call gedatsu_graph_finalize(conn)
+
+    n_vertex = 4
+
+    call gedatsu_graph_set_n_vertex(conn, n_vertex)
+
+    n_edge = 6
+
+    edge(1,1) = 1; edge(2,1) = 1;
+    edge(1,2) = 1; edge(2,2) = 2;
+    edge(1,3) = 2; edge(2,3) = 2;
+    edge(1,4) = 2; edge(2,4) = 3;
+    edge(1,5) = 3; edge(2,5) = 1;
+    edge(1,6) = 3; edge(2,6) = 3;
+
+    call gedatsu_graph_set_edge(conn, n_edge, edge)
+
+    call gedatsu_check_connectivity_graph(node, conn, is_valid)
+
+    call monolis_test_check_eq_L1("gedatsu_check_connectivity_graph_test 2", is_valid, .false.)
+  end subroutine gedatsu_check_connectivity_graph_test
 end module mod_gedatsu_graph_convert_test

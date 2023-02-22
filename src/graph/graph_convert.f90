@@ -120,6 +120,7 @@ contains
 
   !> @ingroup dev_graph_part
   !> 節点グラフとコネクティビティグラフが有効か比較
+  !> 無向グラフの入力が前提のアルゴリズム
   subroutine gedatsu_check_connectivity_graph(node, conn, is_valid)
     implicit none
     !> 節点グラフ
@@ -128,11 +129,29 @@ contains
     type(gedatsu_graph) :: conn
     !> コネクティビティグラフの有効フラグ
     logical :: is_valid
+    integer(kint) :: i, j, jS, jE, k, kS, kE, kn
+    integer(kint) :: i1, i2
 
     is_valid = .false.
 
+    do i = 1, conn%n_vertex
+      jS = conn%index(i) + 1
+      jE = conn%index(i + 1)
+      aa:do j = jS + 1, jE
+        i1 = conn%item(jS)
+        i2 = conn%item(j)
+        kS = node%index(i1) + 1
+        kE = node%index(i1 + 1)
+        do k = kS, kE
+          kn = node%item(k)
+          if(i2 == kn)then
+            cycle aa
+          endif
+        enddo
+        return
+      enddo aa
+    enddo
 
     is_valid = .true.
   end subroutine gedatsu_check_connectivity_graph
-
 end module mod_gedatsu_graph_convert

@@ -53,6 +53,8 @@ contains
 
     call gedatsu_qsort_int_1d(move_vertex_domain_id, 1, n_move_vertex)
 
+    n_neib_domain = 0
+
     call gedatsu_get_uniq_int(move_vertex_domain_id, n_move_vertex, n_neib_domain)
 
     call gedatsu_alloc_int_1d(neib_domain_id, n_neib_domain)
