@@ -4,7 +4,7 @@ program gedatsu_bc_partitioner
   implicit none
   type(gedatsu_graph) :: graph
   integer(kint) :: i, j, in, n_domain, n_bc, n_dof
-  character(monolis_charlen) :: finame, dirname, label, fidname, foname_full
+  character(monolis_charlen) :: finame, dirname, fidname, foname_full
   logical :: is_get
   integer(kint), allocatable :: i_bc(:,:), i_bc_local(:,:)
   real(kdouble), allocatable :: r_bc(:), r_bc_local(:)

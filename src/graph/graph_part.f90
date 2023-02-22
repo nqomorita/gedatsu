@@ -242,4 +242,26 @@ contains
       enddo
     enddo
   end subroutine gedatsu_comm_get_all_external_node_serial
+
+  !> @ingroup dev_graph_part
+  !> グローバルコネクティビティからローカルコネクティビティを取得
+  subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, l_n_vertex, l_index, l_item)
+    implicit none
+    !> [in] 分割領域で利用される節点フラグ
+    integer(kint) :: is_used(:)
+    !> [in] グローバルコネクティビティの要素数
+    integer(kint) :: g_n_vertex
+    !> [in] グローバルコネクティビティの index 配列
+    integer(kint) :: g_index(:)
+    !> [in] グローバルコネクティビティの item 配列
+    integer(kint) :: g_item(:)
+    !> [out] ローカルコネクティビティの要素数
+    integer(kint) :: l_n_vertex
+    !> [out] ローカルコネクティビティの index 配列
+    integer(kint), allocatable :: l_index(:)
+    !> [out] ローカルコネクティビティの item 配列
+    integer(kint), allocatable :: l_item(:)
+
+
+  end subroutine gedatsu_get_parted_connectivity_main
 end module mod_gedatsu_graph_part

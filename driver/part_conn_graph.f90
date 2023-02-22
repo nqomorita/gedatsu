@@ -6,10 +6,11 @@ program gedatsu_connectivity_graph_partitioner
   type(gedatsu_graph) :: global_conn_graph
   type(gedatsu_graph) :: local_node_graph
   type(gedatsu_graph) :: local_conn_graph
-  integer(kint) :: n_domain, i
+  integer(kint) :: n_domain, i, j, in
   character(monolis_charlen) :: finame, dirname, foname, foname_full, fidname
   character(monolis_charlen) :: finname
   logical :: is_get, is_valid
+  integer(kint), allocatable :: is_used(:), id1(:)
 
   call monolis_mpi_initialize()
 
@@ -65,15 +66,28 @@ program gedatsu_connectivity_graph_partitioner
     stop monolis_fail
   endif
 
+  call monolis_alloc_I_1d(is_used, global_node_graph%n_vertex)
+
   do i = 1, n_domain
     foname_full = monolis_get_output_file_name(dirname, trim(fidname), i)
     call monolis_input_global_id(foname_full, local_node_graph%n_vertex, local_node_graph%vertex_id)
 
-    !call local_conn_graph
+    is_used = 0
+    do j = 1, local_node_graph%n_vertex
+      in = local_node_graph%vertex_id(j)
+      is_used(in) = 1
+    enddo
 
+    call gedatsu_get_parted_connectivity_main(is_used, &
+      & global_conn_graph%n_vertex, global_conn_graph%index, global_conn_graph%item, &
+      & local_conn_graph%n_vertex, local_conn_graph%index, local_conn_graph%item)
+
+    call monolis_alloc_I_1d(id1, local_conn_graph%n_vertex)
+    call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
     foname_full = monolis_get_output_file_name(dirname, trim(foname), i)
-    call monolis_output_graph(foname_full, local_conn_graph%n_vertex, local_conn_graph%vertex_id, &
+    call monolis_output_graph(foname_full, local_conn_graph%n_vertex, id1, &
       & local_conn_graph%index, local_conn_graph%item)
+    call monolis_dealloc_I_1d(id1)
 
     call monolis_dealloc_I_1d(local_node_graph%vertex_id)
 
