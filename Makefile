@@ -1,6 +1,4 @@
-
-$(DRIVE9): $(DRV_OBJS9)
-	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)#> gedatsu Makefile
+#> gedatsu Makefile
 
 ##> compiler setting
 FC     = mpif90
@@ -42,6 +40,10 @@ ifdef FLAGS
 
 	ifeq ($(findstring INT64, $(DFLAGS)), INT64)
 		FLAG_INT64 = -DINT64
+	endif
+
+	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
+		USE_LIB = -L./lib -lgedatsu -L../../lib -lmonolis_utils -lmetis
 	endif
 endif
 
