@@ -14,7 +14,7 @@ AR       = - ar ruv
 #> library setting
 METIS_DIR  = .
 METIS_INC  = -I $(METIS_DIR)/include
-METIS_LIB  = -L$(METIS_DIR)/lib -lmetis -lGKlib
+METIS_LIB  = -L$(METIS_DIR)/lib -lmetis
 
 PARMETIS_DIR  = .
 PARMETIS_INC  = -I $(METIS_DIR)/include
@@ -41,6 +41,10 @@ ifdef FLAGS
 
 	ifeq ($(findstring INT64, $(DFLAGS)), INT64)
 		FLAG_INT64 = -DINT64
+	endif
+
+	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
+		METIS_DIR = ../../
 	endif
 endif
 
