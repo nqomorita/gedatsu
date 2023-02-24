@@ -261,7 +261,44 @@ contains
     integer(kint), allocatable :: l_index(:)
     !> [out] ローカルコネクティビティの item 配列
     integer(kint), allocatable :: l_item(:)
+    integer(kint) :: i, j, jS, jE, in, n_conn
 
+    l_n_vertex = 0
+    n_conn = 0
 
+    aa:do i = 1, g_n_vertex
+      jS = g_index(i) + 1
+      jE = g_index(i + 1)
+      do j = jS, jE
+        in = g_item(j)
+        if(is_used(in) == 0) cycle aa
+      enddo
+      do j = jS, jE
+        n_conn = n_conn + 1
+        in = g_item(j)
+      enddo
+      l_n_vertex = l_n_vertex + 1
+    enddo aa
+
+    call monolis_alloc_I_1d(l_index, l_n_vertex + 1)
+    call monolis_alloc_I_1d(l_item, n_conn)
+
+    l_n_vertex = 0
+    n_conn = 0
+
+    bb:do i = 1, g_n_vertex
+      jS = g_index(i) + 1
+      jE = g_index(i + 1)
+      do j = jS, jE
+        in = g_item(j)
+        if(is_used(in) == 0) cycle bb
+      enddo
+      do j = jS, jE
+        n_conn = n_conn + 1
+        l_item(n_conn) = g_item(j)
+      enddo
+      l_n_vertex = l_n_vertex + 1
+      l_index(l_n_vertex + 1) = n_conn
+    enddo bb
   end subroutine gedatsu_get_parted_connectivity_main
 end module mod_gedatsu_graph_part
