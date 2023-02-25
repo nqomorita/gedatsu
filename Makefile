@@ -43,6 +43,7 @@ ifdef FLAGS
 	endif
 
 	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
+		INCLUDE = -I /usr/include -I ./include -I ../../include
 		USE_LIB = -L./lib -lgedatsu -L../../lib -lmonolis_utils -lmetis
 	endif
 endif
