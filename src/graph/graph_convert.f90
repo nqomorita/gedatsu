@@ -48,9 +48,9 @@ contains
     !> 要素数
     integer(kint) :: n_elem
     !> コネクティビティグラフの index 配列
-    integer(kint), allocatable :: conn_index(:)
+    integer(kint) :: conn_index(:)
     !> コネクティビティグラフの item 配列
-    integer(kint), allocatable :: conn_item(:)
+    integer(kint) :: conn_item(:)
     !> 節点グラフの index 配列
     integer(kint), allocatable :: nodal_index(:)
     !> 節点グラフの item 配列
