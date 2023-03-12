@@ -64,10 +64,10 @@ contains
       call monolis_std_error_string("METIS is NOT enabled")
       call monolis_std_error_stop()
 #else
-      !> convert to 0 origin
+      !# convert to 0 origin
       item = item - 1
 
-      !> allocate section
+      !# allocate section
       allocate(index_c(n_vertex+1), source = 0)
       index_c = index
 
@@ -93,20 +93,20 @@ contains
 
       ncon = 1
 
-      !> metis call
+      !# metis call
       call METIS_PARTGRAPHRECURSIVE(n_vertex, ncon, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, n_part, tpwgts, ubvec, options, objval, part_id_c)
 
       part_id = part_id_c + 1
 
-      !> deallocate section
+      !# deallocate section
       deallocate(index_c)
       deallocate(item_c)
       deallocate(part_id_c)
       if(associated(node_wgt_c)) deallocate(node_wgt_c)
       if(associated(edge_wgt_c)) deallocate(edge_wgt_c)
 
-      !> convert to 1 origin
+      !# convert to 1 origin
       item = item + 1
 #endif
     endif

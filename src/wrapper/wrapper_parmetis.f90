@@ -81,14 +81,14 @@ contains
       call gedatsu_error_string("gedatsu_repart_graph_parmetis_with_weight: ParMETIS is NOT enabled")
       stop
 #else
-      !> convert to 0 origin
+      !# convert to 0 origin
       item = item - 1
 
       ncon = 1
 
       nflag = 0
 
-      !> allocate section
+      !# allocate section
       allocate(vtxdist_c(n_part+1), source = 0)
       vtxdist_c = vtxdist
 
@@ -103,10 +103,12 @@ contains
 
       allocate(part_id_c(n_vertex), source = 0)
 
-      wflag = 0 !> No weight
+      !# No weight
+      wflag = 0
 
       if(allocated(node_wgt))then
-        wflag = 2 !> Only node weight
+        !# Only node weight
+        wflag = 2
         allocate(node_wgt_c(n_vertex), source = 0)
         node_wgt_c = node_wgt(1,:)
       else
@@ -115,9 +117,11 @@ contains
 
       if(allocated(edge_wgt))then
         if(wflag == 2)then
-          wflag = 3 !> Both weight
+          !# Both weight
+          wflag = 3
         else
-          wflag = 1 !> Only edge weight
+          !# Only edge weight
+          wflag = 1
         endif
         allocate(edge_wgt_c(nz), source = 0)
         edge_wgt_c = edge_wgt(1,:)
@@ -141,14 +145,14 @@ contains
         tpwgts(i) = 1.0/n_part
       enddo
 
-      !> parmetis call
+      !# parmetis call
       call ParMETIS_V3_AdaptiveRepart(vtxdist_c, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
         & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
 
       part_id = part_id_c + 1
 
-      !> deallocate section
+      !# deallocate section
       deallocate(vtxdist_c)
       deallocate(index_c)
       deallocate(item_c)
@@ -162,7 +166,7 @@ contains
       deallocate(edgecut)
       deallocate(itr)
 
-      !> convert to 1 origin
+      !# convert to 1 origin
       item = item + 1
 #endif
     endif
