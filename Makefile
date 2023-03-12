@@ -58,9 +58,11 @@ AR   = - ar ruv
 LIB_TARGET = $(LIB_DIR)/$(LIBRARY)
 
 ##> source file define
-SRC_UTIL = \
+SRC_DEF = \
   def_graph.f90 \
-  def_dlb.f90 \
+  def_dlb.f90
+
+SRC_WRAP = \
   wrapper_metis.f90 \
   wrapper_parmetis.f90
 
@@ -75,7 +77,8 @@ SRC_DLB = \
   dlb_handler.f90
 
 SRC_ALL = \
-$(addprefix util/, $(SRC_UTIL)) \
+$(addprefix define/, $(SRC_DEF)) \
+$(addprefix wrapper/, $(SRC_WRAP)) \
 $(addprefix graph/, $(SRC_GRAPH)) \
 $(addprefix dlb/, $(SRC_DLB)) \
 gedatsu.f90
