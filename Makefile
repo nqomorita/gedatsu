@@ -14,6 +14,7 @@ BIN_DIR = ./bin
 SRC_DIR = ./src
 OBJ_DIR = ./obj
 LIB_DIR = ./lib
+WRAP_DIR= ./wrapper
 TST_DIR = ./test
 DRV_DIR = ./driver
 LIBRARY = libgedatsu.a
@@ -77,6 +78,14 @@ SRC_DLB = \
   dlb_comm.f90 \
   dlb_handler.f90
 
+##> C wrapper section
+SRC_GRAPH_C = \
+  graph_convert_c.c
+
+SRC_ALL_C = \
+$(addprefix graph/, $(SRC_GRAPH_C))
+
+##> all targes
 SRC_ALL = \
 $(addprefix define/, $(SRC_DEF)) \
 $(addprefix wrapper/, $(SRC_WRAP)) \
@@ -85,9 +94,12 @@ $(addprefix dlb/, $(SRC_DLB)) \
 gedatsu.f90
 
 ##> lib objs
-LIB_SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_ALL))
+LIB_SOURCES = \
+$(addprefix $(SRC_DIR)/,  $(SRC_ALL)) \
+$(addprefix $(WRAP_DIR)/, $(SRC_ALL_C)) \
+./src/gedatsu.f90
 LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
-LIB_OBJS    = $(LIB_OBJSt:.c=.o)
+LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
 
 ##> **********
 ##> target (2)
@@ -152,20 +164,17 @@ $(TEST_TARGET): $(TST_OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
-
 $(OBJ_DIR)/%.o: $(TST_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
-
-$(OBJ_DIR)/%.o: $(TST_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
 
 $(OBJ_DIR)/%.o: $(DRV_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
 
-$(OBJ_DIR)/%.o: $(DRV_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPP) $(INCLUDE) -o $@ -c $<
+$(OBJ_DIR)/%.o: $(WRAP_DIR)/%.f90
+	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
+
+$(OBJ_DIR)/%.o: $(WRAP_DIR)/%.c
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
 	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS1) $(USE_LIB)

@@ -38,7 +38,7 @@ program gedatsu_simple_mesh2graph_convertor
 
   n_node = maxval(elem)
 
-  call gedatsu_convert_simple_elem_to_connectivity_graph(n_elem, n_base, elem, conn_index, conn_item)
+  call gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, conn_index, conn_item)
 
   call gedatsu_convert_connectivity_graph_to_nodal_graph &
     & (n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)

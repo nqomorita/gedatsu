@@ -33,7 +33,7 @@ contains
     elem(1,2) = 2; elem(2,2) = 3
     elem(1,3) = 3; elem(2,3) = 4
 
-    call gedatsu_convert_simple_elem_to_connectivity_graph(n_elem, n_base, elem, index, item)
+    call gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, index, item)
 
     call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph_test 1", index(1), 0)
     call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph_test 2", index(2), 2)
@@ -70,7 +70,7 @@ contains
     elem(1,2) = 2; elem(2,2) = 3
     elem(1,3) = 3; elem(2,3) = 4
 
-    call gedatsu_convert_simple_elem_to_connectivity_graph(n_elem, n_base, elem, conn_index, conn_item)
+    call gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, conn_index, conn_item)
 
     call gedatsu_convert_connectivity_graph_to_nodal_graph &
       & (n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)

@@ -9,7 +9,7 @@ contains
 
   !> @ingroup graph_conv
   !> 単一メッシュ形式からコネクティビティグラフ形式に変換
-  subroutine gedatsu_convert_simple_elem_to_connectivity_graph(n_elem, n_base, elem, index, item)
+  subroutine gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, index, item)
     implicit none
     !> 要素数
     integer(kint) :: n_elem
@@ -35,7 +35,7 @@ contains
         item(n_base*(i-1) + j) = elem(j,i)
       enddo
     enddo
-  end subroutine gedatsu_convert_simple_elem_to_connectivity_graph
+  end subroutine gedatsu_convert_simple_mesh_to_connectivity_graph
 
   !> @ingroup graph_conv
   !> 単一メッシュ形式から節点グラフ形式に変換
