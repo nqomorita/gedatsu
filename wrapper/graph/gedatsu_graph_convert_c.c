@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "graph_convert_c.h"
+#include "gedatsu_graph_convert_c.h"
 #include "metis.h"
 
 /** 単一メッシュ形式からコネクティビティグラフ形式に変換 */

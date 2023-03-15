@@ -80,7 +80,7 @@ SRC_DLB = \
 
 ##> C wrapper section
 SRC_GRAPH_C = \
-  graph_convert_c.c
+  gedatsu_graph_convert_c.c
 
 SRC_ALL_C = \
 $(addprefix graph/, $(SRC_GRAPH_C))
