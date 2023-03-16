@@ -52,6 +52,7 @@ endif
 ##> other commands
 MAKE = make
 CD   = cd
+CP   = cp
 RM   = rm -rf
 AR   = - ar ruv
 
@@ -138,6 +139,7 @@ DRV_OBJS11  = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
 
 ##> target
 all: \
+	cp_header \
 	$(LIB_TARGET) \
 	$(TEST_TARGET) \
 	$(DRIVE1) \
@@ -209,6 +211,10 @@ $(DRIVE10): $(DRV_OBJS10)
 $(DRIVE11): $(DRV_OBJS11)
 	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS11) $(USE_LIB)
 
+cp_header:
+	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
+	$(CP) ./wrapper/gedatsu.h ./include/
+
 clean:
 	$(RM) \
 	$(LIB_OBJS) \
@@ -227,6 +233,7 @@ clean:
 	$(DRIVE9) \
 	$(DRIVE10) \
 	$(DRIVE11) \
+	./include/*.h \
 	./include/*.mod \
 	./bin/*
 
