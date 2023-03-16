@@ -45,7 +45,7 @@ program gedatsu_bc_partitioner
   call monolis_get_arg_input_S("-d", dirname, is_get)
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name(dirname, trim(fidname), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname), i)
     call monolis_input_global_id(foname_full, graph%n_vertex, graph%vertex_id)
 
     call monolis_alloc_I_2d(i_bc_local, n_dof, graph%n_vertex)
@@ -57,7 +57,7 @@ program gedatsu_bc_partitioner
       r_bc_local(j) = r_bc(in)
     enddo
 
-    foname_full = monolis_get_output_file_name(dirname, trim(finame), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i)
     call monolis_output_bc(foname_full, n_bc, n_dof, i_bc_local, r_bc_local)
 
     call monolis_dealloc_I_1d(graph%vertex_id)

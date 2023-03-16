@@ -69,7 +69,7 @@ program gedatsu_connectivity_graph_partitioner
   call monolis_alloc_I_1d(is_used, global_node_graph%n_vertex)
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name(dirname, trim(fidname), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname), i)
     call monolis_input_global_id(foname_full, local_node_graph%n_vertex, local_node_graph%vertex_id)
 
     is_used = 0
@@ -84,7 +84,7 @@ program gedatsu_connectivity_graph_partitioner
 
     call monolis_alloc_I_1d(id1, local_conn_graph%n_vertex)
     call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
-    foname_full = monolis_get_output_file_name(dirname, trim(foname), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname), i)
     call monolis_output_graph(foname_full, local_conn_graph%n_vertex, id1, &
       & local_conn_graph%index, local_conn_graph%item)
     call monolis_dealloc_I_1d(id1)

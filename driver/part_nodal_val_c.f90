@@ -44,7 +44,7 @@ program gedatsu_nodal_val_c_partitioner
   call monolis_get_arg_input_d_tag(dirname, is_get)
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name(dirname, trim(fidname), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname), i)
     call monolis_input_global_id(foname_full, graph%n_vertex, graph%vertex_id)
 
     call monolis_alloc_C_2d(val_local, n_dof, graph%n_vertex)
@@ -54,7 +54,7 @@ program gedatsu_nodal_val_c_partitioner
       val_local(:,j) = val(:,in)
     enddo
 
-    foname_full = monolis_get_output_file_name(dirname, trim(finame), i)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i)
     call monolis_output_distval_c(foname_full, label, graph%n_vertex, n_dof, val_local)
 
     call monolis_dealloc_I_1d(graph%vertex_id)
