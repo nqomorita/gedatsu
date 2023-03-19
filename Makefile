@@ -16,6 +16,7 @@ OBJ_DIR = ./obj
 LIB_DIR = ./lib
 WRAP_DIR= ./wrapper
 TST_DIR = ./test
+TST_WRAP_DIR = ./wrapper_test
 DRV_DIR = ./driver
 LIBRARY = libgedatsu.a
 CPP     = -cpp $(FLAG_DEBUG)
@@ -103,7 +104,7 @@ LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
 LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
 
 ##> **********
-##> target (2)
+##> target (2) test for fotran
 TEST_TARGET = $(TST_DIR)/gedatsu_test
 
 ##> lib objs
@@ -112,7 +113,22 @@ TST_OBJSt   = $(subst $(TST_DIR), $(OBJ_DIR), $(TST_SOURCES:.f90=_test.o))
 TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 
 ##> **********
-##> target (3)
+##> target (3) test for fotran
+TEST_C_TARGET = $(TST_WRAP_DIR)/gedatsu_c_test
+
+##> lib objs
+SRC_GRAPH_C_TEST = \
+gedatsu_graph_convert_c_test.c
+
+SRC_ALL_C_TEST = \
+$(addprefix graph/, $(SRC_GRAPH_C_TEST))
+
+TST_SRC_C_ALL = $(SRC_ALL_C_TEST) gedatsu_c_test.c
+TST_C_SOURCES = $(addprefix $(TST_WRAP_DIR)/, $(TST_SRC_C_ALL))
+TST_C_OBJS    = $(subst $(TST_WRAP_DIR), $(OBJ_DIR), $(TST_C_SOURCES:.c=.o))
+
+##> **********
+##> target (4) driver
 DRIVE1 = $(BIN_DIR)/gedatsu_simple_mesh2graph_convertor
 DRIVE2 = $(BIN_DIR)/gedatsu_bc_partitioner
 DRIVE3 = $(BIN_DIR)/gedatsu_connectivity_graph_partitioner
@@ -142,6 +158,7 @@ all: \
 	cp_header \
 	$(LIB_TARGET) \
 	$(TEST_TARGET) \
+	$(TEST_C_TARGET) \
 	$(DRIVE1) \
 	$(DRIVE2) \
 	$(DRIVE3) \
@@ -155,6 +172,7 @@ all: \
 	$(DRIVE11)
 
 lib: \
+	cp_header \
 	$(LIB_TARGET)
 
 $(LIB_TARGET): $(LIB_OBJS)
@@ -162,6 +180,9 @@ $(LIB_TARGET): $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
 	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) $(USE_LIB)
+
+$(TEST_C_TARGET): $(TST_C_OBJS)
+	$(FC) $(FFLAGS) $(INCLUDE) -o $@ $(TST_C_OBJS) -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
@@ -176,6 +197,9 @@ $(OBJ_DIR)/%.o: $(WRAP_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
 
 $(OBJ_DIR)/%.o: $(WRAP_DIR)/%.c
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+
+$(OBJ_DIR)/%.o: $(TST_WRAP_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCLUDE) -o $@ -c $<
 
 $(DRIVE1): $(DRV_OBJS1)
@@ -219,9 +243,11 @@ clean:
 	$(RM) \
 	$(LIB_OBJS) \
 	$(TST_OBJS) \
+	$(TST_C_OBJS) \
 	$(DRV_OBJS1) \
 	$(LIB_TARGET) \
 	$(TEST_TARGET) \
+	$(TEST_C_TARGET) \
 	$(DRIVE1) \
 	$(DRIVE2) \
 	$(DRIVE3) \

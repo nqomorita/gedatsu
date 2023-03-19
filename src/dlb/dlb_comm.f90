@@ -24,7 +24,7 @@ contains
     integer(kint), allocatable :: move_vertex_domain_id(:)
     integer(kint), allocatable :: neib_domain_id(:)
 
-    my_rank = monolis_mpi_local_my_rank(comm)
+    my_rank = monolis_mpi_get_local_my_rank(comm)
 
     !> 内点が自分の領域番号でない場合、その節点数を取得
     n_internal_vertex = 0

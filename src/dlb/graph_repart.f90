@@ -20,7 +20,7 @@ contains
     integer(kint), allocatable :: vtxdist(:)
     integer(kint), allocatable :: vertex_id(:)
 
-    n_part = monolis_mpi_local_comm_size(COM%comm)
+    n_part = monolis_mpi_get_local_comm_size(COM%comm)
 
     call monolis_alloc_I_1d(vertex_id, graph%n_vertex)
 
@@ -50,7 +50,7 @@ contains
     integer(kint), allocatable :: node_wgt(:,:)
     integer(kint), allocatable :: edge_wgt(:,:)
 
-    n_part = monolis_mpi_local_comm_size(COM%comm)
+    n_part = monolis_mpi_get_local_comm_size(COM%comm)
 
     call monolis_alloc_I_1d(vertex_id, graph%n_vertex)
 
