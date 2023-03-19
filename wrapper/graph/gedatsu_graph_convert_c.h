@@ -16,7 +16,7 @@ void gedatsu_convert_simple_mesh_to_connectivity_graph(
 
 /** 単一メッシュ形式から節点グラフ形式に変換 */
 void gedatsu_convert_connectivity_graph_to_nodal_graph(
-  int   nnode,
+  int   n_node,
   int   n_elem,
   int*  conn_index,
   int*  conn_item,

@@ -9,6 +9,8 @@ int main()
 {
   monolis_std_log_string("gedatsu_c_test");
 
+  monolis_mpi_initialize();
+
   gedatsu_graph_convert_c_test();
 
   monolis_mpi_finalize();
