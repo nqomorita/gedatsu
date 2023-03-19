@@ -30,6 +30,7 @@ ifdef FLAGS
 
 	ifeq ($(findstring DEBUG, $(DFLAGS)), DEBUG)
 		FFLAGS  = -fPIC -O2 -std=legacy -fbounds-check -fbacktrace -Wuninitialized -ffpe-trap=invalid,zero,overflow -Wno-missing-include-dirs -Wall
+		CFLAGS  = -fPIC -O2 -g -ggdb
 	endif
 
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
