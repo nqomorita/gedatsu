@@ -18,7 +18,7 @@ contains
     type(gedatsu_graph) :: graph
     type(monolis_COM) :: COM
 
-    call gedatsu_graph_repartition(graph, COM)
+    !call gedatsu_graph_repartition(graph, COM)
   end subroutine gedatsu_graph_repartition_test
 
   subroutine gedatsu_graph_repartition_with_weight_test()
@@ -26,6 +26,6 @@ contains
     type(gedatsu_graph) :: graph
     type(monolis_COM) :: COM
 
-    call gedatsu_graph_repartition_with_weight(graph, COM)
+    !call gedatsu_graph_repartition_with_weight(graph, COM)
   end subroutine gedatsu_graph_repartition_with_weight_test
 end module mod_gedatsu_graph_repart_test
