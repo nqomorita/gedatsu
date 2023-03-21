@@ -19,7 +19,7 @@ build_gedatsu:
 test_gedatsu:
   stage: test
   script:
-    - cd test
+    - cd src_test
     - ./run.CI.sh
   dependencies:
     - build_gedatsu
