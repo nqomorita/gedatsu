@@ -55,7 +55,7 @@ contains
     integer(kint), allocatable :: nodal_index(:)
     !> 節点グラフの item 配列
     integer(kint), allocatable :: nodal_item(:)
-    integer(kint) :: numflag
+    integer(kint) :: i, jS, jE, numflag
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
     type(c_ptr) :: xadj, adjncy
@@ -115,6 +115,12 @@ contains
 
     !> convert to 1 origin
     nodal_item = nodal_item + 1
+
+    do i = 1, n_node
+      jS = nodal_index(i) + 1
+      jE = nodal_index(i + 1)
+      call monolis_qsort_I_1d(nodal_item, jS, jE)
+    enddo
 #endif
   end subroutine gedatsu_convert_connectivity_graph_to_nodal_graph
 

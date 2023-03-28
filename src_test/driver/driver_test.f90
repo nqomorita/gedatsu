@@ -1,0 +1,292 @@
+!> グラフ分割テストモジュール
+module mod_gedatsu_driver_test
+  use mod_gedatsu
+  use mod_monolis_utils
+  implicit none
+
+contains
+
+  subroutine gedatsu_driver_test()
+    call gedatsu_simple_mesh2graph_convertor_test()
+    call gedatsu_nodal_graph_partitioner_test()
+  end subroutine gedatsu_driver_test
+
+  subroutine gedatsu_nodal_graph_partitioner_test()
+    implicit none
+    character(monolis_charlen) :: fname
+    integer(kint) :: i
+    integer(kint) :: n_vertex, n_vertex_ans
+    integer(kint) :: n_internal, n_internal_ans
+    integer(kint) :: n_neib, n_neib_ans
+    integer(kint), allocatable :: vertex_id(:), vertex_id_ans(:)
+    integer(kint), allocatable :: index(:), index_ans(:)
+    integer(kint), allocatable :: item(:), item_ans(:)
+    integer(kint), pointer :: neib_pe(:) => null()
+    integer(kint), pointer :: neib_pe_ans(:) => null()
+    integer(kint), pointer :: indexp(:) => null()
+    integer(kint), pointer :: indexp_ans(:) => null()
+    integer(kint), pointer :: itemp(:) => null()
+    integer(kint), pointer :: itemp_ans(:) => null()
+
+    call monolis_std_log_string("gedatsu_nodal_graph_partitioner_test")
+
+    fname = "parted.0/graph.dat.0"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    fname = "parted.0.ans/graph.dat.0"
+    call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+    do i = 1, n_vertex + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 3", index(i), index_ans(i))
+    enddo
+
+    do i = 1, index(n_vertex + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 4", item(i), item_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+    call monolis_dealloc_I_1d(index)
+    call monolis_dealloc_I_1d(index_ans)
+    call monolis_dealloc_I_1d(item)
+    call monolis_dealloc_I_1d(item_ans)
+
+    fname = "parted.0/graph.dat.1"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    fname = "parted.0.ans/graph.dat.1"
+    call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+    do i = 1, n_vertex + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 3", index(i), index_ans(i))
+    enddo
+
+    do i = 1, index(n_vertex + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 4", item(i), item_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+
+    fname = "parted.0/graph.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex, vertex_id)
+
+    fname = "parted.0.ans/graph.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+
+    fname = "parted.0/graph.dat.id.1"
+    call monolis_input_global_id(fname, n_vertex, vertex_id)
+
+    fname = "parted.0.ans/graph.dat.id.1"
+    call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-1 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-1 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+
+
+    fname = "parted.0/graph.dat.0"
+    call monolis_input_internal_vertex_number(fname, n_internal)
+
+    fname = "parted.0.ans/graph.dat.0"
+    call monolis_input_internal_vertex_number(fname, n_internal_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test c-0 1", n_internal, n_internal_ans)
+
+
+
+    fname = "parted.0/graph.dat.1"
+    call monolis_input_internal_vertex_number(fname, n_internal)
+
+    fname = "parted.0.ans/graph.dat.1"
+    call monolis_input_internal_vertex_number(fname, n_internal_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test c-1 1", n_internal, n_internal_ans)
+
+
+
+    fname = "parted.0/graph.dat.recv.0"
+    call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
+
+    fname = "parted.0.ans/graph.dat.recv.0"
+    call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 1", n_neib, n_neib_ans)
+
+    do i = 1, n_neib
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 2", neib_pe(i), neib_pe_ans(i))
+    enddo
+
+    do i = 1, n_neib + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 3", indexp(i), indexp_ans(i))
+    enddo
+
+    do i = 1, index(n_neib + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 4", itemp(i), itemp_ans(i))
+    enddo
+
+
+
+    call monolis_pdealloc_I_1d(neib_pe)
+    call monolis_pdealloc_I_1d(neib_pe_ans)
+    call monolis_pdealloc_I_1d(indexp)
+    call monolis_pdealloc_I_1d(indexp_ans)
+    call monolis_pdealloc_I_1d(itemp)
+    call monolis_pdealloc_I_1d(itemp_ans)
+
+    fname = "parted.0/graph.dat.send.0"
+    call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
+
+    fname = "parted.0.ans/graph.dat.send.0"
+    call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 1", n_neib, n_neib_ans)
+
+    do i = 1, n_neib
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 2", neib_pe(i), neib_pe_ans(i))
+    enddo
+
+    do i = 1, n_neib + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 3", indexp(i), indexp_ans(i))
+    enddo
+
+    do i = 1, indexp(n_neib + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 4", itemp(i), itemp_ans(i))
+    enddo
+
+
+
+    call monolis_pdealloc_I_1d(neib_pe)
+    call monolis_pdealloc_I_1d(neib_pe_ans)
+    call monolis_pdealloc_I_1d(indexp)
+    call monolis_pdealloc_I_1d(indexp_ans)
+    call monolis_pdealloc_I_1d(itemp)
+    call monolis_pdealloc_I_1d(itemp_ans)
+
+    fname = "parted.0/graph.dat.recv.1"
+    call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
+
+    fname = "parted.0.ans/graph.dat.recv.1"
+    call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 1", n_neib, n_neib_ans)
+
+    do i = 1, n_neib
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 2", neib_pe(i), neib_pe_ans(i))
+    enddo
+
+    do i = 1, n_neib + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 3", indexp(i), indexp_ans(i))
+    enddo
+
+    do i = 1, indexp(n_neib + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 4", itemp(i), itemp_ans(i))
+    enddo
+
+
+    call monolis_pdealloc_I_1d(neib_pe)
+    call monolis_pdealloc_I_1d(neib_pe_ans)
+    call monolis_pdealloc_I_1d(indexp)
+    call monolis_pdealloc_I_1d(indexp_ans)
+    call monolis_pdealloc_I_1d(itemp)
+    call monolis_pdealloc_I_1d(itemp_ans)
+
+    fname = "parted.0/graph.dat.send.1"
+    call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
+
+    fname = "parted.0.ans/graph.dat.send.1"
+    call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 1", n_neib, n_neib_ans)
+
+    do i = 1, n_neib
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 2", neib_pe(i), neib_pe_ans(i))
+    enddo
+
+    do i = 1, n_neib + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 3", indexp(i), indexp_ans(i))
+    enddo
+
+    do i = 1, indexp(n_neib + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 4", itemp(i), itemp_ans(i))
+    enddo
+  end subroutine gedatsu_nodal_graph_partitioner_test
+
+  subroutine gedatsu_simple_mesh2graph_convertor_test()
+    implicit none
+    character(monolis_charlen) :: fname
+    integer(kint) :: n_vertex
+    integer(kint), allocatable :: vertex_id(:)
+    integer(kint), allocatable :: index(:)
+    integer(kint), allocatable :: item(:)
+
+    call monolis_std_log_string("gedatsu_simple_mesh2graph_convertor")
+
+    fname = "driver/output/graph.conv.dat"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 1", n_vertex, 6)
+
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 2", index(1), 0)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 3", index(2), 3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 4", index(3), 8)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 5", index(4), 11)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 6", index(5), 14)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 7", index(6), 19)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 8", index(7), 22)
+
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 1", item(1), 2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 2", item(2), 4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 3", item(3), 5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 4", item(4), 1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 5", item(5), 3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 6", item(6), 4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 7", item(7), 5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 8", item(8), 6)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 9", item(9), 2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 10", item(10), 5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 11", item(11), 6)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 12", item(12), 1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 13", item(13), 2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 14", item(14), 5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 15", item(15), 1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 16", item(16), 2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 17", item(17), 3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 18", item(18), 4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 19", item(19), 6)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 20", item(20), 2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 21", item(21), 3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor a 22", item(22), 5)
+  end subroutine gedatsu_simple_mesh2graph_convertor_test
+
+end module mod_gedatsu_driver_test

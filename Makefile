@@ -93,8 +93,7 @@ SRC_ALL = \
 $(addprefix define/, $(SRC_DEF)) \
 $(addprefix wrapper/, $(SRC_WRAP)) \
 $(addprefix graph/, $(SRC_GRAPH)) \
-$(addprefix dlb/, $(SRC_DLB)) \
-gedatsu.f90
+$(addprefix dlb/, $(SRC_DLB))
 
 ##> lib objs
 LIB_SOURCES = \
@@ -109,7 +108,8 @@ LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
 TEST_TARGET = $(TST_DIR)/gedatsu_test
 
 ##> lib objs
-TST_SOURCES = $(addprefix $(TST_DIR)/, $(SRC_ALL))
+TST_SRC_ALL = $(SRC_ALL) driver/driver.f90 gedatsu.f90
+TST_SOURCES = $(addprefix $(TST_DIR)/, $(TST_SRC_ALL))
 TST_OBJSt   = $(subst $(TST_DIR), $(OBJ_DIR), $(TST_SOURCES:.f90=_test.o))
 TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 
