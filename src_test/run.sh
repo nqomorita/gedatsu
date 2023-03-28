@@ -7,4 +7,7 @@ OUT=driver/output
 
 ../bin/gedatsu_nodal_graph_partitioner -i ${INP}/graph.dat -o graph.dat -n 2
 
-./gedatsu_test
+cp ${INP}/graph.dat ./
+../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INP}/connectivity.dat -o connectivity.dat -n 2
+
+#./gedatsu_test

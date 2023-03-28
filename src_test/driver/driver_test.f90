@@ -9,7 +9,103 @@ contains
   subroutine gedatsu_driver_test()
     call gedatsu_simple_mesh2graph_convertor_test()
     call gedatsu_nodal_graph_partitioner_test()
+    call gedatsu_conn_graph_partitioner_test()
   end subroutine gedatsu_driver_test
+
+  subroutine gedatsu_conn_graph_partitioner_test()
+    implicit none
+    character(monolis_charlen) :: fname
+    integer(kint) :: i
+    integer(kint) :: n_vertex, n_vertex_ans
+    integer(kint), allocatable :: vertex_id(:), vertex_id_ans(:)
+    integer(kint), allocatable :: index(:), index_ans(:)
+    integer(kint), allocatable :: item(:), item_ans(:)
+
+    call monolis_std_log_string("gedatsu_conn_graph_partitioner_test")
+
+    fname = "parted.0/connectivity.dat.0"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    fname = "parted.0.ans/connectivity.dat.0"
+    call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+    do i = 1, n_vertex + 1
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 3", index(i), index_ans(i))
+    enddo
+
+    do i = 1, index(n_vertex + 1)
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 4", item(i), item_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+    call monolis_dealloc_I_1d(index)
+    call monolis_dealloc_I_1d(index_ans)
+    call monolis_dealloc_I_1d(item)
+    call monolis_dealloc_I_1d(item_ans)
+
+    fname = "parted.0/connectivity.dat.1"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    fname = "parted.0.ans/connectivity.dat.1"
+    call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+    do i = 1, n_vertex + 1
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 3", index(i), index_ans(i))
+    enddo
+
+    do i = 1, index(n_vertex + 1)
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 4", item(i), item_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+
+    fname = "parted.0/connectivity.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex, vertex_id)
+
+    fname = "parted.0.ans/connectivity.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+
+    fname = "parted.0/connectivity.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex, vertex_id)
+
+    fname = "parted.0.ans/connectivity.dat.id.0"
+    call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+  end subroutine gedatsu_conn_graph_partitioner_test
 
   subroutine gedatsu_nodal_graph_partitioner_test()
     implicit none
@@ -151,7 +247,7 @@ contains
       call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 3", indexp(i), indexp_ans(i))
     enddo
 
-    do i = 1, index(n_neib + 1)
+    do i = 1, indexp(n_neib + 1)
       call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 4", itemp(i), itemp_ans(i))
     enddo
 

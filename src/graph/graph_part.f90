@@ -96,9 +96,9 @@ contains
     integer(kint) :: i
 
     do i = 1, n_domain
-      call gedatsu_get_parted_graph_main(graph, i, subgraphs(i))
+      call gedatsu_get_parted_graph_main(graph, i - 1, subgraphs(i))
 
-      call gedatsu_add_overlapping_nodes(graph, i, subgraphs(i))
+      call gedatsu_add_overlapping_nodes(graph, i - 1, subgraphs(i))
     enddo
   end subroutine gedatsu_get_parted_graph
 
@@ -204,10 +204,12 @@ contains
     allocate(recv_list(n_domain))
 
     do i = 1, n_domain
-      call monolis_comm_get_recv_serial(n_domain, i, subgraphs(i)%n_internal_vertex, &
+      call monolis_comm_get_recv_serial(n_domain, i - 1, subgraphs(i)%n_internal_vertex, &
         & outer_node_id_all_global, outer_domain_id_all, displs, com(i), recv_list)
+    enddo
 
-      call monolis_comm_get_send_serial(n_domain, i, &
+    do i = 1, n_domain
+      call monolis_comm_get_send_serial(n_domain, &
         & subgraphs(i)%n_vertex, subgraphs(i)%vertex_id, com(i), recv_list(i))
     enddo
   end subroutine gedatsu_com_get_comm_table_serial
@@ -245,7 +247,7 @@ contains
 
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
-  subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, l_n_vertex, l_index, l_item)
+  subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
     implicit none
     !> [in] 分割領域で利用される節点フラグ
     integer(kint) :: is_used(:)
@@ -255,12 +257,16 @@ contains
     integer(kint) :: g_index(:)
     !> [in] グローバルコネクティビティの item 配列
     integer(kint) :: g_item(:)
+    !> [in] グローバルコネクティビティの id 配列
+    integer(kint) :: g_id(:)
     !> [out] ローカルコネクティビティの要素数
     integer(kint) :: l_n_vertex
     !> [out] ローカルコネクティビティの index 配列
     integer(kint), allocatable :: l_index(:)
     !> [out] ローカルコネクティビティの item 配列
     integer(kint), allocatable :: l_item(:)
+    !> [out] ローカルコネクティビティの id 配列
+    integer(kint), allocatable :: l_id(:)
     integer(kint) :: i, j, jS, jE, in, n_conn
 
     l_n_vertex = 0
@@ -275,11 +281,11 @@ contains
       enddo
       do j = jS, jE
         n_conn = n_conn + 1
-        in = g_item(j)
       enddo
       l_n_vertex = l_n_vertex + 1
     enddo aa
 
+    call monolis_alloc_I_1d(l_id, l_n_vertex)
     call monolis_alloc_I_1d(l_index, l_n_vertex + 1)
     call monolis_alloc_I_1d(l_item, n_conn)
 
@@ -299,6 +305,7 @@ contains
       enddo
       l_n_vertex = l_n_vertex + 1
       l_index(l_n_vertex + 1) = n_conn
+      l_id(l_n_vertex) = g_id(i)
     enddo bb
   end subroutine gedatsu_get_parted_connectivity_main
 end module mod_gedatsu_graph_part

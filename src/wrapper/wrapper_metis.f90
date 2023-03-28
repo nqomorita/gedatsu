@@ -97,7 +97,7 @@ contains
       call METIS_PARTGRAPHRECURSIVE(n_vertex, ncon, index_c, item_c, &
         & node_wgt_c, vsize, edge_wgt_c, n_part, tpwgts, ubvec, options, objval, part_id_c)
 
-      part_id = part_id_c + 1
+      part_id = part_id_c
 
       !# deallocate section
       deallocate(index_c)

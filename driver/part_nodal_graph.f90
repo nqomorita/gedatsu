@@ -89,7 +89,7 @@ program gedatsu_nodal_graph_partitioner
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".n_internal", i - 1)
     call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
-    !> internal vertex_id
+    !> global vertex_id
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".id", i - 1)
     call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 

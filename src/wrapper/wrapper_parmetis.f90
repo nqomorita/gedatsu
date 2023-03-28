@@ -150,7 +150,7 @@ contains
         & node_wgt_c, vsize, edge_wgt_c, wflag, nflag, ncon, &
         & n_part, tpwgts, ubvec, itr, options, edgecut, part_id_c, comm)
 
-      part_id = part_id_c + 1
+      part_id = part_id_c
 
       !# deallocate section
       deallocate(vtxdist_c)
