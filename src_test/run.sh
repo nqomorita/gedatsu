@@ -21,6 +21,15 @@ cp ${INPF}/val.node.r.dat ./
 cp ${INPF}/val.node.c.dat ./
 ../bin/gedatsu_nodal_val_c_partitioner -i ./val.node.c.dat -id graph.dat.id -n 2
 
+cp ${INPF}/val.conn.i.dat ./
+../bin/gedatsu_nodal_val_i_partitioner -i ./val.conn.i.dat -id connectivity.dat.id -n 2
+
+cp ${INPF}/val.conn.r.dat ./
+../bin/gedatsu_nodal_val_r_partitioner -i ./val.conn.r.dat -id connectivity.dat.id -n 2
+
+cp ${INPF}/val.conn.c.dat ./
+../bin/gedatsu_nodal_val_c_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
+
 mv parted.0 parted.0.f
 
 ../bin/gedatsu_simple_mesh2graph_convertor -i ${INPC}/elem.quad.dat -o ${OUTC}/graph.conv.dat
@@ -39,6 +48,23 @@ cp ${INPC}/val.node.r.dat ./
 cp ${INPC}/val.node.c.dat ./
 ../bin/gedatsu_nodal_val_c_partitioner -i ./val.node.c.dat -id graph.dat.id -n 2
 
+cp ${INPF}/val.conn.i.dat ./
+../bin/gedatsu_nodal_val_i_partitioner -i ./val.conn.i.dat -id connectivity.dat.id -n 2
+
+cp ${INPF}/val.conn.r.dat ./
+../bin/gedatsu_nodal_val_r_partitioner -i ./val.conn.r.dat -id connectivity.dat.id -n 2
+
+cp ${INPF}/val.conn.c.dat ./
+../bin/gedatsu_nodal_val_c_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
+
 mv parted.0 parted.0.c
 
 ./gedatsu_test
+
+rm -r parted.0.f
+
+rm -r parted.0.c
+
+rm graph.dat
+
+rm val.*
