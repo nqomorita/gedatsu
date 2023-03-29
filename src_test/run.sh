@@ -1,22 +1,44 @@
 #!/bin/bash
 
-INP=driver/input
-OUT=driver/output
+INPF=driver/input.f
+OUTF=driver/output.f
+INPC=driver/input.c
+OUTC=driver/output.c
 
-../bin/gedatsu_simple_mesh2graph_convertor -i ${INP}/elem.quad.dat -o ${OUT}/graph.conv.dat
+../bin/gedatsu_simple_mesh2graph_convertor -i ${INPF}/elem.quad.dat -o ${OUTF}/graph.conv.dat
 
-../bin/gedatsu_nodal_graph_partitioner -i ${INP}/graph.dat -o graph.dat -n 2
+../bin/gedatsu_nodal_graph_partitioner -i ${INPF}/graph.dat -o graph.dat -n 2
 
-cp ${INP}/graph.dat ./
-../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INP}/connectivity.dat -o connectivity.dat -n 2
+cp ${INPF}/graph.dat ./
+../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INPF}/connectivity.dat -o connectivity.dat -n 2
 
-cp ${INP}/val.i.dat ./
+cp ${INPF}/val.i.dat ./
 ../bin/gedatsu_nodal_val_i_partitioner -i ./val.i.dat -id graph.dat.id -n 2
 
-cp ${INP}/val.r.dat ./
+cp ${INPF}/val.r.dat ./
 ../bin/gedatsu_nodal_val_r_partitioner -i ./val.r.dat -id graph.dat.id -n 2
 
-cp ${INP}/val.c.dat ./
+cp ${INPF}/val.c.dat ./
 ../bin/gedatsu_nodal_val_c_partitioner -i ./val.c.dat -id graph.dat.id -n 2
+
+mv parted.0 parted.0.f
+
+../bin/gedatsu_simple_mesh2graph_convertor -i ${INPC}/elem.quad.dat -o ${OUTC}/graph.conv.dat
+
+../bin/gedatsu_nodal_graph_partitioner -i ${INPC}/graph.dat -o graph.dat -n 2
+
+cp ${INPC}/graph.dat ./
+../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INPC}/connectivity.dat -o connectivity.dat -n 2
+
+cp ${INPC}/val.i.dat ./
+../bin/gedatsu_nodal_val_i_partitioner -i ./val.i.dat -id graph.dat.id -n 2
+
+cp ${INPC}/val.r.dat ./
+../bin/gedatsu_nodal_val_r_partitioner -i ./val.r.dat -id graph.dat.id -n 2
+
+cp ${INPC}/val.c.dat ./
+../bin/gedatsu_nodal_val_c_partitioner -i ./val.c.dat -id graph.dat.id -n 2
+
+mv parted.0 parted.0.c
 
 ./gedatsu_test

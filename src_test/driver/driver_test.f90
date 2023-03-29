@@ -27,7 +27,7 @@ contains
 
     call monolis_std_log_string("gedatsu_nodal_val_partitioner_test")
 
-    fname = "parted.0/val.i.dat.0"
+    fname = "parted.0.f/val.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
     fname = "parted.0.ans/val.i.dat.0"
@@ -47,7 +47,7 @@ contains
     call monolis_dealloc_I_2d(ival)
     call monolis_dealloc_I_2d(ival_ans)
 
-    fname = "parted.0/val.i.dat.1"
+    fname = "parted.0.f/val.i.dat.1"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
     fname = "parted.0.ans/val.i.dat.1"
@@ -64,7 +64,7 @@ contains
 
 
 
-    fname = "parted.0/val.r.dat.0"
+    fname = "parted.0.f/val.r.dat.0"
     call monolis_input_distval_r(fname, label, n_node, n_dof, rval)
 
     fname = "parted.0.ans/val.r.dat.0"
@@ -84,7 +84,7 @@ contains
     call monolis_dealloc_R_2d(rval)
     call monolis_dealloc_R_2d(rval_ans)
 
-    fname = "parted.0/val.r.dat.1"
+    fname = "parted.0.f/val.r.dat.1"
     call monolis_input_distval_r(fname, label, n_node, n_dof, rval)
 
     fname = "parted.0.ans/val.r.dat.1"
@@ -101,7 +101,7 @@ contains
 
 
 
-    fname = "parted.0/val.c.dat.0"
+    fname = "parted.0.f/val.c.dat.0"
     call monolis_input_distval_c(fname, label, n_node, n_dof, cval)
 
     fname = "parted.0.ans/val.c.dat.0"
@@ -121,7 +121,7 @@ contains
     call monolis_dealloc_C_2d(cval)
     call monolis_dealloc_C_2d(cval_ans)
 
-    fname = "parted.0/val.c.dat.1"
+    fname = "parted.0.f/val.c.dat.1"
     call monolis_input_distval_c(fname, label, n_node, n_dof, cval)
 
     fname = "parted.0.ans/val.c.dat.1"
@@ -148,7 +148,7 @@ contains
 
     call monolis_std_log_string("gedatsu_conn_graph_partitioner_test")
 
-    fname = "parted.0/connectivity.dat.0"
+    fname = "parted.0.f/connectivity.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
     fname = "parted.0.ans/connectivity.dat.0"
@@ -177,7 +177,7 @@ contains
     call monolis_dealloc_I_1d(item)
     call monolis_dealloc_I_1d(item_ans)
 
-    fname = "parted.0/connectivity.dat.1"
+    fname = "parted.0.f/connectivity.dat.1"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
     fname = "parted.0.ans/connectivity.dat.1"
@@ -202,7 +202,7 @@ contains
     call monolis_dealloc_I_1d(vertex_id)
     call monolis_dealloc_I_1d(vertex_id_ans)
 
-    fname = "parted.0/connectivity.dat.id.0"
+    fname = "parted.0.f/connectivity.dat.id.0"
     call monolis_input_global_id(fname, n_vertex, vertex_id)
 
     fname = "parted.0.ans/connectivity.dat.id.0"
@@ -219,7 +219,7 @@ contains
     call monolis_dealloc_I_1d(vertex_id)
     call monolis_dealloc_I_1d(vertex_id_ans)
 
-    fname = "parted.0/connectivity.dat.id.0"
+    fname = "parted.0.f/connectivity.dat.id.0"
     call monolis_input_global_id(fname, n_vertex, vertex_id)
 
     fname = "parted.0.ans/connectivity.dat.id.0"
@@ -251,7 +251,7 @@ contains
 
     call monolis_std_log_string("gedatsu_nodal_graph_partitioner_test")
 
-    fname = "parted.0/graph.dat.0"
+    fname = "parted.0.f/graph.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
     fname = "parted.0.ans/graph.dat.0"
@@ -280,7 +280,7 @@ contains
     call monolis_dealloc_I_1d(item)
     call monolis_dealloc_I_1d(item_ans)
 
-    fname = "parted.0/graph.dat.1"
+    fname = "parted.0.f/graph.dat.1"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
     fname = "parted.0.ans/graph.dat.1"
@@ -305,7 +305,7 @@ contains
     call monolis_dealloc_I_1d(vertex_id)
     call monolis_dealloc_I_1d(vertex_id_ans)
 
-    fname = "parted.0/graph.dat.id.0"
+    fname = "parted.0.f/graph.dat.id.0"
     call monolis_input_global_id(fname, n_vertex, vertex_id)
 
     fname = "parted.0.ans/graph.dat.id.0"
@@ -322,7 +322,7 @@ contains
     call monolis_dealloc_I_1d(vertex_id)
     call monolis_dealloc_I_1d(vertex_id_ans)
 
-    fname = "parted.0/graph.dat.id.1"
+    fname = "parted.0.f/graph.dat.id.1"
     call monolis_input_global_id(fname, n_vertex, vertex_id)
 
     fname = "parted.0.ans/graph.dat.id.1"
@@ -336,7 +336,7 @@ contains
 
 
 
-    fname = "parted.0/graph.dat.0"
+    fname = "parted.0.f/graph.dat.0"
     call monolis_input_internal_vertex_number(fname, n_internal)
 
     fname = "parted.0.ans/graph.dat.0"
@@ -346,7 +346,7 @@ contains
 
 
 
-    fname = "parted.0/graph.dat.1"
+    fname = "parted.0.f/graph.dat.1"
     call monolis_input_internal_vertex_number(fname, n_internal)
 
     fname = "parted.0.ans/graph.dat.1"
@@ -356,7 +356,7 @@ contains
 
 
 
-    fname = "parted.0/graph.dat.recv.0"
+    fname = "parted.0.f/graph.dat.recv.0"
     call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
 
     fname = "parted.0.ans/graph.dat.recv.0"
@@ -385,7 +385,7 @@ contains
     call monolis_pdealloc_I_1d(itemp)
     call monolis_pdealloc_I_1d(itemp_ans)
 
-    fname = "parted.0/graph.dat.send.0"
+    fname = "parted.0.f/graph.dat.send.0"
     call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
 
     fname = "parted.0.ans/graph.dat.send.0"
@@ -414,7 +414,7 @@ contains
     call monolis_pdealloc_I_1d(itemp)
     call monolis_pdealloc_I_1d(itemp_ans)
 
-    fname = "parted.0/graph.dat.recv.1"
+    fname = "parted.0.f/graph.dat.recv.1"
     call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
 
     fname = "parted.0.ans/graph.dat.recv.1"
@@ -442,7 +442,7 @@ contains
     call monolis_pdealloc_I_1d(itemp)
     call monolis_pdealloc_I_1d(itemp_ans)
 
-    fname = "parted.0/graph.dat.send.1"
+    fname = "parted.0.f/graph.dat.send.1"
     call monolis_input_com_table_main(fname, n_neib, neib_pe, indexp, itemp)
 
     fname = "parted.0.ans/graph.dat.send.1"
@@ -473,7 +473,7 @@ contains
 
     call monolis_std_log_string("gedatsu_simple_mesh2graph_convertor")
 
-    fname = "driver/output/graph.conv.dat"
+    fname = "driver/output.f/graph.conv.dat"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
     call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 1", n_vertex, 6)
