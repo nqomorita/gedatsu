@@ -7,7 +7,7 @@ program gedatsu_nodal_graph_partitioner
   integer(kint) :: n_nw_dof, n_ew_dof, n_vertex
   character(monolis_charlen) :: finame, dirname, foname, foname_full
   character(monolis_charlen) :: finwname, fiewname, label
-  logical :: is_get, is_inw, is_iew
+  logical :: is_get, is_inw, is_iew, is_1_origin
   type(gedatsu_graph), allocatable :: subgraphs(:)
   type(monolis_COM), allocatable :: com(:)
   integer(kint), allocatable :: node_wgt(:,:)
@@ -52,6 +52,11 @@ program gedatsu_nodal_graph_partitioner
 
   call monolis_input_graph(finame, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
 
+  call monolis_check_fortran_1_origin_graph(graph%vertex_id, is_1_origin)
+
+  if(.not. is_1_origin) graph%vertex_id = graph%vertex_id + 1
+  if(.not. is_1_origin) graph%item = graph%item + 1
+
   finwname = "node_weight.dat"
   call monolis_get_arg_input_S("-inw", finwname, is_inw)
 
@@ -84,6 +89,10 @@ program gedatsu_nodal_graph_partitioner
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname), i - 1)
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
     call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
+
+    if(.not. is_1_origin) subgraphs(i)%item = subgraphs(i)%item - 1
+    if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
+
     call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, id1, subgraphs(i)%index, subgraphs(i)%item)
     call monolis_dealloc_I_1d(id1)
 

@@ -9,7 +9,7 @@ program gedatsu_connectivity_graph_partitioner
   integer(kint) :: n_domain, i, j, in
   character(monolis_charlen) :: finame, dirname, foname, foname_full
   character(monolis_charlen) :: finname
-  logical :: is_get, is_valid
+  logical :: is_get, is_valid, is_1_origin
   integer(kint), allocatable :: is_used(:), id1(:)
 
   call monolis_mpi_initialize()
@@ -59,6 +59,13 @@ program gedatsu_connectivity_graph_partitioner
   call monolis_input_graph(finame, global_conn_graph%n_vertex, global_conn_graph%vertex_id, &
     & global_conn_graph%index, global_conn_graph%item)
 
+  call monolis_check_fortran_1_origin_graph(global_conn_graph%vertex_id, is_1_origin)
+
+  if(.not. is_1_origin) global_node_graph%vertex_id = global_node_graph%vertex_id + 1
+  if(.not. is_1_origin) global_node_graph%item = global_node_graph%item + 1
+  if(.not. is_1_origin) global_conn_graph%vertex_id = global_conn_graph%vertex_id + 1
+  if(.not. is_1_origin) global_conn_graph%item = global_conn_graph%item + 1
+
   call gedatsu_check_connectivity_graph(global_node_graph, global_conn_graph, is_valid)
 
   if(.not. is_valid)then
@@ -71,6 +78,8 @@ program gedatsu_connectivity_graph_partitioner
   do i = 1, n_domain
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".id", i - 1)
     call monolis_input_global_id(foname_full, local_node_graph%n_vertex, local_node_graph%vertex_id)
+
+    if(.not. is_1_origin) local_node_graph%vertex_id = local_node_graph%vertex_id + 1
 
     is_used = 0
     do j = 1, local_node_graph%n_vertex
@@ -86,6 +95,9 @@ program gedatsu_connectivity_graph_partitioner
     call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
 
     !> graph.dat
+    if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
+    if(.not. is_1_origin) id1 = id1 - 1
+
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname), i - 1)
     call monolis_output_graph(foname_full, local_conn_graph%n_vertex, id1, &
       & local_conn_graph%index, local_conn_graph%item)
@@ -94,6 +106,8 @@ program gedatsu_connectivity_graph_partitioner
     call monolis_dealloc_I_1d(local_node_graph%vertex_id)
 
     !> global vertex_id
+    if(.not. is_1_origin) local_conn_graph%vertex_id = local_conn_graph%vertex_id - 1
+
     foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".id", i - 1)
     call monolis_output_global_id(foname_full, local_conn_graph%n_vertex, local_conn_graph%vertex_id)
 
