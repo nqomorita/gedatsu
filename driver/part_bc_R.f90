@@ -40,7 +40,7 @@ program gedatsu_bc_partitioner_R
     stop monolis_fail
   endif
 
-  fidname = "graph.id"
+  fidname = "graph.dat.id"
   call monolis_get_arg_input_S("-id", fidname, is_get)
 
   finame = "bc.dat"

@@ -34,10 +34,10 @@ cp ${INPF}/val.conn.c.dat ./
 ../bin/gedatsu_dist_val_C_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
 
 cp ${INPF}/bc.r.dat ./
-../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id graph.dat.id -n 2
 
 cp ${INPF}/bc.c.dat ./
-../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
 
 mv parted.0 parted.0.f
 
@@ -67,10 +67,10 @@ cp ${INPC}/val.conn.c.dat ./
 ../bin/gedatsu_dist_val_C_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
 
 cp ${INPC}/bc.r.dat ./
-../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id graph.dat.id -n 2
 
 cp ${INPC}/bc.c.dat ./
-../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
 
 mv parted.0 parted.0.c
 
