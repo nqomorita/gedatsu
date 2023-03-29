@@ -90,6 +90,7 @@ program gedatsu_nodal_graph_partitioner
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
     call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
 
+    if(.not. is_1_origin) id1 = id1 - 1
     if(.not. is_1_origin) subgraphs(i)%item = subgraphs(i)%item - 1
     if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
 

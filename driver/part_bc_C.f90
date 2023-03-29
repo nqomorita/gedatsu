@@ -87,7 +87,7 @@ program gedatsu_bc_partitioner_C
       if(idx > 0)then
         n_bc_local = n_bc_local + 1
         in = perm(idx)
-        i_bc_local(1,n_bc_local) = in
+        i_bc_local(1,n_bc_local) = in - shift
         i_bc_local(2,n_bc_local) = i_bc(2,j)
         c_bc_local(n_bc_local) = c_bc(j)
       endif

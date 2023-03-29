@@ -108,7 +108,7 @@ LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
 TEST_TARGET = $(TST_DIR)/gedatsu_test
 
 ##> lib objs
-TST_SRC_ALL = $(SRC_ALL) driver/driver.f90 gedatsu.f90
+TST_SRC_ALL = $(SRC_ALL) driver/driver.f90 driver/driver_c.f90 gedatsu.f90
 TST_SOURCES = $(addprefix $(TST_DIR)/, $(TST_SRC_ALL))
 TST_OBJSt   = $(subst $(TST_DIR), $(OBJ_DIR), $(TST_SOURCES:.f90=_test.o))
 TST_OBJS    = $(TST_OBJSt:.c=_test.o)
