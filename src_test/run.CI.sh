@@ -5,8 +5,8 @@ OUTF=driver/output.f
 INPC=driver/input.c
 OUTC=driver/output.c
 
-mkdir output.f
-mkdir output.c
+mkdir ${OUTF}
+mkdir ${OUTC}
 
 ../bin/gedatsu_simple_mesh2graph_convertor -i ${INPF}/elem.quad.dat -o ${OUTF}/graph.conv.dat
 
