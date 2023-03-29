@@ -11,7 +11,6 @@ contains
     call gedatsu_nodal_graph_partitioner_test()
     call gedatsu_conn_graph_partitioner_test()
     call gedatsu_nodal_val_partitioner_test()
-    !call gedatsu_conn_val_partitioner_test()
   end subroutine gedatsu_driver_test
 
   subroutine gedatsu_nodal_val_partitioner_test()
@@ -27,10 +26,10 @@ contains
 
     call monolis_std_log_string("gedatsu_nodal_val_partitioner_test")
 
-    fname = "parted.0.f/val.i.dat.0"
+    fname = "parted.0.f/val.node.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
-    fname = "parted.0.ans/val.i.dat.0"
+    fname = "parted.0.ans/val.node.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node_ans, n_dof_ans, ival_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test a-0 1", n_node, n_node_ans)
@@ -47,10 +46,10 @@ contains
     call monolis_dealloc_I_2d(ival)
     call monolis_dealloc_I_2d(ival_ans)
 
-    fname = "parted.0.f/val.i.dat.1"
+    fname = "parted.0.f/val.node.i.dat.1"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
-    fname = "parted.0.ans/val.i.dat.1"
+    fname = "parted.0.ans/val.node.i.dat.1"
     call monolis_input_distval_i(fname, label, n_node_ans, n_dof_ans, ival_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test a-1 1", n_node, n_node_ans)
@@ -64,10 +63,10 @@ contains
 
 
 
-    fname = "parted.0.f/val.r.dat.0"
+    fname = "parted.0.f/val.node.r.dat.0"
     call monolis_input_distval_r(fname, label, n_node, n_dof, rval)
 
-    fname = "parted.0.ans/val.r.dat.0"
+    fname = "parted.0.ans/val.node.r.dat.0"
     call monolis_input_distval_r(fname, label, n_node_ans, n_dof_ans, rval_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test b-0 1", n_node, n_node_ans)
@@ -84,10 +83,10 @@ contains
     call monolis_dealloc_R_2d(rval)
     call monolis_dealloc_R_2d(rval_ans)
 
-    fname = "parted.0.f/val.r.dat.1"
+    fname = "parted.0.f/val.node.r.dat.1"
     call monolis_input_distval_r(fname, label, n_node, n_dof, rval)
 
-    fname = "parted.0.ans/val.r.dat.1"
+    fname = "parted.0.ans/val.node.r.dat.1"
     call monolis_input_distval_r(fname, label, n_node_ans, n_dof_ans, rval_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test b-1 1", n_node, n_node_ans)
@@ -101,10 +100,10 @@ contains
 
 
 
-    fname = "parted.0.f/val.c.dat.0"
+    fname = "parted.0.f/val.node.c.dat.0"
     call monolis_input_distval_c(fname, label, n_node, n_dof, cval)
 
-    fname = "parted.0.ans/val.c.dat.0"
+    fname = "parted.0.ans/val.node.c.dat.0"
     call monolis_input_distval_c(fname, label, n_node_ans, n_dof_ans, cval_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test c-0 1", n_node, n_node_ans)
@@ -121,10 +120,10 @@ contains
     call monolis_dealloc_C_2d(cval)
     call monolis_dealloc_C_2d(cval_ans)
 
-    fname = "parted.0.f/val.c.dat.1"
+    fname = "parted.0.f/val.node.c.dat.1"
     call monolis_input_distval_c(fname, label, n_node, n_dof, cval)
 
-    fname = "parted.0.ans/val.c.dat.1"
+    fname = "parted.0.ans/val.node.c.dat.1"
     call monolis_input_distval_c(fname, label, n_node_ans, n_dof_ans, cval_ans)
 
     call monolis_test_check_eq_I1("gedatsu_nodal_val_partitioner_test c-1 1", n_node, n_node_ans)
