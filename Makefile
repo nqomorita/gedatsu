@@ -131,22 +131,24 @@ TST_C_OBJS    = $(subst $(TST_WRAP_DIR), $(OBJ_DIR), $(TST_C_SOURCES:.c=.o))
 ##> **********
 ##> target (4) driver
 DRIVE1 = $(BIN_DIR)/gedatsu_simple_mesh2graph_convertor
-DRIVE2 = $(BIN_DIR)/gedatsu_bc_partitioner
-DRIVE3 = $(BIN_DIR)/gedatsu_connectivity_graph_partitioner
-DRIVE4 = $(BIN_DIR)/gedatsu_nodal_graph_partitioner
-DRIVE5 = $(BIN_DIR)/gedatsu_dist_val_i_partitioner
-DRIVE6 = $(BIN_DIR)/gedatsu_dist_val_r_partitioner
-DRIVE7 = $(BIN_DIR)/gedatsu_dist_val_c_partitioner
-DRIVE8 = $(BIN_DIR)/gedatsu_simple_mesh_partitioner
+DRIVE2 = $(BIN_DIR)/gedatsu_bc_partitioner_R
+DRIVE3 = $(BIN_DIR)/gedatsu_bc_partitioner_C
+DRIVE4 = $(BIN_DIR)/gedatsu_connectivity_graph_partitioner
+DRIVE5 = $(BIN_DIR)/gedatsu_nodal_graph_partitioner
+DRIVE6 = $(BIN_DIR)/gedatsu_dist_val_I_partitioner
+DRIVE7 = $(BIN_DIR)/gedatsu_dist_val_R_partitioner
+DRIVE8 = $(BIN_DIR)/gedatsu_dist_val_C_partitioner
+DRIVE9 = $(BIN_DIR)/gedatsu_simple_mesh_partitioner
 
 DRV_OBJS1 = $(DRV_OBJSt:.c=.o) ./obj/convert_simple_mesh2graph.o
-DRV_OBJS2 = $(DRV_OBJSt:.c=.o) ./obj/part_bc.o
-DRV_OBJS3 = $(DRV_OBJSt:.c=.o) ./obj/part_conn_graph.o
-DRV_OBJS4 = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_graph.o
-DRV_OBJS5 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_i.o
-DRV_OBJS6 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_r.o
-DRV_OBJS7 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_c.o
-DRV_OBJS8 = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
+DRV_OBJS2 = $(DRV_OBJSt:.c=.o) ./obj/part_bc_R.o
+DRV_OBJS3 = $(DRV_OBJSt:.c=.o) ./obj/part_bc_C.o
+DRV_OBJS4 = $(DRV_OBJSt:.c=.o) ./obj/part_conn_graph.o
+DRV_OBJS5 = $(DRV_OBJSt:.c=.o) ./obj/part_nodal_graph.o
+DRV_OBJS6 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_I.o
+DRV_OBJS7 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_R.o
+DRV_OBJS8 = $(DRV_OBJSt:.c=.o) ./obj/part_dist_val_C.o
+DRV_OBJS9 = $(DRV_OBJSt:.c=.o) ./obj/part_simple_mesh.o
 
 ##> target
 all: \
@@ -162,6 +164,7 @@ all: \
 	$(DRIVE6) \
 	$(DRIVE7) \
 	$(DRIVE8) \
+	$(DRIVE9)
 
 lib: \
 	cp_header \
@@ -218,6 +221,9 @@ $(DRIVE7): $(DRV_OBJS7)
 $(DRIVE8): $(DRV_OBJS8)
 	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS8) $(USE_LIB)
 
+$(DRIVE9): $(DRV_OBJS9)
+	$(FC) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)
+
 cp_header:
 	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
 	$(CP) ./wrapper/gedatsu.h ./include/
@@ -228,6 +234,14 @@ clean:
 	$(TST_OBJS) \
 	$(TST_C_OBJS) \
 	$(DRV_OBJS1) \
+	$(DRV_OBJS2) \
+	$(DRV_OBJS3) \
+	$(DRV_OBJS4) \
+	$(DRV_OBJS5) \
+	$(DRV_OBJS6) \
+	$(DRV_OBJS7) \
+	$(DRV_OBJS8) \
+	$(DRV_OBJS9) \
 	$(LIB_TARGET) \
 	$(TEST_TARGET) \
 	$(TEST_C_TARGET) \
@@ -239,6 +253,7 @@ clean:
 	$(DRIVE6) \
 	$(DRIVE7) \
 	$(DRIVE8) \
+	$(DRIVE9) \
 	./include/*.h \
 	./include/*.mod \
 	./bin/*
