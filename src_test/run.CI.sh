@@ -80,3 +80,5 @@ rm -r parted.0.c
 rm graph.dat
 
 rm val.*
+
+rm bc.*

@@ -18,30 +18,98 @@ contains
   subroutine gedatsu_bc_partitioner_test()
     implicit none
     character(monolis_charlen) :: fname
-    character(monolis_charlen) :: label
-    integer(kint) :: n_node, n_node_ans
+    integer(kint) :: n_bc, n_bc_ans
     integer(kint) :: n_dof, n_dof_ans
     integer(kint) :: i, j
-    integer(kint), allocatable :: ival(:,:), ival_ans(:,:)
-    real(kdouble), allocatable :: rval(:,:), rval_ans(:,:)
-    complex(kdouble), allocatable :: cval(:,:), cval_ans(:,:)
+    integer(kint), allocatable :: i_bc(:,:), i_bc_ans(:,:)
+    real(kdouble), allocatable :: r_bc(:), r_bc_ans(:)
+    complex(kdouble), allocatable :: c_bc(:), c_bc_ans(:)
 
-    call monolis_std_log_string("gedatsu_bc_partitioner_test")
+    call monolis_std_log_string("gedatsu_bc_partitioner_test R")
 
-    fname = "parted.0.f/val.conn.i.dat.0"
-    call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
+    fname = "parted.0.f/bc.r.dat.0"
+    call monolis_input_bc_R(fname, n_bc, n_dof, i_bc, r_bc)
 
-    fname = "parted.0.ans/val.conn.i.dat.0"
-    call monolis_input_distval_i(fname, label, n_node_ans, n_dof_ans, ival_ans)
+    fname = "parted.0.ans/bc.r.dat.0"
+    call monolis_input_bc_R(fname, n_bc_ans, n_dof_ans, i_bc_ans, r_bc_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test a-0 1", n_node, n_node_ans)
-    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test a-0 2", n_dof, n_dof_ans)
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 1", n_bc, n_bc_ans)
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 2", n_dof, n_dof_ans)
 
-    do i = 1, n_node
+    do i = 1, n_bc
     do j = 1, n_dof
-      call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test a-0 3", ival(j,i), ival_ans(j,i))
+      call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 3", i_bc(j,i), i_bc_ans(j,i))
     enddo
+    call monolis_test_check_eq_R1("gedatsu_bc_partitioner_test R a-0 4", r_bc(i), r_bc_ans(i))
     enddo
+
+
+
+    call monolis_dealloc_I_2d(i_bc)
+    call monolis_dealloc_I_2d(i_bc_ans)
+    call monolis_dealloc_R_1d(r_bc)
+    call monolis_dealloc_R_1d(r_bc_ans)
+
+    fname = "parted.0.f/bc.r.dat.1"
+    call monolis_input_bc_R(fname, n_bc, n_dof, i_bc, r_bc)
+
+    fname = "parted.0.ans/bc.r.dat.1"
+    call monolis_input_bc_R(fname, n_bc_ans, n_dof_ans, i_bc_ans, r_bc_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 1", n_bc, n_bc_ans)
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 2", n_dof, n_dof_ans)
+
+    do i = 1, n_bc
+    do j = 1, n_dof
+      call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test R a-0 3", i_bc(j,i), i_bc_ans(j,i))
+    enddo
+    call monolis_test_check_eq_R1("gedatsu_bc_partitioner_test R a-0 4", r_bc(i), r_bc_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_2d(i_bc)
+    call monolis_dealloc_I_2d(i_bc_ans)
+
+    fname = "parted.0.f/bc.c.dat.0"
+    call monolis_input_bc_C(fname, n_bc, n_dof, i_bc, c_bc)
+
+    fname = "parted.0.ans/bc.c.dat.0"
+    call monolis_input_bc_C(fname, n_bc_ans, n_dof_ans, i_bc_ans, c_bc_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 1", n_bc, n_bc_ans)
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 2", n_dof, n_dof_ans)
+
+    do i = 1, n_bc
+    do j = 1, n_dof
+      call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 3", i_bc(j,i), i_bc_ans(j,i))
+    enddo
+    call monolis_test_check_eq_C1("gedatsu_bc_partitioner_test C a-0 4", c_bc(i), c_bc_ans(i))
+    enddo
+
+
+
+    call monolis_dealloc_I_2d(i_bc)
+    call monolis_dealloc_I_2d(i_bc_ans)
+    call monolis_dealloc_C_1d(c_bc)
+    call monolis_dealloc_C_1d(c_bc_ans)
+
+    fname = "parted.0.f/bc.c.dat.1"
+    call monolis_input_bc_C(fname, n_bc, n_dof, i_bc, c_bc)
+
+    fname = "parted.0.ans/bc.c.dat.1"
+    call monolis_input_bc_C(fname, n_bc_ans, n_dof_ans, i_bc_ans, c_bc_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 1", n_bc, n_bc_ans)
+    call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 2", n_dof, n_dof_ans)
+
+    do i = 1, n_bc
+    do j = 1, n_dof
+      call monolis_test_check_eq_I1("gedatsu_bc_partitioner_test C a-0 3", i_bc(j,i), i_bc_ans(j,i))
+    enddo
+    call monolis_test_check_eq_C1("gedatsu_bc_partitioner_test C a-0 4", c_bc(i), c_bc_ans(i))
+    enddo
+
   end subroutine gedatsu_bc_partitioner_test
 
   subroutine gedatsu_conn_val_partitioner_test()
