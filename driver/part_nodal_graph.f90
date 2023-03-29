@@ -16,6 +16,8 @@ program gedatsu_nodal_graph_partitioner
 
   call monolis_mpi_initialize()
 
+  call gedatsu_std_log_string("gedatsu_nodal_graph_partitioner")
+
   call monolis_check_arg_input("-h", is_get)
 
   if(is_get)then

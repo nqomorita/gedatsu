@@ -11,6 +11,8 @@ program gedatsu_simple_mesh2graph_convertor
 
   call monolis_mpi_initialize()
 
+  call gedatsu_std_log_string("gedatsu_simple_mesh2graph_convertor")
+
   call monolis_check_arg_input("-h", is_get)
 
   if(is_get)then

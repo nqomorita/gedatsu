@@ -82,4 +82,14 @@ contains
     write(*,*)"graph%item"
     write(*,*)graph%item
   end subroutine gedatsu_graph_debug_write
+
+  !> @ingroup dev_error
+  !> 通常ログ出力関数
+  subroutine gedatsu_std_log_string(string)
+    implicit none
+    !> [in] 出力ログ
+    character(*) :: string
+    write(*,"(a,a)")"** GEDATSU: ", trim(string)
+  end subroutine gedatsu_std_log_string
+
 end module mod_gedatsu_graph
