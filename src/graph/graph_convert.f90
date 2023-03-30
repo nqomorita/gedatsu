@@ -146,6 +146,7 @@ contains
       aa:do j = jS + 1, jE
         i1 = conn%item(jS)
         i2 = conn%item(j)
+        if(i1 == i2) cycle aa
         kS = node%index(i1) + 1
         kE = node%index(i1 + 1)
         do k = kS, kE
