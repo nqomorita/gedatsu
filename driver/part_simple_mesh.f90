@@ -59,11 +59,12 @@ contains
   subroutine elem_partition()
     implicit none
     type(gedatsu_graph) :: local_conn_graph
-    integer(kint) :: i, j, in
+    integer(kint) :: i, j, in, id, idx
     character(monolis_charlen) :: foname_full
     logical :: is_valid
     integer(kint), allocatable :: id1(:)
     integer(kint), allocatable :: is_used(:)
+    integer(kint), allocatable :: perm(:)
 
     call gedatsu_check_connectivity_graph(node_graph, conn_graph, is_valid)
 
@@ -94,6 +95,16 @@ contains
       call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
 
       !> graph.dat
+      call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)
+      call monolis_get_sequence_array_I(perm, subgraphs(i)%n_vertex, 1, 1)
+      call monolis_qsort_I_2d(subgraphs(i)%vertex_id, perm, 1, subgraphs(i)%n_vertex)
+
+      do j = 1, local_conn_graph%index(local_conn_graph%n_vertex + 1)
+        id = local_conn_graph%item(j)
+        call monolis_bsearch_I(subgraphs(i)%vertex_id, 1, subgraphs(i)%n_vertex, id, idx)
+        local_conn_graph%item(j) = perm(idx)
+      enddo
+
       if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
       if(.not. is_1_origin) id1 = id1 - 1
 

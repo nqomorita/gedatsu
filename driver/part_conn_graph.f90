@@ -6,11 +6,11 @@ program gedatsu_connectivity_graph_partitioner
   type(gedatsu_graph) :: global_conn_graph
   type(gedatsu_graph) :: local_node_graph
   type(gedatsu_graph) :: local_conn_graph
-  integer(kint) :: n_domain, i, j, in
+  integer(kint) :: n_domain, i, j, in, id, idx
   character(monolis_charlen) :: finame, dirname, foname, foname_full
   character(monolis_charlen) :: finname
   logical :: is_get, is_valid, is_1_origin
-  integer(kint), allocatable :: is_used(:), id1(:)
+  integer(kint), allocatable :: is_used(:), id1(:), perm(:)
 
   call monolis_mpi_initialize()
 
@@ -95,6 +95,16 @@ program gedatsu_connectivity_graph_partitioner
     call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
 
     !> graph.dat
+    call monolis_alloc_I_1d(perm, local_node_graph%n_vertex)
+    call monolis_get_sequence_array_I(perm, local_node_graph%n_vertex, 1, 1)
+    call monolis_qsort_I_2d(local_node_graph%vertex_id, perm, 1, local_node_graph%n_vertex)
+
+    do j = 1, local_conn_graph%index(local_conn_graph%n_vertex + 1)
+      id = local_conn_graph%item(j)
+      call monolis_bsearch_I(local_node_graph%vertex_id, 1, local_node_graph%n_vertex, id, idx)
+      local_conn_graph%item(j) = perm(idx)
+    enddo
+
     if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
     if(.not. is_1_origin) id1 = id1 - 1
 
