@@ -59,12 +59,13 @@ contains
   subroutine elem_partition()
     implicit none
     type(gedatsu_graph) :: local_conn_graph
-    integer(kint) :: i, j, in, id, idx
+    integer(kint) :: i, j, k, in, id, idx
     character(monolis_charlen) :: foname_full
     logical :: is_valid
     integer(kint), allocatable :: id1(:)
     integer(kint), allocatable :: is_used(:)
     integer(kint), allocatable :: perm(:)
+    integer(kint), allocatable :: local_elem(:,:)
 
     call gedatsu_check_connectivity_graph(node_graph, conn_graph, is_valid)
 
@@ -91,9 +92,6 @@ contains
         & conn_graph%n_vertex, conn_graph%index, conn_graph%item, conn_graph%vertex_id, &
         & local_conn_graph%n_vertex, local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
 
-      call monolis_alloc_I_1d(id1, local_conn_graph%n_vertex)
-      call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
-
       !> graph.dat
       call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)
       call monolis_get_sequence_array_I(perm, subgraphs(i)%n_vertex, 1, 1)
@@ -106,13 +104,20 @@ contains
       enddo
 
       if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
-      if(.not. is_1_origin) id1 = id1 - 1
+
+      call monolis_alloc_I_2d(local_elem, n_base, local_conn_graph%n_vertex)
+
+      do j = 1, local_conn_graph%n_vertex
+        do k = 1, n_base
+          local_elem(k,j) = local_conn_graph%item(n_base*(j - 1) + k)
+        enddo
+      enddo
 
       foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fiename), i - 1)
-      call monolis_output_graph(foname_full, local_conn_graph%n_vertex, id1, &
-        & local_conn_graph%index, local_conn_graph%item)
+      call monolis_output_elem(foname_full, local_conn_graph%n_vertex, n_base, local_elem)
 
       call monolis_dealloc_I_1d(id1)
+      call monolis_dealloc_I_2d(local_elem)
 
       !> global vertex_id
       if(.not. is_1_origin) local_conn_graph%vertex_id = local_conn_graph%vertex_id - 1
@@ -126,10 +131,11 @@ contains
 
   subroutine node_partition()
     implicit none
-    integer(kint) :: i
+    integer(kint) :: i, j, in
     character(monolis_charlen) :: foname_full
     type(monolis_COM), allocatable :: com(:)
     integer(kint), allocatable :: id1(:)
+    real(kdouble), allocatable :: local_node(:,:)
 
     call gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, conn_graph%index, conn_graph%item)
 
@@ -153,23 +159,24 @@ contains
     call gedatsu_com_get_comm_table_serial(node_graph, n_domain, subgraphs, com)
 
     do i = 1, n_domain
-      !> graph.dat
+      !> node.dat
+      call monolis_alloc_R_2d(local_node, 3, subgraphs(i)%n_vertex)
+
+      do j = 1, subgraphs(i)%n_vertex
+        in = subgraphs(i)%vertex_id(j)
+        local_node(:,j) = node(:,in)
+      enddo
+
       foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname), i - 1)
-      call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
-      call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
-
-      if(.not. is_1_origin) id1 = id1 - 1
-      if(.not. is_1_origin) subgraphs(i)%item = subgraphs(i)%item - 1
-      if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
-
-      call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, id1, subgraphs(i)%index, subgraphs(i)%item)
-      call monolis_dealloc_I_1d(id1)
+      call monolis_output_node(foname_full, subgraphs(i)%n_vertex, local_node)
 
       !> internal n_vertex
       foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".n_internal", i - 1)
       call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
       !> global vertex_id
+      if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
+
       foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".id", i - 1)
       call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 
@@ -182,6 +189,7 @@ contains
       call monolis_output_recv_com_table(foname_full, com(i))
 
       call monolis_dealloc_I_1d(id1)
+      call monolis_dealloc_R_2d(local_node)
     enddo
   end subroutine node_partition
 
