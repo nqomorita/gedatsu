@@ -39,6 +39,10 @@ cp ${INPF}/bc.r.dat ./
 cp ${INPF}/bc.c.dat ./
 ../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
 
+cp ${INPF}/node.beam.dat ./
+cp ${INPF}/elem.beam.dat ./
+../bin/gedatsu_simple_mesh_partitioner -in ./node.beam.dat -ie ./elem.beam.dat -n 2
+
 mv parted.0 parted.0.f
 
 ../bin/gedatsu_simple_mesh2graph_convertor -i ${INPC}/elem.quad.dat -o ${OUTC}/graph.conv.dat
@@ -72,6 +76,10 @@ cp ${INPC}/bc.r.dat ./
 cp ${INPC}/bc.c.dat ./
 ../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
 
+cp ${INPC}/node.beam.dat ./
+cp ${INPC}/elem.beam.dat ./
+../bin/gedatsu_simple_mesh_partitioner -in ./node.beam.dat -ie ./elem.beam.dat -n 2
+
 mv parted.0 parted.0.c
 
 ./gedatsu_test
@@ -85,3 +93,7 @@ rm graph.dat
 rm val.*
 
 rm bc.*
+
+rm node.*
+
+rm elem.*

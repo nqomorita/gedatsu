@@ -3,7 +3,7 @@ program gedatsu_nodal_val_r_partitioner
   use mod_gedatsu
   implicit none
   type(gedatsu_graph), allocatable :: graph(:)
-  integer(kint) :: i, j, in, n_domain, n_node, n_dof, shift
+  integer(kint) :: i, j, in, n_domain, n_node, n_dof, shift, maxid
   character(monolis_charlen) :: finame, dirname, label, fidname, foname_full
   logical :: is_get, is_1_origin
   real(kdouble), allocatable :: val(:,:), val_local(:,:)
@@ -56,11 +56,18 @@ program gedatsu_nodal_val_r_partitioner
   enddo
 
   shift = 0
+  maxid = 0
   is_1_origin = .true.
   do i = 1, n_domain
     if(minval(graph(i)%vertex_id) == 0) is_1_origin = .false.
+    if(maxval(graph(i)%vertex_id) > maxid) maxid = maxval(graph(i)%vertex_id)
   enddo
   if(.not. is_1_origin) shift = 1
+
+  if(maxid + shift /= n_node)then
+    call monolis_std_error_string("The number of conditions entered does not match the number of nodes")
+    call monolis_std_error_stop()
+  endif
 
   do i = 1, n_domain
     call monolis_alloc_R_2d(val_local, n_dof, graph(i)%n_vertex)
