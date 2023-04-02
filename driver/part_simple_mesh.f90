@@ -20,7 +20,7 @@ program gedatsu_partitioner_simple_mesh
   if(is_get)then
     write(*,"(a)")"usage:"
     write(*,"(a)") &
-    & "./gedatsu_convertor_simple_mesh2graph {options}"
+    & "./gedatsu_convertor_simple_mesh2graph {options} -n {number of domains}"
     write(*,"(a)")""
     write(*,"(a)")"-in {input node filename}: (default) node.dat"
     write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
@@ -30,6 +30,15 @@ program gedatsu_partitioner_simple_mesh
   endif
 
   call monolis_get_arg_input_n_tag(n_domain, is_get)
+
+  if(.not. is_get)then
+    call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)") &
+    & "./gedatsu_convertor_simple_mesh2graph {options} -n {number of domains}"
+    stop monolis_fail
+  endif
+
+  if(n_domain <= 1) stop
 
   finname = "node.dat"
   call monolis_get_arg_input_in_tag(finname, is_get)

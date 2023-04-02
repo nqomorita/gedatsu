@@ -5,7 +5,7 @@ program gedatsu_nodal_graph_partitioner
   type(gedatsu_graph) :: graph
   integer(kint) :: n_domain, i
   integer(kint) :: n_nw_dof, n_ew_dof, n_vertex
-  character(monolis_charlen) :: finame, dirname, foname, foname_full
+  character(monolis_charlen) :: finame, dirname, foname_full
   character(monolis_charlen) :: finwname, fiewname, label
   logical :: is_get, is_inw, is_iew, is_1_origin
   type(gedatsu_graph), allocatable :: subgraphs(:)
@@ -29,7 +29,6 @@ program gedatsu_nodal_graph_partitioner
     write(*,"(a)")"-i {input node filename}: (default) graph.dat"
     write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
     write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
-    write(*,"(a)")"-o {output graph filename}: (default) graph.dat.{domain_id}"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h : help"
     stop monolis_success
@@ -44,11 +43,10 @@ program gedatsu_nodal_graph_partitioner
     stop monolis_fail
   endif
 
+  if(n_domain <= 1) stop
+
   finame = "graph.dat"
   call monolis_get_arg_input_i_tag(finame, is_get)
-
-  foname = "graph.dat"
-  call monolis_get_arg_input_o_tag(foname, is_get)
 
   call monolis_input_graph(finame, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
 
@@ -86,7 +84,7 @@ program gedatsu_nodal_graph_partitioner
 
   do i = 1, n_domain
     !> graph.dat
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i - 1)
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
     call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
 
@@ -98,19 +96,19 @@ program gedatsu_nodal_graph_partitioner
     call monolis_dealloc_I_1d(id1)
 
     !> internal n_vertex
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".n_internal", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".n_internal", i - 1)
     call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
     !> global vertex_id
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".id", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".id", i - 1)
     call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 
     !> send
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".send", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".send", i - 1)
     call monolis_output_send_com_table(foname_full, com(i))
 
     !> recv
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(foname)//".recv", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".recv", i - 1)
     call monolis_output_recv_com_table(foname_full, com(i))
   enddo
 

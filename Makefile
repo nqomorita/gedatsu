@@ -135,9 +135,9 @@ DRIVE2 = $(BIN_DIR)/gedatsu_bc_partitioner_R
 DRIVE3 = $(BIN_DIR)/gedatsu_bc_partitioner_C
 DRIVE4 = $(BIN_DIR)/gedatsu_connectivity_graph_partitioner
 DRIVE5 = $(BIN_DIR)/gedatsu_nodal_graph_partitioner
-DRIVE6 = $(BIN_DIR)/gedatsu_dist_val_I_partitioner
-DRIVE7 = $(BIN_DIR)/gedatsu_dist_val_R_partitioner
-DRIVE8 = $(BIN_DIR)/gedatsu_dist_val_C_partitioner
+DRIVE6 = $(BIN_DIR)/gedatsu_dist_val_partitioner_I
+DRIVE7 = $(BIN_DIR)/gedatsu_dist_val_partitioner_R
+DRIVE8 = $(BIN_DIR)/gedatsu_dist_val_partitioner_C
 DRIVE9 = $(BIN_DIR)/gedatsu_simple_mesh_partitioner
 
 DRV_OBJS1 = $(DRV_OBJSt:.c=.o) ./obj/convert_simple_mesh2graph.o

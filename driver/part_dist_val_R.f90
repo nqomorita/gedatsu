@@ -10,19 +10,19 @@ program gedatsu_nodal_val_r_partitioner
 
   call monolis_mpi_initialize()
 
-  call gedatsu_std_log_string("gedatsu_nodal_val_r_partitioner")
+  call gedatsu_std_log_string("gedatsu_dist_val_partitioner_R")
 
   call monolis_check_arg_input("-h", is_get)
 
   if(is_get)then
     write(*,"(a)")"usage:"
     write(*,"(a)") &
-    & "./gedatsu_nodal_val_r_partitioner {options} -n {number of domains}"
+    & "./gedatsu_dist_val_partitioner_R {options} -n {number of domains}"
     write(*,"(a)")"- output filename: {input filename}.{domain_id}"
     write(*,"(a)")""
     write(*,"(a)")"-n {number of domains}: (default) 1"
-    write(*,"(a)")"-i {input filename}: (default) node_val.dat"
-    write(*,"(a)")"-id {input id filename}: (default) graph.dat.id"
+    write(*,"(a)")"-i {input filename}: (default) val.dat"
+    write(*,"(a)")"-ig {input graph filename}: (default) graph.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h : help"
     stop monolis_success
@@ -33,15 +33,17 @@ program gedatsu_nodal_val_r_partitioner
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
     write(*,"(a)") &
-    & "./gedatsu_nodal_val_r_partitioner {options} -n {number of domains}"
+    & "./gedatsu_dist_val_partitioner_R {options} -n {number of domains}"
     stop monolis_fail
   endif
 
-  finame = "node_val.dat"
+  if(n_domain <= 1) stop
+
+  finame = "val.dat"
   call monolis_get_arg_input_i_tag(finame, is_get)
 
-  fidname = "graph.dat.id"
-  call monolis_get_arg_input_S("-id", fidname, is_get)
+  fidname = "graph.dat"
+  call monolis_get_arg_input_S("-ig", fidname, is_get)
 
   dirname = "./parted.0"
   call monolis_get_arg_input_d_tag(dirname, is_get)
@@ -51,7 +53,7 @@ program gedatsu_nodal_val_r_partitioner
   allocate(graph(n_domain))
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname)//".id", i - 1)
     call monolis_input_global_id(foname_full, graph(i)%n_vertex, graph(i)%vertex_id)
   enddo
 

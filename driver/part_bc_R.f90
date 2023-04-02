@@ -25,7 +25,7 @@ program gedatsu_bc_partitioner_R
     write(*,"(a)")""
     write(*,"(a)")"-n {number of domains}: (default) 1"
     write(*,"(a)")"-i {input filename}: (default) bc.dat"
-    write(*,"(a)")"-id {input id filename}: (default) graph.dat.id"
+    write(*,"(a)")"-ig {input graph filename}: (default) graph.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h : help"
     stop monolis_success
@@ -40,8 +40,10 @@ program gedatsu_bc_partitioner_R
     stop monolis_fail
   endif
 
-  fidname = "graph.dat.id"
-  call monolis_get_arg_input_S("-id", fidname, is_get)
+  if(n_domain <= 1) stop
+
+  fidname = "graph.dat"
+  call monolis_get_arg_input_S("-ig", fidname, is_get)
 
   finame = "bc.dat"
   call monolis_get_arg_input_i_tag(finame, is_get)
@@ -54,7 +56,7 @@ program gedatsu_bc_partitioner_R
   allocate(graph(n_domain))
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname)//".id", i - 1)
     call monolis_input_global_id(foname_full, graph(i)%n_vertex, graph(i)%vertex_id)
   enddo
 

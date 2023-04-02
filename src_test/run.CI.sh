@@ -16,28 +16,28 @@ cp ${INPF}/graph.dat ./
 ../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INPF}/connectivity.dat -o connectivity.dat -n 2
 
 cp ${INPF}/val.node.i.dat ./
-../bin/gedatsu_dist_val_I_partitioner -i ./val.node.i.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_I -i ./val.node.i.dat -ig graph.dat -n 2
 
 cp ${INPF}/val.node.r.dat ./
-../bin/gedatsu_dist_val_R_partitioner -i ./val.node.r.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_R -i ./val.node.r.dat -ig graph.dat -n 2
 
 cp ${INPF}/val.node.c.dat ./
-../bin/gedatsu_dist_val_C_partitioner -i ./val.node.c.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_C -i ./val.node.c.dat -ig graph.dat -n 2
 
 cp ${INPF}/val.conn.i.dat ./
-../bin/gedatsu_dist_val_I_partitioner -i ./val.conn.i.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_I -i ./val.conn.i.dat -ig connectivity.dat -n 2
 
 cp ${INPF}/val.conn.r.dat ./
-../bin/gedatsu_dist_val_R_partitioner -i ./val.conn.r.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_R -i ./val.conn.r.dat -ig connectivity.dat -n 2
 
 cp ${INPF}/val.conn.c.dat ./
-../bin/gedatsu_dist_val_C_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_C -i ./val.conn.c.dat -ig connectivity.dat -n 2
 
 cp ${INPF}/bc.r.dat ./
-../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id graph.dat.id -n 2
+../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -ig graph.dat -n 2
 
 cp ${INPF}/bc.c.dat ./
-../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
+../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -ig graph.dat -n 2
 
 cp ${INPF}/node.beam.dat ./
 cp ${INPF}/elem.beam.dat ./
@@ -53,28 +53,28 @@ cp ${INPC}/graph.dat ./
 ../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INPC}/connectivity.dat -o connectivity.dat -n 2
 
 cp ${INPC}/val.node.i.dat ./
-../bin/gedatsu_dist_val_I_partitioner -i ./val.node.i.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_I -i ./val.node.i.dat -ig graph.dat -n 2
 
 cp ${INPC}/val.node.r.dat ./
-../bin/gedatsu_dist_val_R_partitioner -i ./val.node.r.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_R -i ./val.node.r.dat -ig graph.dat -n 2
 
 cp ${INPC}/val.node.c.dat ./
-../bin/gedatsu_dist_val_C_partitioner -i ./val.node.c.dat -id graph.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_C -i ./val.node.c.dat -ig graph.dat -n 2
 
 cp ${INPC}/val.conn.i.dat ./
-../bin/gedatsu_dist_val_I_partitioner -i ./val.conn.i.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_I -i ./val.conn.i.dat -ig connectivity.dat -n 2
 
 cp ${INPC}/val.conn.r.dat ./
-../bin/gedatsu_dist_val_R_partitioner -i ./val.conn.r.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_R -i ./val.conn.r.dat -ig connectivity.dat -n 2
 
 cp ${INPC}/val.conn.c.dat ./
-../bin/gedatsu_dist_val_C_partitioner -i ./val.conn.c.dat -id connectivity.dat.id -n 2
+../bin/gedatsu_dist_val_partitioner_C -i ./val.conn.c.dat -ig connectivity.dat -n 2
 
 cp ${INPC}/bc.r.dat ./
-../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -id graph.dat.id -n 2
+../bin/gedatsu_bc_partitioner_R -i ./bc.r.dat -ig graph.dat -n 2
 
 cp ${INPC}/bc.c.dat ./
-../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -id graph.dat.id -n 2
+../bin/gedatsu_bc_partitioner_C -i ./bc.c.dat -ig graph.dat -n 2
 
 cp ${INPC}/node.beam.dat ./
 cp ${INPC}/elem.beam.dat ./
