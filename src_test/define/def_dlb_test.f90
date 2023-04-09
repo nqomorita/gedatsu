@@ -17,22 +17,22 @@ contains
     implicit none
     type(gedatsu_dlb) :: dlb
 
-    call monolis_std_log_string("gedatsu_dlb_initialize_test")
+    call monolis_std_log_string("gedatsu_dlb_initialize")
 
     call gedatsu_dlb_initialize(dlb)
 
-    call monolis_test_check_eq_L1("gedatsu_dlb_initialize_test case 1", dlb%should_update, .false.)
+    call monolis_test_check_eq_L1("gedatsu_dlb_initialize case 1", dlb%should_update, .false.)
   end subroutine gedatsu_dlb_initialize_test
 
   subroutine gedatsu_dlb_finalize_test()
     implicit none
     type(gedatsu_dlb) :: dlb
 
-    call monolis_std_log_string("gedatsu_dlb_finalize_test")
+    call monolis_std_log_string("gedatsu_dlb_finalize")
 
     call gedatsu_dlb_finalize(dlb)
 
-    call monolis_test_check_eq_L1("gedatsu_dlb_finalize_test case 1", dlb%should_update, .false.)
+    call monolis_test_check_eq_L1("gedatsu_dlb_finalize case 1", dlb%should_update, .false.)
   end subroutine gedatsu_dlb_finalize_test
 
   subroutine gedatsu_dlb_should_update_test()
@@ -40,12 +40,12 @@ contains
     type(gedatsu_dlb) :: dlb
     logical :: should_update
 
-    call monolis_std_log_string("gedatsu_dlb_should_update_test")
+    call monolis_std_log_string("gedatsu_dlb_should_update")
 
     call gedatsu_dlb_initialize(dlb)
 
     call gedatsu_dlb_should_update(dlb, should_update)
 
-    call monolis_test_check_eq_L1("gedatsu_dlb_should_update_test case 1", should_update, .false.)
+    call monolis_test_check_eq_L1("gedatsu_dlb_should_update case 1", should_update, .false.)
   end subroutine gedatsu_dlb_should_update_test
 end module mod_gedatsu_def_dlb_test

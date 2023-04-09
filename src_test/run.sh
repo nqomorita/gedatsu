@@ -47,7 +47,6 @@ cp ${INPF}/elem.beam.dat ./
 
 mv parted.0 parted.0.f
 
-
 ../bin/gedatsu_simple_mesh2graph_convertor -i ${INPC}/elem.quad.dat -o ${OUTC}/graph.conv.dat
 
 cp ${INPC}/graph.dat ./
@@ -87,8 +86,7 @@ cp ${INPC}/elem.beam.dat ./
 
 mv parted.0 parted.0.c
 
-
-./gedatsu_test
+./gedatsu_test | tee test_list.dat
 
 rm -r parted.0.f
 

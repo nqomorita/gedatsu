@@ -36,7 +36,7 @@ contains
     real(kdouble), allocatable :: node(:,:)
     real(kdouble), allocatable :: node_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_simple_mesh_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_simple_mesh_partitioner")
 
     fname = "parted.0.c/node.beam.dat.0"
     call monolis_input_node(fname, n_node, node)
@@ -314,7 +314,8 @@ contains
     real(kdouble), allocatable :: r_bc(:), r_bc_ans(:)
     complex(kdouble), allocatable :: c_bc(:), c_bc_ans(:)
 
-    call monolis_std_log_string("gedatsu_bc_partitioner_test R")
+    call monolis_std_global_log_string("gedatsu_bc_partitioner_C")
+    call monolis_std_global_log_string("gedatsu_bc_partitioner_R")
 
     fname = "parted.0.c/bc.r.dat.0"
     call monolis_input_bc_R(fname, n_bc, n_dof, i_bc, r_bc)
@@ -408,7 +409,9 @@ contains
     real(kdouble), allocatable :: rval(:,:), rval_ans(:,:)
     complex(kdouble), allocatable :: cval(:,:), cval_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_conn_val_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_C")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_I")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_R")
 
     fname = "parted.0.c/val.conn.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
@@ -531,8 +534,6 @@ contains
     real(kdouble), allocatable :: rval(:,:), rval_ans(:,:)
     complex(kdouble), allocatable :: cval(:,:), cval_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_nodal_val_partitioner_test")
-
     fname = "parted.0.c/val.node.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
@@ -652,7 +653,7 @@ contains
     integer(kint), allocatable :: index(:), index_ans(:)
     integer(kint), allocatable :: item(:), item_ans(:)
 
-    call monolis_std_log_string("gedatsu_conn_graph_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_connectivity_graph_partitioner")
 
     fname = "parted.0.c/connectivity.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
@@ -755,7 +756,7 @@ contains
     integer(kint), pointer :: itemp(:) => null()
     integer(kint), pointer :: itemp_ans(:) => null()
 
-    call monolis_std_log_string("gedatsu_nodal_graph_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_nodal_graph_partitioner")
 
     fname = "parted.0.c/graph.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
@@ -977,7 +978,7 @@ contains
     integer(kint), allocatable :: index(:)
     integer(kint), allocatable :: item(:)
 
-    call monolis_std_log_string("gedatsu_simple_mesh2graph_convertor")
+    call monolis_std_global_log_string("gedatsu_simple_mesh2graph_convertor")
 
     fname = "driver/output.c/graph.conv.dat"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)

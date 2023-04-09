@@ -9,11 +9,13 @@ contains
   subroutine gedatsu_driver_test()
     call gedatsu_simple_mesh2graph_convertor_test()
     call gedatsu_nodal_graph_partitioner_test()
-    call gedatsu_conn_graph_partitioner_test()
+    call gedatsu_connectivity_graph_partitioner_test()
     call gedatsu_nodal_val_partitioner_test()
     call gedatsu_conn_val_partitioner_test()
     call gedatsu_bc_partitioner_test()
     call gedatsu_simple_mesh_partitioner_test()
+
+    call monolis_std_global_log_string("gedatsu_std_log_string")
   end subroutine gedatsu_driver_test
 
   subroutine gedatsu_simple_mesh_partitioner_test()
@@ -36,7 +38,7 @@ contains
     real(kdouble), allocatable :: node(:,:)
     real(kdouble), allocatable :: node_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_simple_mesh_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_simple_mesh_partitioner")
 
     fname = "parted.0.f/node.beam.dat.0"
     call monolis_input_node(fname, n_node, node)
@@ -44,12 +46,12 @@ contains
     fname = "parted.0.ans/node.beam.dat.0"
     call monolis_input_node(fname, n_node_ans, node_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test a-0 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner a-0 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-0 2", node_ans(1,i), node(1,i))
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-0 2", node_ans(2,i), node(2,i))
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-0 2", node_ans(3,i), node(3,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-0 2", node_ans(1,i), node(1,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-0 2", node_ans(2,i), node(2,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-0 2", node_ans(3,i), node(3,i))
     enddo
 
 
@@ -63,12 +65,12 @@ contains
     fname = "parted.0.ans/node.beam.dat.1"
     call monolis_input_node(fname, n_node_ans, node_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test a-1 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner a-1 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-1 2", node_ans(1,i), node(1,i))
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-1 2", node_ans(2,i), node(2,i))
-      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner_test a-1 2", node_ans(3,i), node(3,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-1 2", node_ans(1,i), node(1,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-1 2", node_ans(2,i), node(2,i))
+      call monolis_test_check_eq_R1("gedatsu_simple_mesh_partitioner a-1 2", node_ans(3,i), node(3,i))
     enddo
 
 
@@ -82,10 +84,10 @@ contains
     fname = "parted.0.ans/node.beam.dat.id.0"
     call monolis_input_global_id(fname, n_node_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test b-0 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner b-0 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner b-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -99,10 +101,10 @@ contains
     fname = "parted.0.ans/node.beam.dat.id.1"
     call monolis_input_global_id(fname, n_node_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test b-1 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner b-1 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test b-1 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner b-1 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -113,7 +115,7 @@ contains
     fname = "parted.0.ans/node.beam.dat.n_internal.0"
     call monolis_input_internal_vertex_number(fname, n_internal_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test c-0 1", n_internal, n_internal_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner c-0 1", n_internal, n_internal_ans)
 
 
 
@@ -123,7 +125,7 @@ contains
     fname = "parted.0.ans/node.beam.dat.n_internal.1"
     call monolis_input_internal_vertex_number(fname, n_internal_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test c-1 1", n_internal, n_internal_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner c-1 1", n_internal, n_internal_ans)
 
 
 
@@ -133,18 +135,18 @@ contains
     fname = "parted.0.ans/node.beam.dat.recv.0"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test d-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner d-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test d-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner d-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test d-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner d-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test d-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner d-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -162,18 +164,18 @@ contains
     fname = "parted.0.ans/node.beam.dat.send.0"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test e-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner e-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test e-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner e-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test e-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner e-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test e-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner e-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -191,18 +193,18 @@ contains
     fname = "parted.0.ans/node.beam.dat.recv.1"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test f-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner f-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test f-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner f-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test f-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner f-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test f-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner f-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -219,18 +221,18 @@ contains
     fname = "parted.0.ans/node.beam.dat.send.1"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test g-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner g-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test g-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner g-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test g-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner g-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test g-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner g-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -241,12 +243,12 @@ contains
     fname = "parted.0.ans/elem.beam.dat.0"
     call monolis_input_elem(fname, n_elem_ans, n_base_ans, elem_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-0 1", n_elem, n_elem_ans)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-0 1", n_base, n_base_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-0 1", n_elem, n_elem_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-0 1", n_base, n_base_ans)
 
     do i = 1, n_elem
     do j = 1, n_base
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-0 2", elem_ans(j,i), elem(j,i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-0 2", elem_ans(j,i), elem(j,i))
     enddo
     enddo
 
@@ -260,12 +262,12 @@ contains
     fname = "parted.0.ans/elem.beam.dat.1"
     call monolis_input_elem(fname, n_elem_ans, n_base_ans, elem_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-1 1", n_elem, n_elem_ans)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-1 1", n_base, n_base_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-1 1", n_elem, n_elem_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-1 1", n_base, n_base_ans)
 
     do i = 1, n_elem
     do j = 1, n_base
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test h-1 2", elem_ans(j,i), elem(j,i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner h-1 2", elem_ans(j,i), elem(j,i))
     enddo
     enddo
 
@@ -280,10 +282,10 @@ contains
     fname = "parted.0.ans/elem.beam.dat.id.0"
     call monolis_input_global_id(fname, n_node_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test i-0 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner i-0 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test i-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner i-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -297,10 +299,10 @@ contains
     fname = "parted.0.ans/elem.beam.dat.id.1"
     call monolis_input_global_id(fname, n_node_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test i-1 1", n_node, n_node_ans)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner i-1 1", n_node, n_node_ans)
 
     do i = 1, n_node
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test i-1 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner i-1 2", vertex_id(i), vertex_id_ans(i))
     enddo
   end subroutine gedatsu_simple_mesh_partitioner_test
 
@@ -314,7 +316,8 @@ contains
     real(kdouble), allocatable :: r_bc(:), r_bc_ans(:)
     complex(kdouble), allocatable :: c_bc(:), c_bc_ans(:)
 
-    call monolis_std_log_string("gedatsu_bc_partitioner_test R")
+    call monolis_std_global_log_string("gedatsu_bc_partitioner_R")
+    call monolis_std_global_log_string("gedatsu_bc_partitioner_C")
 
     fname = "parted.0.f/bc.r.dat.0"
     call monolis_input_bc_R(fname, n_bc, n_dof, i_bc, r_bc)
@@ -408,7 +411,9 @@ contains
     real(kdouble), allocatable :: rval(:,:), rval_ans(:,:)
     complex(kdouble), allocatable :: cval(:,:), cval_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_conn_val_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_C")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_I")
+    call monolis_std_global_log_string("gedatsu_dist_val_partitioner_R")
 
     fname = "parted.0.f/val.conn.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
@@ -531,8 +536,6 @@ contains
     real(kdouble), allocatable :: rval(:,:), rval_ans(:,:)
     complex(kdouble), allocatable :: cval(:,:), cval_ans(:,:)
 
-    call monolis_std_log_string("gedatsu_nodal_val_partitioner_test")
-
     fname = "parted.0.f/val.node.i.dat.0"
     call monolis_input_distval_i(fname, label, n_node, n_dof, ival)
 
@@ -643,7 +646,7 @@ contains
     enddo
   end subroutine gedatsu_nodal_val_partitioner_test
 
-  subroutine gedatsu_conn_graph_partitioner_test()
+  subroutine gedatsu_connectivity_graph_partitioner_test()
     implicit none
     character(monolis_charlen) :: fname
     integer(kint) :: i
@@ -652,7 +655,7 @@ contains
     integer(kint), allocatable :: index(:), index_ans(:)
     integer(kint), allocatable :: item(:), item_ans(:)
 
-    call monolis_std_log_string("gedatsu_conn_graph_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_connectivity_graph_partitioner")
 
     fname = "parted.0.f/connectivity.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
@@ -660,18 +663,18 @@ contains
     fname = "parted.0.ans/connectivity.dat.0"
     call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
     do i = 1, n_vertex + 1
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 3", index(i), index_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 3", index(i), index_ans(i))
     enddo
 
     do i = 1, index(n_vertex + 1)
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 4", item(i), item_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 4", item(i), item_ans(i))
     enddo
 
 
@@ -689,18 +692,18 @@ contains
     fname = "parted.0.ans/connectivity.dat.1"
     call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
     do i = 1, n_vertex + 1
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 3", index(i), index_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 3", index(i), index_ans(i))
     enddo
 
     do i = 1, index(n_vertex + 1)
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test a-0 4", item(i), item_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner a-0 4", item(i), item_ans(i))
     enddo
 
 
@@ -714,10 +717,10 @@ contains
     fname = "parted.0.ans/connectivity.dat.id.0"
     call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner b-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner b-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -731,12 +734,12 @@ contains
     fname = "parted.0.ans/connectivity.dat.id.0"
     call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner b-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_conn_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_connectivity_graph_partitioner b-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
-  end subroutine gedatsu_conn_graph_partitioner_test
+  end subroutine gedatsu_connectivity_graph_partitioner_test
 
   subroutine gedatsu_nodal_graph_partitioner_test()
     implicit none
@@ -755,7 +758,7 @@ contains
     integer(kint), pointer :: itemp(:) => null()
     integer(kint), pointer :: itemp_ans(:) => null()
 
-    call monolis_std_log_string("gedatsu_nodal_graph_partitioner_test")
+    call monolis_std_global_log_string("gedatsu_nodal_graph_partitioner")
 
     fname = "parted.0.f/graph.dat.0"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
@@ -763,18 +766,18 @@ contains
     fname = "parted.0.ans/graph.dat.0"
     call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
     do i = 1, n_vertex + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 3", index(i), index_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-0 3", index(i), index_ans(i))
     enddo
 
     do i = 1, index(n_vertex + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-0 4", item(i), item_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-0 4", item(i), item_ans(i))
     enddo
 
 
@@ -792,18 +795,18 @@ contains
     fname = "parted.0.ans/graph.dat.1"
     call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-1 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-1 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
     do i = 1, n_vertex + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 3", index(i), index_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-1 3", index(i), index_ans(i))
     enddo
 
     do i = 1, index(n_vertex + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test a-1 4", item(i), item_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-1 4", item(i), item_ans(i))
     enddo
 
 
@@ -817,10 +820,10 @@ contains
     fname = "parted.0.ans/graph.dat.id.0"
     call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-0 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner b-0 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-0 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner b-0 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -834,10 +837,10 @@ contains
     fname = "parted.0.ans/graph.dat.id.1"
     call monolis_input_global_id(fname, n_vertex_ans, vertex_id_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-1 1", n_vertex, n_vertex_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner b-1 1", n_vertex, n_vertex_ans)
 
     do i = 1, n_vertex
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test b-1 2", vertex_id(i), vertex_id_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner b-1 2", vertex_id(i), vertex_id_ans(i))
     enddo
 
 
@@ -848,7 +851,7 @@ contains
     fname = "parted.0.ans/graph.dat.n_internal.0"
     call monolis_input_internal_vertex_number(fname, n_internal_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test c-0 1", n_internal, n_internal_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner c-0 1", n_internal, n_internal_ans)
 
 
 
@@ -858,7 +861,7 @@ contains
     fname = "parted.0.ans/graph.dat.n_internal.1"
     call monolis_input_internal_vertex_number(fname, n_internal_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test c-1 1", n_internal, n_internal_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner c-1 1", n_internal, n_internal_ans)
 
 
 
@@ -868,18 +871,18 @@ contains
     fname = "parted.0.ans/graph.dat.recv.0"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner d-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner d-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner d-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test d-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner d-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -897,18 +900,18 @@ contains
     fname = "parted.0.ans/graph.dat.send.0"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner e-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner e-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner e-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test e-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner e-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -926,18 +929,18 @@ contains
     fname = "parted.0.ans/graph.dat.recv.1"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner f-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner f-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner f-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test f-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner f-0 4", itemp(i), itemp_ans(i))
     enddo
 
 
@@ -954,18 +957,18 @@ contains
     fname = "parted.0.ans/graph.dat.send.1"
     call monolis_input_com_table_main(fname, n_neib_ans, neib_pe_ans, indexp_ans, itemp_ans)
 
-    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 1", n_neib, n_neib_ans)
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner g-0 1", n_neib, n_neib_ans)
 
     do i = 1, n_neib
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 2", neib_pe(i), neib_pe_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner g-0 2", neib_pe(i), neib_pe_ans(i))
     enddo
 
     do i = 1, n_neib + 1
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 3", indexp(i), indexp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner g-0 3", indexp(i), indexp_ans(i))
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test g-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner g-0 4", itemp(i), itemp_ans(i))
     enddo
   end subroutine gedatsu_nodal_graph_partitioner_test
 
@@ -977,7 +980,7 @@ contains
     integer(kint), allocatable :: index(:)
     integer(kint), allocatable :: item(:)
 
-    call monolis_std_log_string("gedatsu_simple_mesh2graph_convertor")
+    call monolis_std_global_log_string("gedatsu_simple_mesh2graph_convertor")
 
     fname = "driver/output.f/graph.conv.dat"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)

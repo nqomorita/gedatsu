@@ -50,6 +50,7 @@ mv parted.0 parted.0.f
 ../bin/gedatsu_nodal_graph_partitioner -i ${INPC}/graph.dat -o graph.dat -n 2
 
 cp ${INPC}/graph.dat ./
+cp ${INPC}/connectivity.dat ./
 ../bin/gedatsu_connectivity_graph_partitioner -ig ./graph.dat -i ${INPC}/connectivity.dat -o connectivity.dat -n 2
 
 cp ${INPC}/val.node.i.dat ./
@@ -82,13 +83,15 @@ cp ${INPC}/elem.beam.dat ./
 
 mv parted.0 parted.0.c
 
-./gedatsu_test
+./gedatsu_test | tee test_list.dat
 
 rm -r parted.0.f
 
 rm -r parted.0.c
 
 rm graph.dat
+
+rm connectivity.dat
 
 rm val.*
 

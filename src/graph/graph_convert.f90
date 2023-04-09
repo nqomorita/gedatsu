@@ -39,8 +39,8 @@ contains
 
   !> @ingroup graph_conv
   !> 単一メッシュ形式から節点グラフ形式に変換
-  subroutine gedatsu_convert_connectivity_graph_to_nodal_graph &
-    & (n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)
+  subroutine gedatsu_convert_connectivity_graph_to_nodal_graph( &
+    & n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)
     use iso_c_binding
     implicit none
     !> 節点数
