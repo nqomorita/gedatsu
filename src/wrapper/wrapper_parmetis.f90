@@ -13,21 +13,21 @@ contains
     &  vtxdist, index, item, n_part, part_id, comm)
     implicit none
     !> [in] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(in) :: n_vertex
     !> [in] グラフのノード id
-    integer(kint) :: vertex_id(:)
+    integer(kint), intent(in) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
-    integer(kint) :: vtxdist(:)
+    integer(kint), intent(in) :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(kint) :: index(:)
-    !> [in] graph の CSR 圧縮形式の item 配列
-    integer(kint) :: item(:)
+    integer(kint), intent(in) :: index(:)
+    !> [in,out] graph の CSR 圧縮形式の item 配列
+    integer(kint), intent(inout) :: item(:)
     !> [in] 分割数
-    integer(kint) :: n_part
-    !> [in] 領域番号
-    integer(kint) :: part_id(:)
+    integer(kint), intent(in) :: n_part
+    !> [out] 領域番号
+    integer(kint), intent(out) :: part_id(:)
     !> [in] MPI コミュニケータ
-    integer(kint) :: comm
+    integer(kint), intent(in) :: comm
     integer(kint), allocatable :: node_wgt(:,:)
     integer(kint), allocatable :: edge_wgt(:,:)
 
@@ -43,25 +43,25 @@ contains
     use iso_c_binding
     implicit none
     !> [in] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(in) :: n_vertex
     !> [in] グラフのノード id
-    integer(kint) :: vertex_id(:)
+    integer(kint), intent(in) :: vertex_id(:)
     !> [in] 領域ごとのノード数を示す配列
-    integer(kint) :: vtxdist(:)
+    integer(kint), intent(in) :: vtxdist(:)
     !> [in] graph の CSR 圧縮形式の index 配列
-    integer(kint) :: index(:)
-    !> [in] graph の CSR 圧縮形式の item 配列
-    integer(kint) :: item(:)
+    integer(kint), intent(in) :: index(:)
+    !> [in,out] graph の CSR 圧縮形式の item 配列
+    integer(kint), intent(inout) :: item(:)
     !> [in] ノード重み
-    integer(kint), allocatable :: node_wgt(:,:)
+    integer(kint), allocatable, intent(in) :: node_wgt(:,:)
     !> [in] エッジ重み
-    integer(kint), allocatable :: edge_wgt(:,:)
+    integer(kint), allocatable, intent(in) :: edge_wgt(:,:)
     !> [in] 分割数
-    integer(kint) :: n_part
-    !> [in] 領域番号
-    integer(kint) :: part_id(:)
+    integer(kint), intent(in) :: n_part
+    !> [out] 領域番号
+    integer(kint), intent(out) :: part_id(:)
     !> [in] MPI コミュニケータ
-    integer(kint) :: comm
+    integer(kint), intent(in) :: comm
     integer(c_int) :: ncon, nz, nflag, wflag, i
     integer(c_int), pointer :: vtxdist_c(:) => null()
     integer(c_int), pointer :: index_c(:) => null()
