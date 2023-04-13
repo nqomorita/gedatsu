@@ -11,16 +11,16 @@ contains
   !> 単一メッシュ形式からコネクティビティグラフ形式に変換
   subroutine gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, index, item)
     implicit none
-    !> 要素数
-    integer(kint) :: n_elem
-    !> 要素を構成する節点数
-    integer(kint) :: n_base
-    !> 要素
-    integer(kint) :: elem(:,:)
-    !> コネクティビティグラフの index 配列
-    integer(kint), allocatable :: index(:)
-    !> コネクティビティグラフの item 配列
-    integer(kint), allocatable :: item(:)
+    !> [in] 要素数
+    integer(kint), intent(in) :: n_elem
+    !> [in] 要素を構成する形状関数の数
+    integer(kint), intent(in) :: n_base
+    !> [in] 要素コネクティビティ
+    integer(kint), intent(in) :: elem(:,:)
+    !> [out] コネクティビティグラフの index 配列
+    integer(kint), allocatable, intent(out) :: index(:)
+    !> [out] コネクティビティグラフの item 配列
+    integer(kint), allocatable, intent(out) :: item(:)
     integer(kint) :: i, j
 
     call monolis_alloc_I_1d(index, n_elem + 1)
@@ -43,17 +43,17 @@ contains
     & n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)
     use iso_c_binding
     implicit none
-    !> 節点数
-    integer(kint) :: n_node
-    !> 要素数
-    integer(kint) :: n_elem
-    !> コネクティビティグラフの index 配列
-    integer(kint) :: conn_index(:)
-    !> コネクティビティグラフの item 配列
-    integer(kint) :: conn_item(:)
-    !> 節点グラフの index 配列
-    integer(kint), allocatable :: nodal_index(:)
-    !> 節点グラフの item 配列
+    !> [in] 節点数
+    integer(kint), intent(in) :: n_node
+    !> [in] 要素数
+    integer(kint), intent(in) :: n_elem
+    !> [in] コネクティビティグラフの index 配列
+    integer(kint), intent(in) :: conn_index(:)
+    !> [in,out] コネクティビティグラフの item 配列
+    integer(kint), intent(inout) :: conn_item(:)
+    !> [out] 節点グラフの index 配列
+    integer(kint), allocatable, intent(out) :: nodal_index(:)
+    !> [out] 節点グラフの item 配列
     integer(kint), allocatable :: nodal_item(:)
     integer(kint) :: i, jS, jE, numflag
     integer(c_int), pointer :: index_c(:) => null()
@@ -129,12 +129,12 @@ contains
   !> 無向グラフの入力が前提のアルゴリズム
   subroutine gedatsu_check_connectivity_graph(node, conn, is_valid)
     implicit none
-    !> 節点グラフ
-    type(gedatsu_graph) :: node
-    !> コネクティビティグラフ
-    type(gedatsu_graph) :: conn
-    !> コネクティビティグラフの有効フラグ
-    logical :: is_valid
+    !> [in] 節点グラフ
+    type(gedatsu_graph), intent(in) :: node
+    !> [in] コネクティビティグラフ
+    type(gedatsu_graph), intent(in) :: conn
+    !> [out] コネクティビティグラフの有効フラグ
+    logical, intent(out) :: is_valid
     integer(kint) :: i, j, jS, jE, k, kS, kE, kn
     integer(kint) :: i1, i2
 
