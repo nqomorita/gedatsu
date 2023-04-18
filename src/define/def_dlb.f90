@@ -17,8 +17,8 @@ contains
   !> dlb 構造体の初期化関数
   subroutine gedatsu_dlb_initialize(dlb)
     implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
+    !> [out] dlb 構造体
+    type(gedatsu_dlb), intent(out) :: dlb
 
     dlb%should_update = .false.
   end subroutine gedatsu_dlb_initialize
@@ -27,8 +27,8 @@ contains
   !> dlb 構造体の初期化関数
   subroutine gedatsu_dlb_finalize(dlb)
     implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
+    !> [out] dlb 構造体
+    type(gedatsu_dlb), intent(out) :: dlb
 
     dlb%should_update = .false.
   end subroutine gedatsu_dlb_finalize
@@ -38,9 +38,9 @@ contains
   subroutine gedatsu_dlb_should_update(dlb, should_update)
     implicit none
     !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
+    type(gedatsu_dlb), intent(in) :: dlb
     !> [out] 負荷分散の実行判定
-    logical :: should_update
+    logical, intent(out) :: should_update
     should_update = dlb%should_update
   end subroutine gedatsu_dlb_should_update
 end module mod_gedatsu_dlb

@@ -13,9 +13,9 @@ contains
   subroutine gedatsu_graph_repartition(graph, COM)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] COM 構造体
-    type(monolis_COM) :: COM
+    type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_part
     integer(kint), allocatable :: vtxdist(:)
     integer(kint), allocatable :: vertex_id(:)
@@ -41,9 +41,9 @@ contains
   subroutine gedatsu_graph_repartition_with_weight(graph, COM)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] COM 構造体
-    type(monolis_COM) :: COM
+    type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_part
     integer(kint), allocatable :: vtxdist(:)
     integer(kint), allocatable :: vertex_id(:)

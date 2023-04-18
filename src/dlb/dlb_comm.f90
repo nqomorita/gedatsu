@@ -14,11 +14,11 @@ contains
   subroutine gedatsu_dlb_get_comm_table(dlb, graph, comm)
     implicit none
     !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
+    type(gedatsu_dlb), intent(in) :: dlb
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] MPI コミュニケータ
-    integer(kint) :: comm
+    integer(kint), intent(in) :: comm
     integer(kint) :: i, n_internal_vertex, n_move_vertex, my_rank
     integer(kint) :: n_neib_domain
     integer(kint), allocatable :: move_vertex_domain_id(:)

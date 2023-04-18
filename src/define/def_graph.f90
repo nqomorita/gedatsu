@@ -28,8 +28,8 @@ contains
   !> graph 構造体の初期化関数
   subroutine gedatsu_graph_initialize(graph)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [out] graph 構造体
+    type(gedatsu_graph), intent(out) :: graph
 
     graph%n_vertex = 0
 
@@ -48,8 +48,8 @@ contains
   !> graph 構造体の終了関数
   subroutine gedatsu_graph_finalize(graph)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [out] graph 構造体
+    type(gedatsu_graph), intent(out) :: graph
 
     graph%n_vertex = 0
 
@@ -68,7 +68,7 @@ contains
   subroutine gedatsu_graph_debug_write(graph)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
 
     write(*,*)"--- gedatsu_graph_debug_write"
     write(*,*)"graph%n_vertex"
@@ -88,7 +88,7 @@ contains
   subroutine gedatsu_std_log_string(string)
     implicit none
     !> [in] 出力ログ
-    character(*) :: string
+    character(*), intent(in) :: string
     write(*,"(a,a)")"** GEDATSU: ", trim(string)
   end subroutine gedatsu_std_log_string
 

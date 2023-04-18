@@ -20,12 +20,12 @@ contains
   !> グラフを分割する（節点重みなし）
   subroutine gedatsu_graph_partition(graph, n_domain, subgraphs)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] 分割数
-    integer(kint) :: n_domain
+    integer(kint), intent(in) :: n_domain
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph) :: subgraphs(:)
+    type(gedatsu_graph), intent(out) :: subgraphs(:)
 
     call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
 
@@ -40,16 +40,16 @@ contains
   !> グラフを分割する（節点重みあり）
   subroutine gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] 分割数
-    integer(kint) :: n_domain
+    integer(kint), intent(in) :: n_domain
     !> [in] ノード重み
-    integer(kint), allocatable :: node_wgt(:,:)
+    integer(kint), allocatable, intent(in) :: node_wgt(:,:)
     !> [in] エッジ重み
-    integer(kint), allocatable :: edge_wgt(:,:)
+    integer(kint), allocatable, intent(in) :: edge_wgt(:,:)
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph) :: subgraphs(:)
+    type(gedatsu_graph), intent(out) :: subgraphs(:)
 
     call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
 
@@ -66,11 +66,11 @@ contains
   subroutine gedatsu_check_vertex_domain_id(n_vertex, n_domain, vertex_domain_id)
     implicit none
     !> [in] ノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(in) :: n_vertex
     !> [in] 分割数
-    integer(kint) :: n_domain
-    !> [in] 領域分割番号
-    integer(kint) :: vertex_domain_id(:)
+    integer(kint), intent(in) :: n_domain
+    !> [in,out] 領域分割番号
+    integer(kint), intent(inout) :: vertex_domain_id(:)
     integer(kint) :: newlen
 
     call monolis_qsort_I_1d(vertex_domain_id, 1, n_vertex)
@@ -88,11 +88,11 @@ contains
   subroutine gedatsu_get_parted_graph(graph, n_domain, subgraphs)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 分割数
-    integer(kint) :: n_domain
+    integer(kint), intent(in) :: n_domain
     !> [out] 分割後の graph 構造体
-    type(gedatsu_graph) :: subgraphs(:)
+    type(gedatsu_graph), intent(out) :: subgraphs(:)
     integer(kint) :: i
 
     do i = 1, n_domain
@@ -107,11 +107,11 @@ contains
   subroutine gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
-    !> [out] 領域番号 domain_id に属する分割 graph 構造体
-    type(gedatsu_graph) :: subgraph
+    integer(kint), intent(in) :: domain_id
+    !> [in,out] 領域番号 domain_id に属する分割 graph 構造体
+    type(gedatsu_graph), intent(inout) :: subgraph
     integer(kint) :: n_vertex, n_edge
     integer(kint), allocatable :: edge(:,:)
 
@@ -146,11 +146,11 @@ contains
   subroutine gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
-    !> [out] 領域番号 domain_id に属する分割 graph 構造体
-    type(gedatsu_graph) :: subgraph
+    integer(kint), intent(in) :: domain_id
+    !> [in,out] 領域番号 domain_id に属する分割 graph 構造体
+    type(gedatsu_graph), intent(inout) :: subgraph
     integer(kint) :: n_vertex, n_edge
     integer(kint), allocatable :: OVL_vertex_id(:), edge(:,:)
 
@@ -180,13 +180,13 @@ contains
   subroutine gedatsu_com_get_comm_table_serial(graph, n_domain, subgraphs, com)
     implicit none
     !> [in] 全体グラフ
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域分割数
-    integer(kint) :: n_domain
+    integer(kint), intent(in) :: n_domain
     !> [in] 分割グラフ
-    type(gedatsu_graph) :: subgraphs(:)
+    type(gedatsu_graph), intent(in) :: subgraphs(:)
     !> [out] 分割領域に対応する com 構造体
-    type(monolis_COM) :: com(:)
+    type(monolis_COM), intent(out) :: com(:)
     !> 全ての外部節点番号（グローバル番号）
     integer(kint), allocatable :: outer_node_id_all_global(:)
     !> 全ての外部節点が属する領域番号
@@ -219,13 +219,13 @@ contains
   subroutine gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
     implicit none
     !> [in] 分割グラフ
-    type(gedatsu_graph) :: subgraphs(:)
+    type(gedatsu_graph), intent(in) :: subgraphs(:)
     !> [in] 領域分割数
-    integer(kint) :: n_domain
-    !> [in] 全ての外部節点番号
-    integer(kint), allocatable :: outer_node_id_all_global(:)
-    !> [in] 全ての外部節点配列の各領域に属する節点数
-    integer(kint), allocatable :: displs(:)
+    integer(kint), intent(in) :: n_domain
+    !> [out] 全ての外部節点番号
+    integer(kint), allocatable, intent(out) :: outer_node_id_all_global(:)
+    !> [out] 全ての外部節点配列の各領域に属する節点数
+    integer(kint), allocatable, intent(out) :: displs(:)
     integer(kint) :: i, j, in
 
     call monolis_alloc_I_1d(displs, n_domain + 1)
@@ -250,23 +250,23 @@ contains
   subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
     implicit none
     !> [in] 分割領域で利用される節点フラグ
-    integer(kint) :: is_used(:)
+    integer(kint), intent(in) :: is_used(:)
     !> [in] グローバルコネクティビティの要素数
-    integer(kint) :: g_n_vertex
+    integer(kint), intent(in) :: g_n_vertex
     !> [in] グローバルコネクティビティの index 配列
-    integer(kint) :: g_index(:)
+    integer(kint), intent(in) :: g_index(:)
     !> [in] グローバルコネクティビティの item 配列
-    integer(kint) :: g_item(:)
+    integer(kint), intent(in) :: g_item(:)
     !> [in] グローバルコネクティビティの id 配列
-    integer(kint) :: g_id(:)
+    integer(kint), intent(in) :: g_id(:)
     !> [out] ローカルコネクティビティの要素数
-    integer(kint) :: l_n_vertex
+    integer(kint), intent(out) :: l_n_vertex
     !> [out] ローカルコネクティビティの index 配列
-    integer(kint), allocatable :: l_index(:)
+    integer(kint), allocatable, intent(out) :: l_index(:)
     !> [out] ローカルコネクティビティの item 配列
-    integer(kint), allocatable :: l_item(:)
+    integer(kint), allocatable, intent(out) :: l_item(:)
     !> [out] ローカルコネクティビティの id 配列
-    integer(kint), allocatable :: l_id(:)
+    integer(kint), allocatable, intent(out) :: l_id(:)
     integer(kint) :: i, j, jS, jE, in, n_conn
 
     l_n_vertex = 0

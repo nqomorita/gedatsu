@@ -27,10 +27,10 @@ contains
   !> @details 既にノードが設定されている場合はエラー終了する。
   subroutine gedatsu_graph_set_n_vertex(graph, n_vertex)
     implicit none
-    !> [inout] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(in) :: n_vertex
 
     if(graph%n_vertex > 0)then
       call monolis_std_error_string("gedatsu_graph_set_n_vertex")
@@ -56,10 +56,10 @@ contains
   !> @details 追加されたノードに対応する節点番号、領域番号は 0 初期化される。
   subroutine gedatsu_graph_add_n_vertex(graph, n_vertex_add)
     implicit none
-    !> [inout] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] グラフに追加するノード数
-    integer(kint) :: n_vertex_add
+    integer(kint), intent(in) :: n_vertex_add
     integer(kint) :: n_vertex_all
 
     if(n_vertex_add < 1)then
@@ -82,12 +82,12 @@ contains
   !> @details 追加されたノードに対応する節点番号は引数で初期化され、領域番号は 0 初期化される。
   subroutine gedatsu_graph_add_n_vertex_with_vertex_id(graph, n_vertex_add, vertex_id)
     implicit none
-    !> [inout] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] グラフに追加するノード数
-    integer(kint) :: n_vertex_add
+    integer(kint), intent(in) :: n_vertex_add
     !> [in] グラフに追加するノードに対応する節点番号
-    integer(kint) :: vertex_id(:)
+    integer(kint), intent(in) :: vertex_id(:)
     integer(kint) :: n_vertex_all, i
 
     if(n_vertex_add < 1)then
@@ -121,9 +121,9 @@ contains
   subroutine gedatsu_graph_get_n_vertex(graph, n_vertex)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [out] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(out) :: n_vertex
     n_vertex = graph%n_vertex
   end subroutine gedatsu_graph_get_n_vertex
 
@@ -132,11 +132,11 @@ contains
   subroutine gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(out) :: n_vertex
     integer(kint) :: i
 
     n_vertex = 0
@@ -150,11 +150,11 @@ contains
   subroutine gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフのノード数
-    integer(kint) :: n_vertex
+    integer(kint), intent(out) :: n_vertex
     integer(kint) :: i, j, jS, jE, nid
     integer(kint), allocatable :: is_used(:)
 
@@ -183,11 +183,11 @@ contains
   subroutine gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] 領域番号 domain_id に属する節点番号
-    integer(kint) :: ids(:)
+    integer(kint), intent(out) :: ids(:)
     integer(kint) :: i, n_vertex
 
     n_vertex = 0
@@ -204,11 +204,11 @@ contains
   subroutine gedatsu_graph_get_vertex_id_in_overlap_region(graph, domain_id, ids)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] 領域番号 domain_id に属する節点番号
-    integer(kint) :: ids(:)
+    integer(kint), intent(out) :: ids(:)
     integer(kint) :: n_vertex
     integer(kint) :: i, j, jS, jE, nid
     integer(kint), allocatable :: is_used(:)
@@ -241,9 +241,9 @@ contains
   subroutine gedatsu_graph_get_n_edge(graph, n_edge)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [out] グラフのエッジ数
-    integer(kint) :: n_edge
+    integer(kint), intent(out) :: n_edge
     n_edge = graph%index(graph%n_vertex + 1)
   end subroutine gedatsu_graph_get_n_edge
 
@@ -252,11 +252,11 @@ contains
   subroutine gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフのエッジ数
-    integer(kint) :: n_edge
+    integer(kint), intent(out) :: n_edge
     integer(kint) :: i, j, jS, jE, nid
 
     n_edge = 0
@@ -276,11 +276,11 @@ contains
   subroutine gedatsu_graph_get_n_edge_in_overlap_region(graph, domain_id, n_edge)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフのエッジ数
-    integer(kint) :: n_edge
+    integer(kint), intent(out) :: n_edge
     integer(kint) :: i, j, jS, jE, nid
 
     n_edge = 0
@@ -302,11 +302,11 @@ contains
   subroutine gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフのエッジ配列
-    integer(kint) :: edge(:,:)
+    integer(kint), intent(out) :: edge(:,:)
 
     integer(kint) :: i, nid, idx, j, jS, jE
     integer(kint) :: n_vertex, n_edge, e1, e2
@@ -351,11 +351,11 @@ contains
   subroutine gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
     implicit none
     !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph), intent(in) :: graph
     !> [in] 領域番号
-    integer(kint) :: domain_id
+    integer(kint), intent(in) :: domain_id
     !> [out] グラフエッジ
-    integer(kint) :: edge(:,:)
+    integer(kint), intent(out) :: edge(:,:)
     integer(kint) :: i, j, jS, jE, nid, idx1, idx2
     integer(kint) :: n_edge, n1, n2, n_vertex
     integer(kint), allocatable :: ids(:)
@@ -406,12 +406,12 @@ contains
   !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。
   subroutine gedatsu_graph_set_edge(graph, n_edge, edge)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] グラフのエッジ数
-    integer(kint) :: n_edge
+    integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
-    integer(kint) :: edge(:,:)
+    integer(kint), intent(in) :: edge(:,:)
     integer(kint) :: i, e1, e2, jS, jE, in
     integer(kint), allocatable :: temp(:,:)
 
@@ -467,12 +467,12 @@ contains
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
   subroutine gedatsu_graph_add_edge(graph, n_edge, edge)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] グラフのエッジ数
-    integer(kint) :: n_edge
+    integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
-    integer(kint) :: edge(:,:)
+    integer(kint), intent(in) :: edge(:,:)
     integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
     integer(kint), allocatable :: edge_all(:,:)
 
