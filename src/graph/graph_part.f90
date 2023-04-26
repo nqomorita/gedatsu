@@ -202,7 +202,7 @@ contains
     integer(kint), allocatable :: outer_domain_id_all(:)
     !> 全ての外部節点配列の各領域に属する節点数
     integer(kint), allocatable :: displs(:)
-    integer(kint) :: i
+    integer(kint) :: i, n_domain_i
     type(monolis_comm_node_list), allocatable :: recv_list(:)
 
     call gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
@@ -213,7 +213,8 @@ contains
     allocate(recv_list(n_domain))
 
     do i = 1, n_domain
-      call monolis_comm_get_recv_serial(n_domain, i - 1, subgraphs(i)%n_internal_vertex, &
+      n_domain_i = i - 1
+      call monolis_comm_get_recv_serial(n_domain, n_domain_i, subgraphs(i)%n_internal_vertex, &
         & outer_node_id_all_global, outer_domain_id_all, displs, com(i), recv_list)
     enddo
 
