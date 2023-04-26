@@ -27,7 +27,9 @@ contains
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), intent(out) :: subgraphs(:)
 
-    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    if(.not. allocated(graph%vertex_domain_id))then
+      call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    endif
 
     call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
 
@@ -51,7 +53,9 @@ contains
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), intent(out) :: subgraphs(:)
 
-    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    if(.not. allocated(graph%vertex_domain_id))then
+      call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    endif
 
     call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
       & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
@@ -70,12 +74,17 @@ contains
     !> [in] 分割数
     integer(kint), intent(in) :: n_domain
     !> [in,out] 領域分割番号
-    integer(kint), intent(inout) :: vertex_domain_id(:)
+    integer(kint), intent(in) :: vertex_domain_id(:)
     integer(kint) :: newlen
+    integer(kint), allocatable :: temp(:)
 
-    call monolis_qsort_I_1d(vertex_domain_id, 1, n_vertex)
+    call monolis_alloc_I_1d(temp, n_vertex)
 
-    call monolis_get_uniq_array_I(vertex_domain_id, n_vertex, newlen)
+    temp = vertex_domain_id
+
+    call monolis_qsort_I_1d(temp, 1, n_vertex)
+
+    call monolis_get_uniq_array_I(temp, n_vertex, newlen)
 
     if(newlen /= n_domain)then
       call monolis_std_error_string("gedatsu_check_vertex_domain_id")

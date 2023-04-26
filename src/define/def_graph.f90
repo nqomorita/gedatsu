@@ -48,8 +48,8 @@ contains
   !> graph 構造体の終了関数
   subroutine gedatsu_graph_finalize(graph)
     implicit none
-    !> [out] graph 構造体
-    type(gedatsu_graph), intent(out) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
 
     graph%n_vertex = 0
 

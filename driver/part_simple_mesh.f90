@@ -112,6 +112,9 @@ contains
         local_conn_graph%item(j) = perm(idx)
       enddo
 
+      call monolis_dealloc_I_1d(perm)
+      call monolis_dealloc_I_1d(conn_graph%vertex_id)
+
       if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
 
       call monolis_alloc_I_2d(local_elem, n_base, local_conn_graph%n_vertex)

@@ -58,8 +58,8 @@ contains
 
     call gedatsu_graph_partition(graph, n_domain, subgraphs)
 
-    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 2)
-    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 5)
+    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 4)
 !    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 2", subgraph%n_internal_vertex, 2)
 !    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 3", subgraph%vertex_id(1), 1)
 !    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 4", subgraph%vertex_id(2), 2)

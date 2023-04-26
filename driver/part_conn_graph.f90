@@ -104,6 +104,8 @@ program gedatsu_connectivity_graph_partitioner
       local_conn_graph%item(j) = perm(idx)
     enddo
 
+    call monolis_dealloc_I_1d(perm)
+
     if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
     if(.not. is_1_origin) id1 = id1 - 1
 
