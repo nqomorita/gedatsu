@@ -80,7 +80,7 @@ program gedatsu_bc_partitioner_R
       if(idx > 0) n_bc_local = n_bc_local + 1
     enddo
 
-    call monolis_alloc_I_2d(i_bc_local, n_dof, n_bc_local)
+    call monolis_alloc_I_2d(i_bc_local, n_dof + 1, n_bc_local)
     call monolis_alloc_R_1d(r_bc_local, n_bc_local)
 
     n_bc_local = 0
