@@ -56,7 +56,7 @@ program gedatsu_bc_partitioner_R
   allocate(graph(n_domain))
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname)//".id", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fidname)//".id", i - 1)
     call monolis_input_global_id(foname_full, graph(i)%n_vertex, graph(i)%vertex_id)
   enddo
 
@@ -95,7 +95,7 @@ program gedatsu_bc_partitioner_R
       endif
     enddo
 
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame), i - 1)
     call monolis_output_bc_R(foname_full, n_bc_local, n_dof, i_bc_local, r_bc_local)
 
     call monolis_dealloc_I_1d(graph(i)%vertex_id)

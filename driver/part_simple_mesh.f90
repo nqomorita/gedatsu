@@ -125,7 +125,7 @@ contains
         enddo
       enddo
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fiename), i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename), i - 1)
       call monolis_output_elem(foname_full, local_conn_graph%n_vertex, n_base, local_elem)
 
       call monolis_dealloc_I_1d(id1)
@@ -134,7 +134,7 @@ contains
       !> global vertex_id
       if(.not. is_1_origin) local_conn_graph%vertex_id = local_conn_graph%vertex_id - 1
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fiename)//".id", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename)//".id", i - 1)
       call monolis_output_global_id(foname_full, local_conn_graph%n_vertex, local_conn_graph%vertex_id)
 
       call gedatsu_graph_finalize(local_conn_graph)
@@ -179,25 +179,25 @@ contains
         local_node(:,j) = node(:,in)
       enddo
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname), i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname), i - 1)
       call monolis_output_node(foname_full, subgraphs(i)%n_vertex, local_node)
 
       !> internal n_vertex
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".n_internal", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".n_internal", i - 1)
       call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
       !> global vertex_id
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".id", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".id", i - 1)
       call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 
       !> send
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".send", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".send", i - 1)
       call monolis_output_send_com_table(foname_full, com(i))
 
       !> recv
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".recv", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".recv", i - 1)
       call monolis_output_recv_com_table(foname_full, com(i))
 
       call monolis_dealloc_I_1d(id1)
