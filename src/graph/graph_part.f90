@@ -257,10 +257,13 @@ contains
 
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
-  subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
+  subroutine gedatsu_get_parted_connectivity_main(is_used, is_internal, &
+    & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
     implicit none
-    !> [in] 分割領域で利用される節点フラグ
+    !> [in] 分割領域で利用される節点のフラグ
     integer(kint), intent(in) :: is_used(:)
+    !> [in] 分割領域で利用される内部節点のフラグ
+    integer(kint), intent(in) :: is_internal(:)
     !> [in] グローバルコネクティビティの要素数
     integer(kint), intent(in) :: g_n_vertex
     !> [in] グローバルコネクティビティの index 配列
@@ -278,10 +281,12 @@ contains
     !> [out] ローカルコネクティビティの id 配列
     integer(kint), allocatable, intent(out) :: l_id(:)
     integer(kint) :: i, j, jS, jE, in, n_conn
+    logical :: flag
 
     l_n_vertex = 0
     n_conn = 0
 
+    !! 要素数と節点数を数える
     aa:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
@@ -302,12 +307,13 @@ contains
     l_n_vertex = 0
     n_conn = 0
 
+    !! 内部要素の取得
     bb:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
       do j = jS, jE
         in = g_item(j)
-        if(is_used(in) == 0) cycle bb
+        if(is_internal(in) == 0) cycle bb
       enddo
       do j = jS, jE
         n_conn = n_conn + 1
@@ -317,5 +323,25 @@ contains
       l_index(l_n_vertex + 1) = n_conn
       l_id(l_n_vertex) = g_id(i)
     enddo bb
+
+    !! 境界要素の取得
+    cc:do i = 1, g_n_vertex
+      jS = g_index(i) + 1
+      jE = g_index(i + 1)
+      flag = .false.
+      do j = jS, jE
+        in = g_item(j)
+        if(is_used(in) == 0) cycle cc
+        if(is_internal(in) == 0) flag = .true.
+      enddo
+      if(.not. flag) cycle cc
+      do j = jS, jE
+        n_conn = n_conn + 1
+        l_item(n_conn) = g_item(j)
+      enddo
+      l_n_vertex = l_n_vertex + 1
+      l_index(l_n_vertex + 1) = n_conn
+      l_id(l_n_vertex) = g_id(i)
+    enddo cc
   end subroutine gedatsu_get_parted_connectivity_main
 end module mod_gedatsu_graph_part
