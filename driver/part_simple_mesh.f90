@@ -72,8 +72,7 @@ contains
     character(monolis_charlen) :: foname_full
     logical :: is_valid
     integer(kint), allocatable :: id1(:)
-    integer(kint), allocatable :: is_used(:)
-    integer(kint), allocatable :: is_internal(:)
+    integer(kint), allocatable :: domain_id(:)
     integer(kint), allocatable :: perm(:)
     integer(kint), allocatable :: local_elem(:,:)
 
@@ -84,28 +83,25 @@ contains
       stop monolis_fail
     endif
 
-    call monolis_alloc_I_1d(is_used, node_graph%n_vertex)
-    call monolis_alloc_I_1d(is_internal, node_graph%n_vertex)
+    call monolis_alloc_I_1d(domain_id, node_graph%n_vertex)
+
+    !> get domain id array
+    do i = 1, n_domain
+      do j = 1, subgraphs(i)%n_internal_vertex
+        in = subgraphs(i)%vertex_id(j)
+        if(.not. is_1_origin) in = in + 1
+        domain_id(in) = i
+      enddo
+    enddo
+    domain_id = domain_id - 1
 
     do i = 1, n_domain
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id + 1
 
-      is_used = 0
-      do j = 1, subgraphs(i)%n_vertex
-        in = subgraphs(i)%vertex_id(j)
-        is_used(in) = 1
-      enddo
-
-      is_internal = 0
-      do j = 1, subgraphs(i)%n_internal_vertex
-        in = subgraphs(i)%vertex_id(j)
-        is_internal(in) = 1
-      enddo
-
       call monolis_alloc_I_1d(conn_graph%vertex_id, conn_graph%n_vertex)
       call monolis_get_sequence_array_I(conn_graph%vertex_id, conn_graph%n_vertex, 1, 1)
 
-      call gedatsu_get_parted_connectivity_main(is_used, is_internal, &
+      call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
         & conn_graph%n_vertex, conn_graph%index, conn_graph%item, conn_graph%vertex_id, &
         & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
         & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)

@@ -257,13 +257,13 @@ contains
 
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
-  subroutine gedatsu_get_parted_connectivity_main(is_used, is_internal, &
+  subroutine gedatsu_get_parted_connectivity_main(id, domain_id, &
     & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_n_internal_vertex, l_index, l_item, l_id)
     implicit none
-    !> [in] 分割領域で利用される節点のフラグ
-    integer(kint), intent(in) :: is_used(:)
-    !> [in] 分割領域で利用される内部節点のフラグ
-    integer(kint), intent(in) :: is_internal(:)
+    !> [in] 取得する分割番号
+    integer(kint), intent(in) :: id
+    !> [in] 節点が所属する領域番号配列
+    integer(kint), intent(in) :: domain_id(:)
     !> [in] グローバルコネクティビティの要素数
     integer(kint), intent(in) :: g_n_vertex
     !> [in] グローバルコネクティビティの index 配列
@@ -283,7 +283,7 @@ contains
     !> [out] ローカルコネクティビティの id 配列
     integer(kint), allocatable, intent(out) :: l_id(:)
     integer(kint) :: i, j, jS, jE, in, n_conn
-    logical :: flag
+    logical :: is_inner, is_outer
 
     l_n_vertex = 0
     n_conn = 0
@@ -292,10 +292,12 @@ contains
     aa:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
+      is_inner = .false.
       do j = jS, jE
         in = g_item(j)
-        if(is_used(in) == 0) cycle aa
+        if(domain_id(in) == id) is_inner = .true.
       enddo
+      if(.not. is_inner) cycle aa
       do j = jS, jE
         n_conn = n_conn + 1
       enddo
@@ -314,10 +316,15 @@ contains
     bb:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
+      is_inner = .false.
+      is_outer = .false.
       do j = jS, jE
         in = g_item(j)
-        if(is_internal(in) == 0) cycle bb
+        if(domain_id(in) == id) is_inner = .true.
+        if(domain_id(in) /= id) is_outer = .true.
       enddo
+      if(.not. is_inner) cycle bb
+      if(is_outer) cycle bb
       do j = jS, jE
         n_conn = n_conn + 1
         l_item(n_conn) = g_item(j)
@@ -332,13 +339,15 @@ contains
     cc:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
-      flag = .false.
+      is_inner = .false.
+      is_outer = .false.
       do j = jS, jE
         in = g_item(j)
-        if(is_used(in) == 0) cycle cc
-        if(is_internal(in) == 0) flag = .true.
+        if(domain_id(in) == id) is_inner = .true.
+        if(domain_id(in) /= id) is_outer = .true.
       enddo
-      if(.not. flag) cycle cc
+      if(.not. is_inner) cycle cc
+      if(.not. is_outer) cycle cc
       do j = jS, jE
         n_conn = n_conn + 1
         l_item(n_conn) = g_item(j)

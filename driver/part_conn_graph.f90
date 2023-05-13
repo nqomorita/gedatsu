@@ -10,7 +10,7 @@ program gedatsu_connectivity_graph_partitioner
   character(monolis_charlen) :: finame, dirname, foname_full
   character(monolis_charlen) :: finname
   logical :: is_get, is_valid, is_1_origin
-  integer(kint), allocatable :: is_used(:), is_internal(:), id1(:), perm(:)
+  integer(kint), allocatable :: domain_id(:), id1(:), perm(:)
 
   call monolis_mpi_initialize()
 
@@ -72,8 +72,25 @@ program gedatsu_connectivity_graph_partitioner
     stop monolis_fail
   endif
 
-  call monolis_alloc_I_1d(is_used, global_node_graph%n_vertex)
-  call monolis_alloc_I_1d(is_internal, global_node_graph%n_vertex)
+  call monolis_alloc_I_1d(domain_id, global_node_graph%n_vertex)
+
+  !> get domain id array
+  do i = 1, n_domain
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".id", i - 1)
+    call monolis_input_global_id(foname_full, local_node_graph%n_vertex, local_node_graph%vertex_id)
+
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".n_internal", i - 1)
+    call monolis_input_internal_vertex_number(foname_full, local_node_graph%n_internal_vertex)
+
+    if(.not. is_1_origin) local_node_graph%vertex_id = local_node_graph%vertex_id + 1
+
+    do j = 1, local_node_graph%n_internal_vertex
+      in = local_node_graph%vertex_id(j)
+      domain_id(in) = i
+    enddo
+    call monolis_dealloc_I_1d(local_node_graph%vertex_id)
+  enddo
+  domain_id = domain_id - 1
 
   do i = 1, n_domain
     foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".id", i - 1)
@@ -84,19 +101,7 @@ program gedatsu_connectivity_graph_partitioner
 
     if(.not. is_1_origin) local_node_graph%vertex_id = local_node_graph%vertex_id + 1
 
-    is_used = 0
-    do j = 1, local_node_graph%n_vertex
-      in = local_node_graph%vertex_id(j)
-      is_used(in) = 1
-    enddo
-
-    is_internal = 0
-    do j = 1, local_node_graph%n_internal_vertex
-      in = local_node_graph%vertex_id(j)
-      is_internal(in) = 1
-    enddo
-
-    call gedatsu_get_parted_connectivity_main(is_used, is_internal, &
+    call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
       & global_conn_graph%n_vertex, global_conn_graph%index, global_conn_graph%item, global_conn_graph%vertex_id, &
       & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
       & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
