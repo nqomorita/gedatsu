@@ -107,7 +107,8 @@ contains
 
       call gedatsu_get_parted_connectivity_main(is_used, is_internal, &
         & conn_graph%n_vertex, conn_graph%index, conn_graph%item, conn_graph%vertex_id, &
-        & local_conn_graph%n_vertex, local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
+        & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
+        & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
 
       !> graph.dat
       call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)
@@ -146,7 +147,7 @@ contains
       call monolis_output_global_id(foname_full, local_conn_graph%n_vertex, local_conn_graph%vertex_id)
 
       !> internal n_vertex
-      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".n_internal", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename)//".n_internal", i - 1)
       call monolis_output_internal_vertex_number(foname_full, local_conn_graph%n_internal_vertex)
 
       call gedatsu_graph_finalize(local_conn_graph)

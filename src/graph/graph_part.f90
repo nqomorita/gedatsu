@@ -258,7 +258,7 @@ contains
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
   subroutine gedatsu_get_parted_connectivity_main(is_used, is_internal, &
-    & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
+    & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_n_internal_vertex, l_index, l_item, l_id)
     implicit none
     !> [in] 分割領域で利用される節点のフラグ
     integer(kint), intent(in) :: is_used(:)
@@ -274,6 +274,8 @@ contains
     integer(kint), intent(in) :: g_id(:)
     !> [out] ローカルコネクティビティの要素数
     integer(kint), intent(out) :: l_n_vertex
+    !> [out] ローカルコネクティビティの内部要素数
+    integer(kint), intent(out) :: l_n_internal_vertex
     !> [out] ローカルコネクティビティの index 配列
     integer(kint), allocatable, intent(out) :: l_index(:)
     !> [out] ローカルコネクティビティの item 配列
@@ -305,6 +307,7 @@ contains
     call monolis_alloc_I_1d(l_item, n_conn)
 
     l_n_vertex = 0
+    l_n_internal_vertex = 0
     n_conn = 0
 
     !! 内部要素の取得
@@ -320,6 +323,7 @@ contains
         l_item(n_conn) = g_item(j)
       enddo
       l_n_vertex = l_n_vertex + 1
+      l_n_internal_vertex = l_n_internal_vertex + 1
       l_index(l_n_vertex + 1) = n_conn
       l_id(l_n_vertex) = g_id(i)
     enddo bb
