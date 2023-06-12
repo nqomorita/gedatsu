@@ -21,9 +21,6 @@ module mod_gedatsu
   !> @defgroup graph_basic グラフデータ処理関数群（基本関数）
   !> 基本的なグラフデータ処理に関連する関数グループ
 
-  !> @defgroup graph_weight グラフデータ処理関数群（グラフ重み関数）
-  !> グラフ重み処理に関連する関数グループ
-
   !> @defgroup graph_conv グラフデータ処理関数群（グラフデータ変換関数）
   !> グラフデータ変換に関連する関数グループ
 
@@ -38,4 +35,7 @@ module mod_gedatsu
 
   !> @defgroup dev_graph_part 開発者用：グラフデータ処理関数群（グラフ分割関数）
   !> グラフ分割に関連する関数グループ（開発者用）
+
+  !> @defgroup dev_graph 開発者用関数
+  !> 開発者用関数群
 end module mod_gedatsu

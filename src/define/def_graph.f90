@@ -64,6 +64,7 @@ contains
     call monolis_dealloc_I_1d(graph%item)
   end subroutine gedatsu_graph_finalize
 
+  !> @ingroup dev_graph
   !> graph 構造体のデバッグ用データ書き出し
   subroutine gedatsu_graph_debug_write(graph)
     implicit none
@@ -83,7 +84,7 @@ contains
     write(*,*)graph%item
   end subroutine gedatsu_graph_debug_write
 
-  !> @ingroup dev_error
+  !> @ingroup dev_graph
   !> 通常ログ出力関数
   subroutine gedatsu_std_log_string(string)
     implicit none
