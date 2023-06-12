@@ -4,7 +4,8 @@
 
 ## manual
 
-- [doxygen manual](https://morita.gitlab.io/gedatsu/)
+- [doxygen manual (fortran)](https://morita.gitlab.io/gedatsu/fortran/)
+- [doxygen manual (C lang)](https://morita.gitlab.io/gedatsu/c/)
 
 ## license
 
