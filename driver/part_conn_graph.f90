@@ -36,8 +36,16 @@ program gedatsu_connectivity_graph_partitioner
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_connectivity_graph_partitioner {options} -n {number of domains}"
+    write(*,"(a)")""
+    write(*,"(a)")"-n {number of domains}: (default) 1"
+    write(*,"(a)")"-i {input connectivity graph filename}: (default) connectivity.dat"
+    write(*,"(a)")"-ig {input nodal graph filename}: (default) graph.dat"
+    write(*,"(a)")"-o {output connectivity graph filename}: (default) connectivity.dat.{domain_id}"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h : help"
     stop monolis_fail
   endif
 

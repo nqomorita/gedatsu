@@ -33,9 +33,14 @@ program gedatsu_partitioner_simple_mesh
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_convertor_simple_mesh2graph {options} -n {number of domains}"
-    stop monolis_fail
+    write(*,"(a)")""
+    write(*,"(a)")"-in {input node filename}: (default) node.dat"
+    write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h  : help"
   endif
 
   if(n_domain <= 1) stop

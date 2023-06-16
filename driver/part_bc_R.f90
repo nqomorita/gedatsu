@@ -35,8 +35,16 @@ program gedatsu_bc_partitioner_R
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_bc_partitioner {options} -n {number of domains}"
+    write(*,"(a)")"- output filename: {input filename}.{domain_id}"
+    write(*,"(a)")""
+    write(*,"(a)")"-n {number of domains}: (default) 1"
+    write(*,"(a)")"-i {input filename}: (default) bc.dat"
+    write(*,"(a)")"-ig {input graph filename}: (default) graph.dat"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h : help"
     stop monolis_fail
   endif
 
