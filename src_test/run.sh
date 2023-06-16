@@ -88,9 +88,9 @@ mv parted.0 parted.0.c
 
 ./gedatsu_test | tee test_list.dat
 
-rm -r parted.0.f
+#rm -r parted.0.f
 
-rm -r parted.0.c
+#rm -r parted.0.c
 
 rm graph.dat
 

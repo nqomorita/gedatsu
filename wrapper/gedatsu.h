@@ -8,6 +8,11 @@ extern "C" {
 
 #include "gedatsu_graph_convert_c.h"
 
+/**
+ * @defgroup graph_conv グラフデータ処理関数群（グラフデータ変換関数）
+ * グラフデータ変換に関連する関数グループ
+*/
+
 #ifdef __cplusplus
 }
 #endif

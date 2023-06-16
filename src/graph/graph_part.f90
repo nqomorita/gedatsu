@@ -27,7 +27,9 @@ contains
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), intent(out) :: subgraphs(:)
 
-    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    if(.not. allocated(graph%vertex_domain_id))then
+      call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    endif
 
     call gedatsu_part_graph_metis(graph%n_vertex, graph%index, graph%item, n_domain, graph%vertex_domain_id)
 
@@ -51,7 +53,9 @@ contains
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), intent(out) :: subgraphs(:)
 
-    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    if(.not. allocated(graph%vertex_domain_id))then
+      call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    endif
 
     call gedatsu_part_graph_metis_with_weight(graph%n_vertex, graph%index, graph%item, &
       & node_wgt, edge_wgt, n_domain, graph%vertex_domain_id)
@@ -70,12 +74,17 @@ contains
     !> [in] 分割数
     integer(kint), intent(in) :: n_domain
     !> [in,out] 領域分割番号
-    integer(kint), intent(inout) :: vertex_domain_id(:)
+    integer(kint), intent(in) :: vertex_domain_id(:)
     integer(kint) :: newlen
+    integer(kint), allocatable :: temp(:)
 
-    call monolis_qsort_I_1d(vertex_domain_id, 1, n_vertex)
+    call monolis_alloc_I_1d(temp, n_vertex)
 
-    call monolis_get_uniq_array_I(vertex_domain_id, n_vertex, newlen)
+    temp = vertex_domain_id
+
+    call monolis_qsort_I_1d(temp, 1, n_vertex)
+
+    call monolis_get_uniq_array_I(temp, n_vertex, newlen)
 
     if(newlen /= n_domain)then
       call monolis_std_error_string("gedatsu_check_vertex_domain_id")
@@ -193,7 +202,7 @@ contains
     integer(kint), allocatable :: outer_domain_id_all(:)
     !> 全ての外部節点配列の各領域に属する節点数
     integer(kint), allocatable :: displs(:)
-    integer(kint) :: i
+    integer(kint) :: i, n_domain_i
     type(monolis_comm_node_list), allocatable :: recv_list(:)
 
     call gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
@@ -204,7 +213,8 @@ contains
     allocate(recv_list(n_domain))
 
     do i = 1, n_domain
-      call monolis_comm_get_recv_serial(n_domain, i - 1, subgraphs(i)%n_internal_vertex, &
+      n_domain_i = i - 1
+      call monolis_comm_get_recv_serial(n_domain, n_domain_i, subgraphs(i)%n_internal_vertex, &
         & outer_node_id_all_global, outer_domain_id_all, displs, com(i), recv_list)
     enddo
 
@@ -247,10 +257,13 @@ contains
 
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
-  subroutine gedatsu_get_parted_connectivity_main(is_used, g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_index, l_item, l_id)
+  subroutine gedatsu_get_parted_connectivity_main(id, domain_id, &
+    & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_n_internal_vertex, l_index, l_item, l_id)
     implicit none
-    !> [in] 分割領域で利用される節点フラグ
-    integer(kint), intent(in) :: is_used(:)
+    !> [in] 取得する分割番号
+    integer(kint), intent(in) :: id
+    !> [in] 節点が所属する領域番号配列
+    integer(kint), intent(in) :: domain_id(:)
     !> [in] グローバルコネクティビティの要素数
     integer(kint), intent(in) :: g_n_vertex
     !> [in] グローバルコネクティビティの index 配列
@@ -261,6 +274,8 @@ contains
     integer(kint), intent(in) :: g_id(:)
     !> [out] ローカルコネクティビティの要素数
     integer(kint), intent(out) :: l_n_vertex
+    !> [out] ローカルコネクティビティの内部要素数
+    integer(kint), intent(out) :: l_n_internal_vertex
     !> [out] ローカルコネクティビティの index 配列
     integer(kint), allocatable, intent(out) :: l_index(:)
     !> [out] ローカルコネクティビティの item 配列
@@ -268,17 +283,21 @@ contains
     !> [out] ローカルコネクティビティの id 配列
     integer(kint), allocatable, intent(out) :: l_id(:)
     integer(kint) :: i, j, jS, jE, in, n_conn
+    logical :: is_inner, is_outer
 
     l_n_vertex = 0
     n_conn = 0
 
+    !! 要素数と節点数を数える
     aa:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
+      is_inner = .false.
       do j = jS, jE
         in = g_item(j)
-        if(is_used(in) == 0) cycle aa
+        if(domain_id(in) == id) is_inner = .true.
       enddo
+      if(.not. is_inner) cycle aa
       do j = jS, jE
         n_conn = n_conn + 1
       enddo
@@ -290,15 +309,45 @@ contains
     call monolis_alloc_I_1d(l_item, n_conn)
 
     l_n_vertex = 0
+    l_n_internal_vertex = 0
     n_conn = 0
 
+    !! 内部要素の取得
     bb:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
+      is_inner = .false.
+      is_outer = .false.
       do j = jS, jE
         in = g_item(j)
-        if(is_used(in) == 0) cycle bb
+        if(domain_id(in) == id) is_inner = .true.
+        if(domain_id(in) /= id) is_outer = .true.
       enddo
+      if(.not. is_inner) cycle bb
+      if(is_outer) cycle bb
+      do j = jS, jE
+        n_conn = n_conn + 1
+        l_item(n_conn) = g_item(j)
+      enddo
+      l_n_vertex = l_n_vertex + 1
+      l_n_internal_vertex = l_n_internal_vertex + 1
+      l_index(l_n_vertex + 1) = n_conn
+      l_id(l_n_vertex) = g_id(i)
+    enddo bb
+
+    !! 境界要素の取得
+    cc:do i = 1, g_n_vertex
+      jS = g_index(i) + 1
+      jE = g_index(i + 1)
+      is_inner = .false.
+      is_outer = .false.
+      do j = jS, jE
+        in = g_item(j)
+        if(domain_id(in) == id) is_inner = .true.
+        if(domain_id(in) /= id) is_outer = .true.
+      enddo
+      if(.not. is_inner) cycle cc
+      if(.not. is_outer) cycle cc
       do j = jS, jE
         n_conn = n_conn + 1
         l_item(n_conn) = g_item(j)
@@ -306,6 +355,6 @@ contains
       l_n_vertex = l_n_vertex + 1
       l_index(l_n_vertex + 1) = n_conn
       l_id(l_n_vertex) = g_id(i)
-    enddo bb
+    enddo cc
   end subroutine gedatsu_get_parted_connectivity_main
 end module mod_gedatsu_graph_part

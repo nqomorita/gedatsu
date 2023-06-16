@@ -35,8 +35,16 @@ program gedatsu_bc_partitioner_R
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_bc_partitioner {options} -n {number of domains}"
+    write(*,"(a)")"- output filename: {input filename}.{domain_id}"
+    write(*,"(a)")""
+    write(*,"(a)")"-n {number of domains}: (default) 1"
+    write(*,"(a)")"-i {input filename}: (default) bc.dat"
+    write(*,"(a)")"-ig {input graph filename}: (default) graph.dat"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h : help"
     stop monolis_fail
   endif
 
@@ -56,7 +64,7 @@ program gedatsu_bc_partitioner_R
   allocate(graph(n_domain))
 
   do i = 1, n_domain
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fidname)//".id", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fidname)//".id", i - 1)
     call monolis_input_global_id(foname_full, graph(i)%n_vertex, graph(i)%vertex_id)
   enddo
 
@@ -80,7 +88,7 @@ program gedatsu_bc_partitioner_R
       if(idx > 0) n_bc_local = n_bc_local + 1
     enddo
 
-    call monolis_alloc_I_2d(i_bc_local, n_dof, n_bc_local)
+    call monolis_alloc_I_2d(i_bc_local, n_dof + 1, n_bc_local)
     call monolis_alloc_R_1d(r_bc_local, n_bc_local)
 
     n_bc_local = 0
@@ -95,7 +103,7 @@ program gedatsu_bc_partitioner_R
       endif
     enddo
 
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame), i - 1)
     call monolis_output_bc_R(foname_full, n_bc_local, n_dof, i_bc_local, r_bc_local)
 
     call monolis_dealloc_I_1d(graph(i)%vertex_id)

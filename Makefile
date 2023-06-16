@@ -35,7 +35,7 @@ ifdef FLAGS
 
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
 		FC      = mpiifort
-		FFLAGS  = -fPIC -O2 -align array64byte
+		FFLAGS  = -fPIC -O2 -align array64byte  -nofor-main
 		CC      = mpiicc
 		CFLAGS  = -fPIC -O2 -no-multibyte-chars
 		MOD_DIR = -module ./include
@@ -46,7 +46,7 @@ ifdef FLAGS
 	endif
 
 	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
-		INCLUDE = -I /usr/include -I ./include -I ../monolis_utils/include
+		INCLUDE = -I /usr/include -I ./include -I ../monolis_utils/include -I ../../include
 		USE_LIB = -L./lib -lgedatsu -L../monolis_utils/lib -lmonolis_utils -L../../lib -lmetis
 	endif
 endif

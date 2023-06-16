@@ -38,8 +38,16 @@ program gedatsu_nodal_graph_partitioner
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_nodal_graph_partitioner {options} -n {number of domains}"
+    write(*,"(a)")""
+    write(*,"(a)")"-n {number of domains}: (default) 1"
+    write(*,"(a)")"-i {input node filename}: (default) graph.dat"
+    write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
+    write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h : help"
     stop monolis_fail
   endif
 
@@ -84,7 +92,7 @@ program gedatsu_nodal_graph_partitioner
 
   do i = 1, n_domain
     !> graph.dat
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame), i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame), i - 1)
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
     call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
 
@@ -96,19 +104,19 @@ program gedatsu_nodal_graph_partitioner
     call monolis_dealloc_I_1d(id1)
 
     !> internal n_vertex
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".n_internal", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame)//".n_internal", i - 1)
     call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
     !> global vertex_id
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".id", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame)//".id", i - 1)
     call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 
     !> send
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".send", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame)//".send", i - 1)
     call monolis_output_send_com_table(foname_full, com(i))
 
     !> recv
-    foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finame)//".recv", i - 1)
+    foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame)//".recv", i - 1)
     call monolis_output_recv_com_table(foname_full, com(i))
   enddo
 

@@ -20,7 +20,6 @@ contains
     !> [out] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
 
-    call monolis_com_initialize(dlb%COM)
     dlb%should_update = .false.
   end subroutine gedatsu_dlb_initialize
 
@@ -31,7 +30,6 @@ contains
     !> [out] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
 
-    call monolis_com_finalize(dlb%COM)
     dlb%should_update = .false.
   end subroutine gedatsu_dlb_finalize
 

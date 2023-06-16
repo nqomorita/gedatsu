@@ -15,7 +15,8 @@ extern "C" {
  * @param[in] displs 全ての外部計算点配列の各領域に属する計算点数
  * @param[in] recv_n_neib 隣接する領域数
  * @param[in] is_neib 隣接する領域フラグ（サイズ：[comm_size]）
- * @ingroup dev_com
+ * @ingroup graph_conv
+>>>>>>> main
  */
 void gedatsu_convert_simple_mesh_to_connectivity_graph(
   int   n_elem,
@@ -33,7 +34,7 @@ void gedatsu_convert_simple_mesh_to_connectivity_graph(
  * @param[in] displs 全ての外部計算点配列の各領域に属する計算点数
  * @param[in] recv_n_neib 隣接する領域数
  * @param[in] is_neib 隣接する領域フラグ（サイズ：[comm_size]）
- * @ingroup dev_com
+ * @ingroup graph_conv
  */
 void gedatsu_convert_connectivity_graph_to_nodal_graph(
   int   n_node,

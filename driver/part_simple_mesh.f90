@@ -33,9 +33,14 @@ program gedatsu_partitioner_simple_mesh
 
   if(.not. is_get)then
     call monolis_std_error_string("input parameter 'n' are not set")
+    write(*,"(a)")"usage:"
     write(*,"(a)") &
     & "./gedatsu_convertor_simple_mesh2graph {options} -n {number of domains}"
-    stop monolis_fail
+    write(*,"(a)")""
+    write(*,"(a)")"-in {input node filename}: (default) node.dat"
+    write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"-h  : help"
   endif
 
   if(n_domain <= 1) stop
@@ -72,7 +77,7 @@ contains
     character(monolis_charlen) :: foname_full
     logical :: is_valid
     integer(kint), allocatable :: id1(:)
-    integer(kint), allocatable :: is_used(:)
+    integer(kint), allocatable :: domain_id(:)
     integer(kint), allocatable :: perm(:)
     integer(kint), allocatable :: local_elem(:,:)
 
@@ -83,23 +88,28 @@ contains
       stop monolis_fail
     endif
 
-    call monolis_alloc_I_1d(is_used, node_graph%n_vertex)
+    call monolis_alloc_I_1d(domain_id, node_graph%n_vertex)
+
+    !> get domain id array
+    do i = 1, n_domain
+      do j = 1, subgraphs(i)%n_internal_vertex
+        in = subgraphs(i)%vertex_id(j)
+        if(.not. is_1_origin) in = in + 1
+        domain_id(in) = i
+      enddo
+    enddo
+    domain_id = domain_id - 1
 
     do i = 1, n_domain
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id + 1
 
-      is_used = 0
-      do j = 1, subgraphs(i)%n_vertex
-        in = subgraphs(i)%vertex_id(j)
-        is_used(in) = 1
-      enddo
-
       call monolis_alloc_I_1d(conn_graph%vertex_id, conn_graph%n_vertex)
       call monolis_get_sequence_array_I(conn_graph%vertex_id, conn_graph%n_vertex, 1, 1)
 
-      call gedatsu_get_parted_connectivity_main(is_used, &
+      call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
         & conn_graph%n_vertex, conn_graph%index, conn_graph%item, conn_graph%vertex_id, &
-        & local_conn_graph%n_vertex, local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
+        & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
+        & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
 
       !> graph.dat
       call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)
@@ -112,6 +122,9 @@ contains
         local_conn_graph%item(j) = perm(idx)
       enddo
 
+      call monolis_dealloc_I_1d(perm)
+      call monolis_dealloc_I_1d(conn_graph%vertex_id)
+
       if(.not. is_1_origin) local_conn_graph%item = local_conn_graph%item - 1
 
       call monolis_alloc_I_2d(local_elem, n_base, local_conn_graph%n_vertex)
@@ -122,7 +135,7 @@ contains
         enddo
       enddo
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fiename), i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename), i - 1)
       call monolis_output_elem(foname_full, local_conn_graph%n_vertex, n_base, local_elem)
 
       call monolis_dealloc_I_1d(id1)
@@ -131,8 +144,12 @@ contains
       !> global vertex_id
       if(.not. is_1_origin) local_conn_graph%vertex_id = local_conn_graph%vertex_id - 1
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(fiename)//".id", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename)//".id", i - 1)
       call monolis_output_global_id(foname_full, local_conn_graph%n_vertex, local_conn_graph%vertex_id)
+
+      !> internal n_vertex
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(fiename)//".n_internal", i - 1)
+      call monolis_output_internal_vertex_number(foname_full, local_conn_graph%n_internal_vertex)
 
       call gedatsu_graph_finalize(local_conn_graph)
     enddo
@@ -176,25 +193,25 @@ contains
         local_node(:,j) = node(:,in)
       enddo
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname), i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname), i - 1)
       call monolis_output_node(foname_full, subgraphs(i)%n_vertex, local_node)
 
       !> internal n_vertex
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".n_internal", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".n_internal", i - 1)
       call monolis_output_internal_vertex_number(foname_full, subgraphs(i)%n_internal_vertex)
 
       !> global vertex_id
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
 
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".id", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".id", i - 1)
       call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)
 
       !> send
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".send", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".send", i - 1)
       call monolis_output_send_com_table(foname_full, com(i))
 
       !> recv
-      foname_full = monolis_get_output_file_name_by_domain_id(dirname, trim(finname)//".recv", i - 1)
+      foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".recv", i - 1)
       call monolis_output_recv_com_table(foname_full, com(i))
 
       call monolis_dealloc_I_1d(id1)
