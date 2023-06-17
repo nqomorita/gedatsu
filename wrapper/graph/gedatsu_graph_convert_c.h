@@ -16,7 +16,6 @@ extern "C" {
  * @param[in] recv_n_neib 隣接する領域数
  * @param[in] is_neib 隣接する領域フラグ（サイズ：[comm_size]）
  * @ingroup graph_conv
->>>>>>> main
  */
 void gedatsu_convert_simple_mesh_to_connectivity_graph(
   int   n_elem,
