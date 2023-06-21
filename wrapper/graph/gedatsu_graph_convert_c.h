@@ -8,13 +8,11 @@ extern "C" {
 
 /**
  * @brief 単一メッシュ形式からコネクティビティグラフ形式に変換
- * @param[in] comm MPI コミュニケータ
- * @param[in] n_vertex 全計算点数
- * @param[in] outer_domain_id_all 全ての外部計算点が属する領域番号
- * @param[in] comm_size !
- * @param[in] displs 全ての外部計算点配列の各領域に属する計算点数
- * @param[in] recv_n_neib 隣接する領域数
- * @param[in] is_neib 隣接する領域フラグ（サイズ：[comm_size]）
+ * @param[in] n_elem 要素数
+ * @param[in] n_base 要素を構成する形状関数の数
+ * @param[in] elem 要素コネクティビティ
+ * @param[out] index コネクティビティグラフの index 配列
+ * @param[out] item コネクティビティグラフの item 配列
  * @ingroup graph_conv
  */
 void gedatsu_convert_simple_mesh_to_connectivity_graph(
@@ -26,13 +24,12 @@ void gedatsu_convert_simple_mesh_to_connectivity_graph(
 
 /**
  * @brief 単一メッシュ形式から節点グラフ形式に変換
- * @param[in] comm MPI コミュニケータ
- * @param[in] n_vertex 全計算点数
- * @param[in] outer_domain_id_all 全ての外部計算点が属する領域番号
- * @param[in] comm_size !
- * @param[in] displs 全ての外部計算点配列の各領域に属する計算点数
- * @param[in] recv_n_neib 隣接する領域数
- * @param[in] is_neib 隣接する領域フラグ（サイズ：[comm_size]）
+ * @param[in] n_node 節点数
+ * @param[in] n_elem 要素数
+ * @param[in] conn_index コネクティビティグラフの index 配列
+ * @param[inout] conn_item コネクティビティグラフの item 配列
+ * @param[out] nodal_index 節点グラフの index 配列
+ * @param[out] nodal_item 節点グラフの item 配列
  * @ingroup graph_conv
  */
 void gedatsu_convert_connectivity_graph_to_nodal_graph(
