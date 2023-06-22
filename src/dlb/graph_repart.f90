@@ -9,11 +9,11 @@ module mod_gedatsu_graph_repart
 contains
 
   !> @ingroup group_dlb
-  !> グラフを再分割する（節点重みなし）
+  !> グラフを再分割して再分割後に属する領域番号を取得（節点重みなし）
   subroutine gedatsu_graph_repartition(graph, COM)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph), intent(in) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_part
@@ -26,29 +26,29 @@ contains
 
     call monolis_alloc_I_1d(vtxdist, n_part + 1)
 
-    !call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
+    call monolis_com_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
 
-    !call gedatsu_generate_global_vertex_id(graph%n_vertex, vtxdist, vertex_id, COM)
+    call monolis_generate_global_vertex_id(graph%n_internal_vertex, graph%n_vertex, vertex_id, COM)
 
-    !call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
-    !  & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, COM%comm)
-
-    !call gedatsu_update_vertex_domain_id(graph%vertex_domain_id, COM)
+    call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
+      & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, COM%comm)
   end subroutine gedatsu_graph_repartition
 
   !> @ingroup group_dlb
-  !> グラフを再分割する（節点重みあり）
-  subroutine gedatsu_graph_repartition_with_weight(graph, COM)
+  !> グラフを再分割して再分割後に属する領域番号を取得（節点重みあり）
+  subroutine gedatsu_graph_repartition_with_weight(graph, COM, node_wgt, edge_wgt)
     implicit none
-    !> [in] graph 構造体
-    type(gedatsu_graph), intent(in) :: graph
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    !> [in] ノード重み
+    integer(kint), allocatable, intent(in) :: node_wgt(:,:)
+    !> [in] エッジ重み
+    integer(kint), allocatable, intent(in) :: edge_wgt(:,:)
     integer(kint) :: n_part
     integer(kint), allocatable :: vtxdist(:)
     integer(kint), allocatable :: vertex_id(:)
-    integer(kint), allocatable :: node_wgt(:,:)
-    integer(kint), allocatable :: edge_wgt(:,:)
 
     n_part = monolis_mpi_get_local_comm_size(COM%comm)
 
@@ -56,11 +56,11 @@ contains
 
     call monolis_alloc_I_1d(vtxdist, n_part + 1)
 
-    !call gedatsu_comm_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
+    call monolis_com_n_vertex_list(graph%n_internal_vertex, COM%comm, vtxdist)
 
-    !call gedatsu_generate_global_vertex_id(graph%n_vertex, vtxdist, vertex_id, COM)
+    call monolis_generate_global_vertex_id(graph%n_internal_vertex, graph%n_vertex, vertex_id, COM)
 
-    !call gedatsu_repart_graph_parmetis_with_weight(graph%n_vertex, vertex_id, &
-    !  & vtxdist, graph%index, graph%item, node_wgt, edge_wgt, n_part, graph%vertex_domain_id, COM%comm)
+    call gedatsu_repart_graph_parmetis_with_weight(graph%n_vertex, vertex_id, &
+      & vtxdist, graph%index, graph%item, node_wgt, edge_wgt, n_part, graph%vertex_domain_id, COM%comm)
   end subroutine gedatsu_graph_repartition_with_weight
 end module mod_gedatsu_graph_repart

@@ -133,8 +133,6 @@ contains
 
     call gedatsu_graph_set_n_vertex(subgraph, n_vertex)
 
-    !call gedatsu_graph_get_vertex_domain_id_in_internal_region(graph, domain_id, subgraph%vertex_domain_id)
-
     call gedatsu_graph_get_n_edge_in_internal_region(graph, domain_id, n_edge)
 
     call gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, subgraph%vertex_id)

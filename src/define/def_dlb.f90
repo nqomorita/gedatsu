@@ -5,7 +5,7 @@ module mod_gedatsu_dlb
 
   !> dlb 構造体
   type gedatsu_dlb
-    !> comm 構造体
+    !> DLB 用通信テープル構造体
     type(monolis_COM) :: COM
     !> 負荷分散の実行判定
     logical :: should_update

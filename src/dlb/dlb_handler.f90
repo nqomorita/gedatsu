@@ -10,21 +10,25 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための事前分析
-  subroutine gedatsu_dlb_analysis(dlb, graph)
+  subroutine gedatsu_dlb_analysis_with_weight(dlb, graph, COM, node_wgt, edge_wgt)
     implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
+    !> [out] dlb 構造体
+    type(gedatsu_dlb), intent(out) :: dlb
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    !> [in] ノード重み
+    integer(kint), allocatable, intent(in) :: node_wgt(:,:)
+    !> [in] エッジ重み
+    integer(kint), allocatable, intent(in) :: edge_wgt(:,:)
 
-    !call gedatsu_comm_get_comm_table_parallel(graph, dlb%COM)
-
-    !call gedatsu_graph_repartition(graph, dlb%COM)
+    call gedatsu_graph_repartition_with_weight(graph, COM, node_wgt, edge_wgt)
 
     !call gedatsu_dlb_update_check(dlb, graph)
 
-    !call gedatsu_dlb_get_comm_table(dlb, graph, dlb%COM%comm)
-  end subroutine gedatsu_dlb_analysis
+    call gedatsu_dlb_get_comm_table(dlb, graph, COM%comm)
+  end subroutine gedatsu_dlb_analysis_with_weight
 
   !> @ingroup group_dlb
   !> 負荷分散：負荷分散の実行チェック
