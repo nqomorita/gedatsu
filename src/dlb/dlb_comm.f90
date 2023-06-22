@@ -10,67 +10,185 @@ module mod_gedatsu_dlb_comm
 contains
 
   !> @ingroup group_dlb
-  !> 動的負荷分散のための通信テーブル作成
+  !> 動的負荷分散のための通信テーブル作成（節点グラフ）
   subroutine gedatsu_dlb_get_comm_table(dlb, graph, comm)
     implicit none
     !> [in] dlb 構造体
-    type(gedatsu_dlb), intent(in) :: dlb
+    type(gedatsu_dlb), intent(out) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
     !> [in] MPI コミュニケータ
     integer(kint), intent(in) :: comm
-    integer(kint) :: i, n_internal_vertex, n_move_vertex, my_rank
-    integer(kint) :: n_neib_domain
-    integer(kint), allocatable :: move_vertex_domain_id(:)
-    integer(kint), allocatable :: neib_domain_id(:)
+    !# オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex, n_move_vertex_all
+    integer(kint), allocatable :: move_global_id(:)
+    integer(kint), allocatable :: move_global_id_all(:)
+    integer(kint), allocatable :: move_domain_id(:)
+    integer(kint), allocatable :: move_domain_id_all(:)
+    integer(kint), allocatable :: is_in(:)
+    integer(kint), allocatable :: counts(:)
+
+    call monolis_alloc_I_1d(is_in, graph%n_vertex)
+
+    call gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in, comm)
+
+    call monolis_alloc_I_1d(move_global_id, n_move_vertex)
+
+    call gedatsu_dlb_get_n_move_vertex_global_id(graph, n_move_vertex, is_in, move_global_id)
+
+    call monolis_alloc_I_1d(move_domain_id, n_move_vertex)
+
+    call gedatsu_dlb_get_n_move_vertex_domain_id(graph, n_move_vertex, is_in, move_domain_id)
+
+    n_move_vertex_all = n_move_vertex
+    call monolis_allreduce_I1(n_move_vertex_all, monolis_mpi_sum, comm)
+
+    call monolis_allgather_I1(n_move_vertex, counts, comm)
+
+    call gedatsu_dlb_get_n_move_vertex_global_id_all(graph, n_move_vertex, counts, move_global_id, move_global_id_all, comm)
+
+    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id, move_domain_id_all, comm)
+  end subroutine gedatsu_dlb_get_comm_table
+
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信する計算点数の取得
+  subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in, comm)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex
+    !> [in] オーバーラップ計算点を含む通信する計算点のフラグ
+    integer(kint) :: is_in(:)
+    !> [in] MPI コミュニケータ
+    integer(kint), intent(in) :: comm
+    integer(kint) :: i, j, jS, jE, jn, my_rank
 
     my_rank = monolis_mpi_get_local_my_rank(comm)
 
-    !> 内点が自分の領域番号でない場合、その節点数を取得
-    n_internal_vertex = 0
-    n_move_vertex = 0
-    do i = 1, graph%n_internal_vertex
-      if(graph%vertex_domain_id(i) == my_rank + 1)then
-        n_internal_vertex = n_internal_vertex + 1
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) == my_rank)then
+        is_in(i) = 1
       else
-        n_move_vertex = n_move_vertex + 1
+        cycle
       endif
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        jn = graph%item(j)
+        is_in(jn) = 1
+      enddo
     enddo
-
-    write(*,*)"n_internal_vertex: ", n_internal_vertex
-    write(*,*)"n_move_vertex: ", n_move_vertex
-
-    !> 自領域でない領域番号を取得
-    call gedatsu_alloc_int_1d(move_vertex_domain_id, n_move_vertex)
 
     n_move_vertex = 0
-    do i = 1, graph%n_internal_vertex
-      if(graph%vertex_domain_id(i) /= my_rank + 1)then
-        n_move_vertex = n_move_vertex + 1
-        move_vertex_domain_id(n_move_vertex) = graph%vertex_domain_id(i)
+    do i = 1, graph%n_vertex
+      if(is_in(i) == 1) n_move_vertex = n_move_vertex + 1
+    enddo
+  end subroutine gedatsu_dlb_get_n_move_vertex
+
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信する計算点のグローバル id の取得
+  subroutine gedatsu_dlb_get_n_move_vertex_global_id(graph, n_move_vertex, is_in, move_global_id)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex
+    !> [in] オーバーラップ計算点を含む通信する計算点のフラグ
+    integer(kint) :: is_in(:)
+    !> [in] オーバーラップ計算点を含む通信する計算点のグローバル id
+    integer(kint) :: move_global_id(:)
+    integer(kint) :: i, in
+
+    in = 0
+    do i = 1, graph%n_vertex
+      if(is_in(i) == 1)then
+        in = in + 1
+        move_global_id(in) = graph%vertex_id(i)
       endif
     enddo
+  end subroutine gedatsu_dlb_get_n_move_vertex_global_id
 
-    call gedatsu_qsort_int_1d(move_vertex_domain_id, 1, n_move_vertex)
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信する計算点の領域 id の取得
+  subroutine gedatsu_dlb_get_n_move_vertex_domain_id(graph, n_move_vertex, is_in, move_domain_id)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex
+    !> [in] オーバーラップ計算点を含む通信する計算点のフラグ
+    integer(kint) :: is_in(:)
+    !> [in] オーバーラップ計算点を含む通信する計算点の領域 id
+    integer(kint) :: move_domain_id(:)
+    integer(kint) :: i, in
 
-    n_neib_domain = 0
+    in = 0
+    do i = 1, graph%n_vertex
+      if(is_in(i) == 1)then
+        in = in + 1
+        move_domain_id(in) = graph%vertex_domain_id(i)
+      endif
+    enddo
+  end subroutine gedatsu_dlb_get_n_move_vertex_domain_id
 
-    call gedatsu_get_uniq_int(move_vertex_domain_id, n_move_vertex, n_neib_domain)
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信する全ての計算点のグローバル計算点 id の取得
+  subroutine gedatsu_dlb_get_n_move_vertex_global_id_all(graph, n_move_vertex, counts, move_global_id, move_global_id_all, comm)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex
+    !> [in] 各領域の計算点数配列
+    integer(kint) :: counts(:)
+    !> [in] オーバーラップ計算点を含む通信する計算点のグローバル id
+    integer(kint) :: move_global_id(:)
+    !> [in] オーバーラップ計算点を含む通信する全ての計算点のグローバル id
+    integer(kint) :: move_global_id_all(:)
+    !> [in] MPI コミュニケータ
+    integer(kint), intent(in) :: comm
+    integer(kint) :: comm_size, i
+    integer(kint), allocatable :: displs(:)
 
-    call gedatsu_alloc_int_1d(neib_domain_id, n_neib_domain)
+    comm_size = monolis_mpi_get_local_comm_size(comm)
 
-    neib_domain_id = move_vertex_domain_id(1:n_neib_domain)
+    call monolis_alloc_I_1d(displs, comm_size)
 
-    write(*,*)"n_neib_domain: ", n_neib_domain
-    write(*,*)"neib_domain_id: ", neib_domain_id
+    do i = 1, comm_size
+      displs(i + 1) = displs(i) + counts(i)
+    enddo
 
-    !> 個数共有
-    !call gedatsu_allgather_I1(sval, rbuf, comm)
+    call monolis_allgatherv_I(n_move_vertex, move_global_id, move_global_id_all, counts, displs, comm)
+  end subroutine gedatsu_dlb_get_n_move_vertex_global_id_all
 
-    !call gedatsu_dlb_get_new_n_vertex()
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信する全ての計算点のグローバル領域 id の取得
+  subroutine gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id, move_domain_id_all, comm)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_vertex
+    !> [in] 各領域の計算点数配列
+    integer(kint) :: counts(:)
+    !> [in] オーバーラップ計算点を含む通信する計算点のグローバル id
+    integer(kint) :: move_domain_id(:)
+    !> [in] オーバーラップ計算点を含む通信する全ての計算点のグローバル id
+    integer(kint) :: move_domain_id_all(:)
+    !> [in] MPI コミュニケータ
+    integer(kint), intent(in) :: comm
+    integer(kint) :: comm_size, i
+    integer(kint), allocatable :: displs(:)
 
-    !call gedatsu_dlb_get_new_n_neib_domain()
+    comm_size = monolis_mpi_get_local_comm_size(comm)
 
-    !call gedatsu_dlb_get_new_neib_domain_id()
-  end subroutine gedatsu_dlb_get_comm_table
+    call monolis_alloc_I_1d(displs, comm_size)
+
+    do i = 1, comm_size
+      displs(i + 1) = displs(i) + counts(i)
+    enddo
+
+    call monolis_allgatherv_I(n_move_vertex, move_domain_id, move_domain_id_all, counts, displs, comm)
+  end subroutine gedatsu_dlb_get_n_move_vertex_domain_id_all
 end module mod_gedatsu_dlb_comm
