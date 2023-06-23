@@ -23,11 +23,14 @@ contains
     integer(kint) :: n_move_vertex, n_move_vertex_all
     integer(kint), allocatable :: move_global_id(:)
     integer(kint), allocatable :: move_global_id_all(:)
-    integer(kint), allocatable :: move_domain_id(:)
-    integer(kint), allocatable :: move_domain_id_all(:)
+    integer(kint), allocatable :: move_domain_id_new(:)
+    integer(kint), allocatable :: move_domain_id_new_all(:)
+    integer(kint), allocatable :: move_domain_id_org(:)
+    integer(kint), allocatable :: move_domain_id_org_all(:)
     integer(kint), allocatable :: is_in(:)
     integer(kint), allocatable :: counts(:)
 
+    !# 送信計算点の全体情報取得
     call monolis_alloc_I_1d(is_in, graph%n_vertex)
 
     call gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in, comm)
@@ -36,9 +39,13 @@ contains
 
     call gedatsu_dlb_get_n_move_vertex_global_id(graph, n_move_vertex, is_in, move_global_id)
 
-    call monolis_alloc_I_1d(move_domain_id, n_move_vertex)
+    call monolis_alloc_I_1d(move_domain_id_new, n_move_vertex)
 
-    call gedatsu_dlb_get_n_move_vertex_domain_id(graph, n_move_vertex, is_in, move_domain_id)
+    call gedatsu_dlb_get_n_move_vertex_domain_id(graph, n_move_vertex, is_in, move_domain_id_new)
+
+    call monolis_alloc_I_1d(move_domain_id_org, n_move_vertex)
+
+    move_domain_id_org = monolis_mpi_get_local_my_rank(comm)
 
     n_move_vertex_all = n_move_vertex
     call monolis_allreduce_I1(n_move_vertex_all, monolis_mpi_sum, comm)
@@ -47,7 +54,17 @@ contains
 
     call gedatsu_dlb_get_n_move_vertex_global_id_all(graph, n_move_vertex, counts, move_global_id, move_global_id_all, comm)
 
-    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id, move_domain_id_all, comm)
+    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id_new, move_domain_id_new_all, comm)
+
+    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id_org, move_domain_id_org_all, comm)
+
+    !# n_internal_vertex の取得
+
+    !# n_vertex の取得
+
+    !# send table の作成
+
+    !# recv table の作成
   end subroutine gedatsu_dlb_get_comm_table
 
   !> @ingroup group_dlb
