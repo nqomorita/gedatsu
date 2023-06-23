@@ -21,27 +21,31 @@ contains
     integer(kint), intent(in) :: comm
     !# オーバーラップ計算点を含む通信する計算点数
     integer(kint) :: n_move_vertex, n_move_vertex_all
+    integer(kint) :: n_move_edge, n_move_edge_all
     integer(kint), allocatable :: move_global_id(:)
     integer(kint), allocatable :: move_global_id_all(:)
     integer(kint), allocatable :: move_domain_id_new(:)
     integer(kint), allocatable :: move_domain_id_new_all(:)
     integer(kint), allocatable :: move_domain_id_org(:)
     integer(kint), allocatable :: move_domain_id_org_all(:)
-    integer(kint), allocatable :: is_in(:)
-    integer(kint), allocatable :: counts(:)
+    integer(kint), allocatable :: move_global_edge_node(:)
+    integer(kint), allocatable :: is_in_node(:)
+    integer(kint), allocatable :: is_in_edge(:)
+    integer(kint), allocatable :: counts_node(:)
+    integer(kint), allocatable :: counts_edge(:)
 
     !# 送信計算点の全体情報取得
-    call monolis_alloc_I_1d(is_in, graph%n_vertex)
+    call monolis_alloc_I_1d(is_in_node, graph%n_vertex)
 
-    call gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in, comm)
+    call gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in_node, comm)
 
     call monolis_alloc_I_1d(move_global_id, n_move_vertex)
 
-    call gedatsu_dlb_get_n_move_vertex_global_id(graph, n_move_vertex, is_in, move_global_id)
+    call gedatsu_dlb_get_move_vertex_global_id(graph, n_move_vertex, is_in_node, move_global_id)
 
     call monolis_alloc_I_1d(move_domain_id_new, n_move_vertex)
 
-    call gedatsu_dlb_get_n_move_vertex_domain_id(graph, n_move_vertex, is_in, move_domain_id_new)
+    call gedatsu_dlb_get_move_vertex_domain_id(graph, n_move_vertex, is_in_node, move_domain_id_new)
 
     call monolis_alloc_I_1d(move_domain_id_org, n_move_vertex)
 
@@ -50,13 +54,25 @@ contains
     n_move_vertex_all = n_move_vertex
     call monolis_allreduce_I1(n_move_vertex_all, monolis_mpi_sum, comm)
 
-    call monolis_allgather_I1(n_move_vertex, counts, comm)
+    call monolis_allgather_I1(n_move_vertex, counts_node, comm)
 
-    call gedatsu_dlb_get_n_move_vertex_global_id_all(graph, n_move_vertex, counts, move_global_id, move_global_id_all, comm)
+    call gedatsu_dlb_get_move_vertex_global_id_all(graph, n_move_vertex, counts_node, &
+      & move_global_id, move_global_id_all, comm)
 
-    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id_new, move_domain_id_new_all, comm)
+    call gedatsu_dlb_get_move_vertex_domain_id_all(graph, n_move_vertex, counts_node, &
+      & move_domain_id_new, move_domain_id_new_all, comm)
 
-    call gedatsu_dlb_get_n_move_vertex_domain_id_all(graph, n_move_vertex, counts, move_domain_id_org, move_domain_id_org_all, comm)
+    call gedatsu_dlb_get_move_vertex_domain_id_all(graph, n_move_vertex, counts_node, &
+      & move_domain_id_org, move_domain_id_org_all, comm)
+
+    !# 送信エッジの全体情報取得
+    call monolis_alloc_I_1d(is_in_edge, graph%index(graph%n_vertex + 1))
+
+    call gedatsu_dlb_get_n_move_edge(graph, n_move_edge, is_in_edge, comm)
+
+    call monolis_alloc_I_1d(move_global_edge_node, 2*n_move_edge)
+
+    call gedatsu_dlb_get_move_global_edge_node(graph, n_move_edge, is_in_edge, move_global_edge_node)
 
     !# n_internal_vertex の取得
 
@@ -208,4 +224,70 @@ contains
 
     call monolis_allgatherv_I(n_move_vertex, move_domain_id, move_domain_id_all, counts, displs, comm)
   end subroutine gedatsu_dlb_get_n_move_vertex_domain_id_all
+
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信するエッジ数の取得
+  subroutine gedatsu_dlb_get_n_move_edge(graph, n_move_edge, is_in, comm)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信するエッジ数
+    integer(kint) :: n_move_edge
+    !> [in] オーバーラップ計算点を含む通信するエッジのフラグ
+    integer(kint) :: is_in(:)
+    !> [in] MPI コミュニケータ
+    integer(kint), intent(in) :: comm
+    integer(kint) :: i, j, jS, jE, jn, my_rank
+
+    my_rank = monolis_mpi_get_local_my_rank(comm)
+
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        jn = graph%item(j)
+        if(graph%vertex_domain_id(i) == my_rank)then
+          is_in(i) = 1
+        elseif(graph%vertex_domain_id(jn) == my_rank)then
+          is_in(i) = 1
+        endif
+      enddo
+    enddo
+
+    n_move_edge = 0
+    do i = 1, graph%index(graph%n_vertex + 1)
+      if(is_in(i) == 1) n_move_edge = n_move_edge + 1
+    enddo
+  end subroutine gedatsu_dlb_get_n_move_edge
+
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信するエッジの取得
+  subroutine gedatsu_dlb_get_move_global_edge_node(graph, n_move_edge, is_in, move_global_edge_node)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: n_move_edge
+    !> [in] オーバーラップ計算点を含む通信する計算点のフラグ
+    integer(kint) :: is_in(:)
+    !> [in] オーバーラップ計算点を含む通信する計算点のグローバル id
+    integer(kint) :: move_global_edge_node(:)
+    integer(kint) :: i, in, j, jn, jS, jE, id1, id2
+
+    in = 0
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        jn = graph%item(j)
+        if(is_in(j) == 1)then
+          id1 = graph%vertex_id(i)
+          id2 = graph%vertex_id(jn)
+          in = in + 1
+          move_global_edge_node(2*in-1) = id1
+          move_global_edge_node(2*in  ) = id2
+        endif
+      enddo
+    enddo
+  end subroutine gedatsu_dlb_get_move_global_edge_node
 end module mod_gedatsu_dlb_comm
