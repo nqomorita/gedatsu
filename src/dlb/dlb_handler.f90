@@ -23,10 +23,13 @@ contains
     !> [in] エッジ重み
     integer(kint), allocatable, intent(in) :: edge_wgt(:,:)
 
+    call monolis_com_get_n_internal_vertex(COM, graph%n_internal_vertex)
+
     call gedatsu_graph_repartition_with_weight(graph, COM, node_wgt, edge_wgt)
 
     !call gedatsu_dlb_update_check(dlb, graph)
 
+write(*,*)"graph", graph%vertex_domain_id
     call gedatsu_dlb_get_comm_table(dlb, graph, COM%comm)
   end subroutine gedatsu_dlb_analysis_with_weight
 

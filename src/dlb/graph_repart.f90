@@ -22,6 +22,9 @@ contains
 
     n_part = monolis_mpi_get_local_comm_size(COM%comm)
 
+    call monolis_dealloc_I_1d(graph%vertex_domain_id)
+    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+
     call monolis_alloc_I_1d(vertex_id, graph%n_vertex)
 
     call monolis_alloc_I_1d(vtxdist, n_part + 1)
@@ -51,6 +54,9 @@ contains
     integer(kint), allocatable :: vertex_id(:)
 
     n_part = monolis_mpi_get_local_comm_size(COM%comm)
+
+    call monolis_dealloc_I_1d(graph%vertex_domain_id)
+    call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
 
     call monolis_alloc_I_1d(vertex_id, graph%n_vertex)
 

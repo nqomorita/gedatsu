@@ -20,6 +20,7 @@ contains
     !> [in] MPI コミュニケータ
     integer(kint), intent(in) :: comm
     !# オーバーラップ計算点を含む通信する計算点数
+    integer(kint) :: comm_size
     integer(kint) :: n_move_vertex, n_move_vertex_all
     integer(kint) :: n_move_edge, n_move_edge_all
     integer(kint), allocatable :: move_global_id(:)
@@ -36,6 +37,8 @@ contains
     integer(kint), allocatable :: counts_edge(:)
 
     !# 送信計算点の全体情報取得
+    comm_size = monolis_mpi_get_local_comm_size(comm)
+
     call monolis_alloc_I_1d(is_in_node, graph%n_vertex)
 
     call gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_in_node, comm)
@@ -55,6 +58,7 @@ contains
     n_move_vertex_all = n_move_vertex
     call monolis_allreduce_I1(n_move_vertex_all, monolis_mpi_sum, comm)
 
+    call monolis_alloc_I_1d(counts_node, comm_size + 1)
     call monolis_allgather_I1(n_move_vertex, counts_node, comm)
 
     call monolis_alloc_I_1d(move_global_id_all, n_move_vertex_all)
@@ -82,6 +86,7 @@ contains
     n_move_edge_all = n_move_edge
     call monolis_allreduce_I1(n_move_edge_all, monolis_mpi_sum, comm)
 
+    call monolis_alloc_I_1d(counts_edge, comm_size + 1)
     call monolis_allgather_I1(n_move_edge, counts_edge, comm)
 
     call monolis_alloc_I_1d(move_global_edge_node_all, n_move_edge_all)
@@ -205,7 +210,7 @@ contains
 
     comm_size = monolis_mpi_get_local_comm_size(comm)
 
-    call monolis_alloc_I_1d(displs, comm_size)
+    call monolis_alloc_I_1d(displs, comm_size + 1)
 
     do i = 1, comm_size
       displs(i + 1) = displs(i) + counts(i)
@@ -235,7 +240,7 @@ contains
 
     comm_size = monolis_mpi_get_local_comm_size(comm)
 
-    call monolis_alloc_I_1d(displs, comm_size)
+    call monolis_alloc_I_1d(displs, comm_size + 1)
 
     do i = 1, comm_size
       displs(i + 1) = displs(i) + counts(i)
@@ -332,7 +337,7 @@ contains
 
     comm_size = monolis_mpi_get_local_comm_size(comm)
 
-    call monolis_alloc_I_1d(displs, comm_size)
+    call monolis_alloc_I_1d(displs, comm_size + 1)
 
     do i = 1, comm_size
       displs(i + 1) = displs(i) + counts(i)

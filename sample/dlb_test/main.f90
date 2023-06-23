@@ -4,36 +4,30 @@ program dlb_test
   implicit none
   !> dlb 構造体
   type(gedatsu_dlb) :: dlb
-  !> 分割後の graph 構造体
-  type(gedatsu_graph) :: subgraph
+  !> graph 構造体
+  type(gedatsu_graph) :: graph
+  !> コミュニケータ 構造体
+  type(monolis_COM) :: COM
   !> 分割数
   integer(kint) :: n_domain
   !> 入力ファイル名
   character(monolis_charlen) :: finame
-  !> 出力ファイル名
-  character(monolis_charlen) :: foname
-  !> 出力ディレクトリ名
-  character(monolis_charlen) :: fdname
+  integer(kint), allocatable :: node_wgt(:,:), edge_wgt(:,:)
 
-!  fdname = "parted.0"
-!
-!  call gedatsu_global_initialize()
-!
-!  call gedatsu_get_arg_graph_partitioner(finame, n_domain)
-!
-!  !> IO section
-!  foname = gedatsu_get_input_file_name(fdname, finame, gedatsu_mpi_global_my_rank())
-!  call gedatsu_input_graph(foname, subgraph)
-!
-!  foname = gedatsu_get_input_file_name(fdname, "node.id", gedatsu_mpi_global_my_rank())
-!  call gedatsu_input_node_id(foname, subgraph)
-!
-!  foname = gedatsu_get_input_file_name(fdname, "internal_node", gedatsu_mpi_global_my_rank())
-!  call gedatsu_input_internal_node_number(foname, subgraph)
-!
-!  dlb%comm%comm = gedatsu_mpi_global_comm()
-!
-!  call gedatsu_dlb_analysis(dlb, subgraph)
-!
-!  call gedatsu_global_finalize()
+  call monolis_mpi_initialize()
+  call gedatsu_dlb_initialize(dlb)
+
+  n_domain = monolis_mpi_get_global_comm_size()
+
+  !> IO section
+  finame = monolis_get_global_input_file_name(MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat")
+  call monolis_input_graph(finame, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
+
+  call monolis_com_initialize_by_parted_files(COM, monolis_mpi_get_global_comm(), &
+    & MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat")
+
+  !> repart section
+  call gedatsu_dlb_analysis_with_weight(dlb, graph, COM, node_wgt, edge_wgt)
+
+  call monolis_mpi_finalize()
 end program dlb_test
