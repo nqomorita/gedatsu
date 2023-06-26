@@ -29,7 +29,7 @@ contains
 
     !call gedatsu_dlb_update_check(dlb, graph)
 
-    call gedatsu_dlb_get_comm_table(dlb, graph, COM%comm)
+    call gedatsu_dlb_get_comm_table(dlb, graph, COM)
   end subroutine gedatsu_dlb_analysis_with_weight
 
   !> @ingroup group_dlb
