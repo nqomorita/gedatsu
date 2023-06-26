@@ -5,8 +5,10 @@ module mod_gedatsu_dlb
 
   !> dlb 構造体
   type gedatsu_dlb
-    !> DLB 用通信テープル構造体
+    !> DLB 用通信テーブル構造体
     type(monolis_COM) :: COM
+    !> 更新後の計算点のグローバル id
+    integer(kint), allocatable :: global_id(:)
     !> 負荷分散の実行判定
     logical :: should_update
   end type gedatsu_dlb
