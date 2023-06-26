@@ -23,6 +23,9 @@ program dlb_test
   finame = monolis_get_global_input_file_name(MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat")
   call monolis_input_graph(finame, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
 
+  finame = monolis_get_global_input_file_name(MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat.id")
+  call monolis_input_global_id(finame, graph%n_vertex, graph%vertex_id)
+
   call monolis_com_initialize_by_parted_files(COM, monolis_mpi_get_global_comm(), &
     & MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat")
 

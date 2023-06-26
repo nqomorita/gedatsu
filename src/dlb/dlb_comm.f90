@@ -36,7 +36,8 @@ contains
     integer(kint), allocatable :: counts_node(:)
     integer(kint), allocatable :: counts_edge(:)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"graph", graph%vertex_domain_id
+write(100+monolis_mpi_get_global_my_rank(),*)"graph    ", graph%vertex_domain_id
+write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id", graph%vertex_id
 
     !# 送信計算点の全体情報取得
     comm_size = monolis_mpi_get_local_comm_size(comm)
