@@ -29,7 +29,6 @@ contains
 
     !call gedatsu_dlb_update_check(dlb, graph)
 
-write(*,*)"graph", graph%vertex_domain_id
     call gedatsu_dlb_get_comm_table(dlb, graph, COM%comm)
   end subroutine gedatsu_dlb_analysis_with_weight
 

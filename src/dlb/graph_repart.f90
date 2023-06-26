@@ -35,6 +35,8 @@ contains
 
     call gedatsu_repart_graph_parmetis(graph%n_vertex, vertex_id, &
       & vtxdist, graph%index, graph%item, n_part, graph%vertex_domain_id, COM%comm)
+
+    call monolis_mpi_update_I(COM, 1, graph%vertex_domain_id)
   end subroutine gedatsu_graph_repartition
 
   !> @ingroup group_dlb
@@ -68,5 +70,7 @@ contains
 
     call gedatsu_repart_graph_parmetis_with_weight(graph%n_vertex, vertex_id, &
       & vtxdist, graph%index, graph%item, node_wgt, edge_wgt, n_part, graph%vertex_domain_id, COM%comm)
+
+    call monolis_mpi_update_I(COM, 1, graph%vertex_domain_id)
   end subroutine gedatsu_graph_repartition_with_weight
 end module mod_gedatsu_graph_repart
