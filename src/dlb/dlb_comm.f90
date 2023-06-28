@@ -11,12 +11,14 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_get_comm_table(dlb, graph, COM)
+  subroutine gedatsu_dlb_get_comm_table(dlb, graph, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(out) :: graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
     !# オーバーラップ計算点を含む通信する計算点数
@@ -37,9 +39,6 @@ contains
     integer(kint), allocatable :: counts_node(:)
     integer(kint), allocatable :: counts_edge(:)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"graph    ", graph%vertex_domain_id
-write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id", graph%vertex_id
-
     !# 送信計算点の全体情報取得
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 
@@ -56,13 +55,13 @@ write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id", graph%vertex_id
     call gedatsu_dlb_get_move_vertex_domain_id(graph, graph%vertex_domain_id, n_move_vertex, is_move_node, move_domain_id_new)
 
     call monolis_alloc_I_1d(domain_id_org, graph%n_vertex)
+
     domain_id_org = monolis_mpi_get_local_my_rank(COM%comm)
     call monolis_mpi_update_I(COM, 1, domain_id_org)
 
     call monolis_alloc_I_1d(move_domain_id_org, n_move_vertex)
-    call gedatsu_dlb_get_move_vertex_domain_id(graph, domain_id_org, n_move_vertex, is_move_node, move_domain_id_org)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"move_domain_id_org", move_domain_id_org
+    call gedatsu_dlb_get_move_vertex_domain_id(graph, domain_id_org, n_move_vertex, is_move_node, move_domain_id_org)
 
     n_move_vertex_all = n_move_vertex
     call monolis_allreduce_I1(n_move_vertex_all, monolis_mpi_sum, COM%comm)
@@ -103,6 +102,11 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_domain_id_org", move_domain_i
     call gedatsu_dlb_get_move_global_edge_node_all(graph, n_move_edge, counts_edge, &
       & move_global_edge_node, move_global_edge_node_all, COM%comm)
 
+write(100+monolis_mpi_get_global_my_rank(),*)"vertex_domain_id", graph%vertex_domain_id
+write(100+monolis_mpi_get_global_my_rank(),*)"domain_id_org   ", domain_id_org
+write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id       ", graph%vertex_id
+write(100+monolis_mpi_get_global_my_rank(),*)"move_domain_id_org", move_domain_id_org
+
 write(100+monolis_mpi_get_global_my_rank(),*)"n_move_vertex", n_move_vertex
 write(100+monolis_mpi_get_global_my_rank(),*)"n_move_vertex_all", n_move_vertex_all
 write(100+monolis_mpi_get_global_my_rank(),*)"move_global_id_all    ", move_global_id_all
@@ -117,7 +121,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
     !# n_internal_vertex の取得
     !# n_edge の取得
     !# graph index / item の取得
-    call gedatsu_dlb_get_new_graph(graph, n_move_vertex_all, &
+    call gedatsu_dlb_get_new_graph(graph, graph_new, domain_id_org, n_move_vertex_all, &
     & move_global_id_all, move_domain_id_new_all, move_domain_id_org_all, &
     & n_move_edge_all, move_global_edge_node_all, COM%comm)
 
@@ -128,72 +132,89 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_new_graph(graph, n_move_vertex_all, &
+  subroutine gedatsu_dlb_get_new_graph(graph, graph_new, domain_id_org, n_move_vertex_all, &
     & move_global_id_all, move_domain_id_new_all, move_domain_id_org_all, &
     & n_move_edge_all, move_global_edge_node_all, comm)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
     !> [in] graph 構造体
+    type(gedatsu_graph), intent(out) :: graph_new
+    !> [in] 元の領域番号
+    integer(kint) :: domain_id_org(:)
+    !> [in] 全移動計算点数
     integer(kint) :: n_move_vertex_all
-    !> [in] graph 構造体
+    !> [in] 全移動エッジ数
     integer(kint) :: n_move_edge_all
-    !> [in] graph 構造体
+    !> [in]
     integer(kint), allocatable :: move_global_id_all(:)
-    !> [in] graph 構造体
+    !> [in]
     integer(kint), allocatable :: move_domain_id_new_all(:)
-    !> [in] graph 構造体
+    !> [in]
     integer(kint), allocatable :: move_domain_id_org_all(:)
-    !> [in] graph 構造体
+    !> [in]
     integer(kint), allocatable :: move_global_edge_node_all(:)
     !> [in] MPI コミュニケータ
     integer(kint), intent(in) :: comm
     integer(kint) :: n_my_global_id
-    integer(kint) :: n_my_edge
-    integer(kint) :: i, in, my_rank
+    integer(kint) :: n_my_edge, edge(2), edge_local(2)
+    integer(kint) :: i, in, my_rank, jn, j, jS, jE, id1, id2, lid1, lid2
+    logical :: is_exist
     integer(kint), allocatable :: my_global_id(:)
-    integer(kint), allocatable :: my_global_id_domain(:)
+    integer(kint), allocatable :: my_domain_new(:)
+    integer(kint), allocatable :: my_domain_org(:)
     integer(kint), allocatable :: my_global_id_perm(:)
+    integer(kint), allocatable :: my_edge(:,:)
+    integer(kint), allocatable :: is_used_node(:)
+    integer(kint), allocatable :: my_global_id_local(:)
+    integer(kint), allocatable :: my_global_id_local_perm(:)
     integer(kint), allocatable :: itmp(:)
 
-    !# 更新後の節点の取得
+    !# 自領域＋共有領域の節点数の取得
     my_rank = monolis_mpi_get_local_my_rank(comm)
 
     n_my_global_id = 0
     do i = 1, graph%n_vertex
-      if(graph%vertex_domain_id(i) == my_rank)then
+      if(graph%vertex_domain_id(i) == my_rank .and. &
+        & domain_id_org(i) == my_rank)then
         n_my_global_id = n_my_global_id + 1
       endif
     enddo
 
     do i = 1, n_move_vertex_all
-      if(move_domain_id_new_all(i) /= my_rank)then
-        n_my_global_id = n_my_global_id + 1
-      endif
+      if(move_domain_id_new_all(i) == my_rank .and. &
+       & move_domain_id_org_all(i) == my_rank) cycle
+      n_my_global_id = n_my_global_id + 1
     enddo
 
 write(100+monolis_mpi_get_global_my_rank(),*)"n_my_global_id", n_my_global_id
 
+    !# 自領域＋共有領域の節点番号、領域番号の取得
     call monolis_alloc_I_1d(my_global_id, n_my_global_id)
-    call monolis_alloc_I_1d(my_global_id_domain, n_my_global_id)
+    call monolis_alloc_I_1d(my_domain_new, n_my_global_id)
+    call monolis_alloc_I_1d(my_domain_org, n_my_global_id)
 
     n_my_global_id = 0
     do i = 1, graph%n_vertex
-      if(graph%vertex_domain_id(i) == my_rank)then
+      if(graph%vertex_domain_id(i) == my_rank .and. &
+        & domain_id_org(i) == my_rank)then
         n_my_global_id = n_my_global_id + 1
         my_global_id(n_my_global_id) = graph%vertex_id(i)
-        my_global_id_domain(n_my_global_id) = graph%vertex_domain_id(i)
+        my_domain_new(n_my_global_id) = graph%vertex_domain_id(i)
+        my_domain_org(n_my_global_id) = domain_id_org(i)
       endif
     enddo
 
     do i = 1, n_move_vertex_all
-      if(move_domain_id_new_all(i) /= my_rank)then
-        n_my_global_id = n_my_global_id + 1
-        my_global_id(n_my_global_id) = move_global_id_all(i)
-        my_global_id_domain(n_my_global_id) = move_domain_id_new_all(i)
-      endif
+      if(move_domain_id_new_all(i) == my_rank .and. &
+       & move_domain_id_org_all(i) == my_rank) cycle
+      n_my_global_id = n_my_global_id + 1
+      my_global_id(n_my_global_id) = move_global_id_all(i)
+      my_domain_new(n_my_global_id) = move_domain_id_new_all(i)
+      my_domain_org(n_my_global_id) = move_domain_id_org_all(i)
     enddo
 
+    !# 自領域＋共有領域の節点番号、領域番号のソート
     call monolis_alloc_I_1d(my_global_id_perm, n_my_global_id)
     call monolis_alloc_I_1d(itmp, n_my_global_id)
 
@@ -201,17 +222,77 @@ write(100+monolis_mpi_get_global_my_rank(),*)"n_my_global_id", n_my_global_id
 
     call monolis_qsort_I_2d(my_global_id, my_global_id_perm, 1, n_my_global_id)
 
-    itmp = my_global_id_domain
+    itmp = my_domain_new
     do i = 1, n_my_global_id
       in = my_global_id_perm(i)
-      my_global_id_domain(i) = itmp(in)
+      my_domain_new(i) = itmp(in)
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"my_global_id       ", my_global_id
-write(100+monolis_mpi_get_global_my_rank(),*)"my_global_id_domain", my_global_id_domain
+    itmp = my_domain_org
+    do i = 1, n_my_global_id
+      in = my_global_id_perm(i)
+      my_domain_org(i) = itmp(in)
+    enddo
 
-    !# 更新後のエッジの取得
-    n_my_edge = 0
+write(100+monolis_mpi_get_global_my_rank(),*)"my_global_id ", my_global_id
+write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_new", my_domain_new
+write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_org", my_domain_org
+
+    call monolis_dealloc_I_1d(itmp)
+
+    !# 自領域＋共有領域のエッジの重複削除（検索テーブルの作成）
+    call monolis_alloc_I_1d(my_global_id_local, graph%n_vertex)
+
+    my_global_id_local = graph%vertex_id
+
+    call monolis_alloc_I_1d(my_global_id_local_perm, graph%n_vertex)
+
+    call monolis_get_sequence_array_I(my_global_id_local_perm, graph%n_vertex, 1, 1)
+
+    call monolis_qsort_I_2d(my_global_id_local, my_global_id_local_perm, 1, graph%n_vertex)
+
+    !# 自領域＋共有領域のエッジの重複削除
+    call monolis_alloc_I_1d(itmp, n_move_edge_all)
+
+    do i = 1, n_move_edge_all
+      edge(1) = move_global_edge_node_all(2*i-1)
+      edge(2) = move_global_edge_node_all(2*i  )
+      call monolis_bsearch_I(my_global_id_local, 1, graph%n_vertex, edge(1), edge_local(1))
+      call monolis_bsearch_I(my_global_id_local, 1, graph%n_vertex, edge(2), edge_local(2))
+      if(edge_local(1) == -1) cycle
+      if(edge_local(2) == -1) cycle
+      call gedatsu_graph_check_edge(graph, edge_local, is_exist)
+      if(.not. is_exist) itmp(i) = 1
+    enddo
+
+    n_my_edge = graph%index(graph%n_vertex + 1)
+    do i = 1, n_move_edge_all
+      if(itmp(i) == 1) n_my_edge = n_my_edge + 1
+    enddo
+
+    call monolis_alloc_I_2d(my_edge, 2, n_my_edge)
+
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        my_edge(1,j) = i
+        my_edge(2,j) = graph%item(j)
+      enddo
+    enddo
+
+    n_my_edge = graph%index(graph%n_vertex + 1)
+    do i = 1, n_move_edge_all
+      if(itmp(i) == 1)then
+        n_my_edge = n_my_edge + 1
+        my_edge(1,j) = move_global_edge_node_all(2*i-1)
+        my_edge(2,j) = move_global_edge_node_all(2*i  )
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_my_edge", n_my_edge
+write(100+monolis_mpi_get_global_my_rank(),*)"my_edge", my_edge
+
   end subroutine gedatsu_dlb_get_new_graph
 
   !> @ingroup group_dlb

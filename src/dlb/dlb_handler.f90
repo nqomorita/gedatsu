@@ -26,32 +26,35 @@ contains
     call monolis_com_get_n_internal_vertex(COM, graph%n_internal_vertex)
 
     call gedatsu_graph_repartition_with_weight(graph, COM, node_wgt, edge_wgt)
-
-    !call gedatsu_dlb_update_check(dlb, graph)
-
-    call gedatsu_dlb_get_comm_table(dlb, graph, COM)
   end subroutine gedatsu_dlb_analysis_with_weight
 
   !> @ingroup group_dlb
   !> 負荷分散：負荷分散の実行チェック
-  subroutine gedatsu_dlb_update_check(dlb, graph)
+  subroutine gedatsu_dlb_update_check(dlb, graph, should_update)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
-
+    !> [in] graph 構造体
+    logical :: should_update
+    should_update = .false.
   end subroutine gedatsu_dlb_update_check
 
   !> @ingroup group_dlb
   !> 負荷分散：グラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_graph(dlb, graph)
+  subroutine gedatsu_dlb_update_graph(dlb, graph_org, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in,out] graph 構造体
-    type(gedatsu_graph) :: graph
+    type(gedatsu_graph) :: graph_org
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: graph_new
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
 
+    call gedatsu_dlb_get_comm_table(dlb, graph_org, graph_new, COM)
   end subroutine gedatsu_dlb_update_graph
 
   !> @ingroup group_dlb

@@ -507,4 +507,34 @@ contains
 
     call gedatsu_graph_set_edge(graph, n_edge_all, edge_all)
   end subroutine gedatsu_graph_add_edge
+
+  !> @ingroup graph_basic
+  !> グラフのエッジを追加
+  !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
+  subroutine gedatsu_graph_check_edge(graph, edge, is_exist)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] グラフエッジ
+    integer(kint), intent(out) :: edge(:)
+    !> [in] グラフエッジ
+    logical, intent(out) :: is_exist
+    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE, e1, e2
+    integer(kint), allocatable :: edge_all(:,:)
+
+    is_exist = .false.
+
+    e1 = edge(1)
+    e2 = edge(2)
+
+    jS = graph%index(e1) + 1
+    jE = graph%index(e1 + 1)
+    do j = jS, jE
+      i = graph%item(j)
+      if(i == e2)then
+        is_exist = .true.
+        return
+      endif
+    enddo
+  end subroutine gedatsu_graph_check_edge
 end module mod_gedatsu_graph_handler

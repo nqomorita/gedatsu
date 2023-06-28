@@ -6,6 +6,8 @@ program dlb_test
   type(gedatsu_dlb) :: dlb
   !> graph 構造体
   type(gedatsu_graph) :: graph
+  !> graph 構造体
+  type(gedatsu_graph) :: graph_new
   !> コミュニケータ 構造体
   type(monolis_COM) :: COM
   !> 分割数
@@ -31,6 +33,8 @@ program dlb_test
 
   !> repart section
   call gedatsu_dlb_analysis_with_weight(dlb, graph, COM, node_wgt, edge_wgt)
+
+  call gedatsu_dlb_update_graph(dlb, graph, graph_new, COM)
 
   call monolis_mpi_finalize()
 end program dlb_test
