@@ -11,7 +11,7 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_get_comm_table(dlb, graph, graph_new, COM)
+  subroutine gedatsu_dlb_update_graph_main(dlb, graph, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
@@ -127,8 +127,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
 
     !# send table の作成
     !# recv table の作成
-    !call gedatsu_dlb_get_comm_table_main()
-  end subroutine gedatsu_dlb_get_comm_table
+    call gedatsu_dlb_get_comm_table_main()
+  end subroutine gedatsu_dlb_update_graph_main
+
+  !> @ingroup group_dlb
+  !> データ通信のための通信テーブルの作成
+  subroutine gedatsu_dlb_get_comm_table_main()
+    implicit none
+
+  end subroutine gedatsu_dlb_get_comm_table_main
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得

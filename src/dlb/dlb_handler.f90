@@ -38,7 +38,7 @@ contains
     type(gedatsu_graph) :: graph
     !> [in] graph 構造体
     logical :: should_update
-    should_update = .false.
+    should_update = .true.
   end subroutine gedatsu_dlb_update_check
 
   !> @ingroup group_dlb
@@ -54,60 +54,64 @@ contains
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
 
-    call gedatsu_dlb_get_comm_table(dlb, graph_org, graph_new, COM)
+    call gedatsu_dlb_update_graph_main(dlb, graph_org, graph_new, COM)
   end subroutine gedatsu_dlb_update_graph
 
   !> @ingroup group_dlb
   !> 負荷分散：1 次元整数配列のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_I_1d(dlb, ndof, var)
+  subroutine gedatsu_dlb_update_I_1d(dlb, ndof, var_org, var_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
     !> [in,out] アップデートする配列
-    integer(kint), allocatable :: var(:)
+    integer(kint) :: var_org(:)
+    integer(kint) :: var_new(:)
 
   end subroutine gedatsu_dlb_update_I_1d
 
   !> @ingroup group_dlb
-  !> 負荷分散：1 次元整数配列のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_R_1d(dlb, ndof, var)
+  !> 負荷分散：1 次元実数配列のアップデート（配列のメモリ再確保）
+  subroutine gedatsu_dlb_update_R_1d(dlb, ndof, var_org, var_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
     !> [in,out] アップデートする配列
-    real(kdouble), allocatable :: var(:)
+    real(kdouble) :: var_org(:)
+    real(kdouble) :: var_new(:)
 
   end subroutine gedatsu_dlb_update_R_1d
 
   !> @ingroup group_dlb
-  !> 負荷分散：1 次元整数配列のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_L_1d(dlb, ndof, var)
+  !> 負荷分散：1 次元複素数配列のアップデート（配列のメモリ再確保）
+  subroutine gedatsu_dlb_update_C_1d(dlb, ndof, var_org, var_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
     !> [in,out] アップデートする配列
-    logical, allocatable :: var(:)
+    complex(kdouble) :: var_org(:)
+    complex(kdouble) :: var_new(:)
 
-  end subroutine gedatsu_dlb_update_L_1d
+  end subroutine gedatsu_dlb_update_C_1d
 
   !> @ingroup group_dlb
-  !> 負荷分散：グラフ情報の情報送受信
-  subroutine gedatsu_dlb_SendRecv_graph(dlb, graph_in, graph_out)
+  !> 負荷分散：1 次元論理型配列のアップデート（配列のメモリ再確保）
+  subroutine gedatsu_dlb_update_L_1d(dlb, ndof, var_org, var_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
-    !> [in] 元の graph 構造体
-    type(gedatsu_graph) :: graph_in
-    !> [out] 負荷分散後の graph 構造体
-    type(gedatsu_graph) :: graph_out
+    !> [in] 1 節点あたりの自由度
+    integer(kint) :: ndof
+    !> [in,out] アップデートする配列
+    logical :: var_org(:)
+    logical :: var_new(:)
 
-  end subroutine gedatsu_dlb_SendRecv_graph
+  end subroutine gedatsu_dlb_update_L_1d
 
   !> @ingroup group_dlb
   !> 負荷分散：1 次元整数配列の情報送受信
@@ -125,7 +129,7 @@ contains
   end subroutine gedatsu_dlb_SendRecv_I_1d
 
   !> @ingroup group_dlb
-  !> 負荷分散：1 次元整数配列の情報送受信
+  !> 負荷分散：1 次元実数配列の情報送受信
   subroutine gedatsu_dlb_SendRecv_R_1d(dlb, ndof, var_send, var_recv)
     implicit none
     !> [in] dlb 構造体
@@ -140,7 +144,22 @@ contains
   end subroutine gedatsu_dlb_SendRecv_R_1d
 
   !> @ingroup group_dlb
-  !> 負荷分散：1 次元整数配列の情報送受信
+  !> 負荷分散：1 次元複素数配列の情報送受信
+  subroutine gedatsu_dlb_SendRecv_C_1d(dlb, ndof, var_send, var_recv)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb) :: dlb
+    !> [in] 1 節点あたりの自由度
+    integer(kint) :: ndof
+    !> [in] 元の配列
+    real(kdouble) :: var_send(:)
+    !> [out] 負荷分散後の配列
+    complex(kdouble) :: var_recv(:)
+
+  end subroutine gedatsu_dlb_SendRecv_C_1d
+
+  !> @ingroup group_dlb
+  !> 負荷分散：1 次元論理型配列の情報送受信
   subroutine gedatsu_dlb_SendRecv_L_1d(dlb, ndof, var_send, var_recv)
     implicit none
     !> [in] dlb 構造体

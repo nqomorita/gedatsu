@@ -519,8 +519,7 @@ contains
     integer(kint), intent(out) :: edge(:)
     !> [in] グラフエッジ
     logical, intent(out) :: is_exist
-    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE, e1, e2
-    integer(kint), allocatable :: edge_all(:,:)
+    integer(kint) :: i, j, jS, jE, e1, e2
 
     is_exist = .false.
 
