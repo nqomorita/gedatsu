@@ -403,7 +403,7 @@ contains
 
   !> @ingroup graph_basic
   !> グラフのエッジを設定
-  !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。
+  !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。ノード数は変化しない。
   subroutine gedatsu_graph_set_edge(graph, n_edge, edge)
     implicit none
     !> [in,out] graph 構造体

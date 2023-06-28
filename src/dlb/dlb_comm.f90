@@ -158,7 +158,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
     integer(kint), intent(in) :: comm
     integer(kint) :: n_my_global_id
     integer(kint) :: n_my_edge, edge(2), edge_local(2)
-    integer(kint) :: i, in, my_rank, jn, j, jS, jE, id1, id2, lid1, lid2
+    integer(kint) :: i, in, my_rank, jn, j, jS, jE, n_new_edge
     logical :: is_exist
     integer(kint), allocatable :: my_global_id(:)
     integer(kint), allocatable :: my_domain_new(:)
@@ -166,9 +166,11 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
     integer(kint), allocatable :: my_global_id_perm(:)
     integer(kint), allocatable :: my_edge(:,:)
     integer(kint), allocatable :: is_used_node(:)
+    integer(kint), allocatable :: is_used_edge(:)
     integer(kint), allocatable :: my_global_id_local(:)
     integer(kint), allocatable :: my_global_id_local_perm(:)
     integer(kint), allocatable :: itmp(:)
+    integer(kint), allocatable :: add_edge(:,:)
 
     !# 自領域＋共有領域の節点数の取得
     my_rank = monolis_mpi_get_local_my_rank(comm)
@@ -262,12 +264,12 @@ write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_org", my_domain_org
       if(edge_local(1) == -1) cycle
       if(edge_local(2) == -1) cycle
       call gedatsu_graph_check_edge(graph, edge_local, is_exist)
-      if(.not. is_exist) itmp(i) = 1
+      if(is_exist) itmp(i) = 1
     enddo
 
     n_my_edge = graph%index(graph%n_vertex + 1)
     do i = 1, n_move_edge_all
-      if(itmp(i) == 1) n_my_edge = n_my_edge + 1
+      if(itmp(i) == 0) n_my_edge = n_my_edge + 1
     enddo
 
     call monolis_alloc_I_2d(my_edge, 2, n_my_edge)
@@ -276,23 +278,95 @@ write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_org", my_domain_org
       jS = graph%index(i) + 1
       jE = graph%index(i + 1)
       do j = jS, jE
-        my_edge(1,j) = i
-        my_edge(2,j) = graph%item(j)
+        my_edge(1,j) = graph%vertex_id(i)
+        my_edge(2,j) = graph%vertex_id(graph%item(j))
       enddo
     enddo
 
     n_my_edge = graph%index(graph%n_vertex + 1)
     do i = 1, n_move_edge_all
-      if(itmp(i) == 1)then
+      if(itmp(i) == 0)then
         n_my_edge = n_my_edge + 1
-        my_edge(1,j) = move_global_edge_node_all(2*i-1)
-        my_edge(2,j) = move_global_edge_node_all(2*i  )
+        my_edge(1,n_my_edge) = move_global_edge_node_all(2*i-1)
+        my_edge(2,n_my_edge) = move_global_edge_node_all(2*i  )
       endif
     enddo
 
 write(100+monolis_mpi_get_global_my_rank(),*)"n_my_edge", n_my_edge
-write(100+monolis_mpi_get_global_my_rank(),*)"my_edge", my_edge
+write(100+monolis_mpi_get_global_my_rank(),*)"my_edge"
+write(100+monolis_mpi_get_global_my_rank(),"(4i4)")my_edge
 
+    !# 更新後のエッジ数・節点数の取得
+    call monolis_alloc_I_1d(is_used_node, n_my_global_id)
+    call monolis_alloc_I_1d(is_used_edge, n_my_edge)
+
+    call gedatsu_graph_initialize(graph_new)
+
+    n_new_edge = 0
+    do i = 1, n_my_edge
+      edge(1) = my_edge(1,i)
+      edge(2) = my_edge(2,i)
+      call monolis_bsearch_I(my_global_id, 1, n_my_global_id, edge(1), edge_local(1))
+      call monolis_bsearch_I(my_global_id, 1, n_my_global_id, edge(2), edge_local(2))
+      if(my_domain_new(edge_local(1)) == my_rank .or. &
+       & my_domain_new(edge_local(2)) == my_rank)then
+        n_new_edge = n_new_edge + 1
+        is_used_node(edge_local(1)) = 1
+        is_used_node(edge_local(2)) = 1
+        is_used_edge(i) = 1
+      endif
+    enddo
+
+    graph_new%n_vertex = 0
+    graph_new%n_internal_vertex = 0
+    do i = 1, n_my_global_id
+      if(is_used_node(i) == 1 .and. my_domain_new(i) == my_rank)then
+        graph_new%n_internal_vertex = graph_new%n_internal_vertex + 1
+      endif
+      if(is_used_node(i) == 1)then
+        graph_new%n_vertex = graph_new%n_vertex + 1
+        is_used_node(i) = graph_new%n_vertex
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"graph_new%n_vertex", graph_new%n_vertex
+write(100+monolis_mpi_get_global_my_rank(),*)"graph_new%n_internal_vertex", graph_new%n_internal_vertex
+
+    !# 更新後の節点の設定
+    call monolis_alloc_I_1d(graph_new%vertex_id, graph_new%n_vertex)
+
+    do i = 1, n_my_global_id
+      if(is_used_node(i) /= 0) graph_new%vertex_id(i) = my_global_id(i)
+    enddo
+
+    call monolis_alloc_I_1d(graph_new%vertex_domain_id, graph_new%n_vertex)
+
+    do i = 1, n_my_global_id
+      if(is_used_node(i) /= 0) graph_new%vertex_domain_id(i) = my_domain_new(i)
+    enddo
+
+    !# 更新後のエッジの設定
+    call monolis_alloc_I_2d(add_edge, 2, n_new_edge)
+
+    n_new_edge = 0
+    do i = 1, n_my_edge
+      if(is_used_edge(i) == 1)then
+        edge(1) = my_edge(1,i)
+        edge(2) = my_edge(2,i)
+        call monolis_bsearch_I(my_global_id, 1, n_my_global_id, edge(1), edge_local(1))
+        call monolis_bsearch_I(my_global_id, 1, n_my_global_id, edge(2), edge_local(2))
+        n_new_edge = n_new_edge + 1
+        add_edge(1,n_new_edge) = is_used_node(edge_local(1))
+        add_edge(2,n_new_edge) = is_used_node(edge_local(2))
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_new_edge", n_new_edge
+write(100+monolis_mpi_get_global_my_rank(),*)"add_edge", add_edge
+
+    call monolis_alloc_I_1d(graph_new%index, graph_new%n_vertex + 1)
+
+    call gedatsu_graph_set_edge(graph_new, n_new_edge, add_edge)
   end subroutine gedatsu_dlb_get_new_graph
 
   !> @ingroup group_dlb
