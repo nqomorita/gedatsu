@@ -322,10 +322,27 @@ write(100+monolis_mpi_get_global_my_rank(),"(4i4)")my_edge
     do i = 1, n_my_global_id
       if(is_used_node(i) == 1 .and. my_domain_new(i) == my_rank)then
         graph_new%n_internal_vertex = graph_new%n_internal_vertex + 1
-      endif
-      if(is_used_node(i) == 1)then
         graph_new%n_vertex = graph_new%n_vertex + 1
-        is_used_node(i) = graph_new%n_vertex
+        is_used_node(i) = 1
+      endif
+      if(is_used_node(i) == 1 .and. my_domain_new(i) /= my_rank)then
+        graph_new%n_vertex = graph_new%n_vertex + 1
+        is_used_node(i) = -1
+      endif
+    enddo
+
+    in = 0
+    do i = 1, n_my_global_id
+      if(is_used_node(i) == 1)then
+        in = in + 1
+        is_used_node(i) = in
+      endif
+    enddo
+
+    do i = 1, n_my_global_id
+      if(is_used_node(i) == -1)then
+        in = in + 1
+        is_used_node(i) = in
       endif
     enddo
 
@@ -361,12 +378,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"graph_new%n_internal_vertex", grap
       endif
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_new_edge", n_new_edge
-write(100+monolis_mpi_get_global_my_rank(),*)"add_edge", add_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_new_edge", n_new_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"add_edge", add_edge
 
     call monolis_alloc_I_1d(graph_new%index, graph_new%n_vertex + 1)
 
     call gedatsu_graph_set_edge(graph_new, n_new_edge, add_edge)
+
+write(100+monolis_mpi_get_global_my_rank(),*)"graph_new%index", graph_new%index
+write(100+monolis_mpi_get_global_my_rank(),*)"graph_new%item", graph_new%item
   end subroutine gedatsu_dlb_get_new_graph
 
   !> @ingroup group_dlb
