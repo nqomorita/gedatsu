@@ -274,16 +274,60 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
   subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, update_db, COM)
     implicit none
     !> [in] dlb 構造体
-    type(gedatsu_dlb), intent(out) :: dlb
+    type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
-    type(gedatsu_graph), intent(in) :: graph_org
+    type(gedatsu_graph), intent(inout) :: graph_org
     !> [in,out] graph 構造体
-    type(gedatsu_graph), intent(out) :: graph_new
+    type(gedatsu_graph), intent(inout) :: graph_new
     !> [in] データベース 構造体
     type(gedatsu_update_db) :: update_db(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    integer(kint) :: my_rank, n_recv_node, n_recv_edge
+    real(kdouble) :: tcomm
+    integer(kint), allocatable :: domain_id_org(:)
+    integer(kint), allocatable :: recv_global_id(:)
+    integer(kint), allocatable :: recv_domain_new(:)
+    integer(kint), allocatable :: recv_domain_org(:)
 
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+
+    !# 計算点の送受信
+    n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
+
+    call monolis_alloc_I_1d(recv_global_id,  n_recv_node)
+    call monolis_alloc_I_1d(recv_domain_new, n_recv_node)
+    call monolis_alloc_I_1d(recv_domain_org, n_recv_node)
+
+    call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & graph_org%vertex_id, recv_global_id, 1, dlb%COM_node%comm)
+
+    call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & graph_org%vertex_domain_id, recv_domain_new, 1, dlb%COM_node%comm)
+
+    call monolis_alloc_I_1d(domain_id_org, graph_org%n_vertex)
+    domain_id_org = my_rank
+    call monolis_mpi_update_I(COM, 1, domain_id_org, tcomm)
+
+    call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & domain_id_org, recv_domain_org, 1, dlb%COM_node%comm)
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_node", n_recv_node
+write(100+monolis_mpi_get_global_my_rank(),*)"recv_global_id", recv_global_id
+write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_new", recv_domain_new
+write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
+
+    !# エッジの送受信
+    n_recv_edge = dlb%COM_edge%recv_index(dlb%COM_edge%recv_n_neib + 1)
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
