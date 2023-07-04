@@ -93,7 +93,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
     integer(kint) :: recv_n_edge_list(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: i, in, id, j, n_item
+    integer(kint) :: i, in, j, n_item
     integer(kint) :: my_rank, comm_size
 
     call monolis_com_finalize(dlb%COM_node)
@@ -120,9 +120,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
       endif
     enddo
 
-    call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, dlb%COM_node%send_n_neib)
-    call monolis_palloc_I_1d(dlb%COM_node%send_index, dlb%COM_node%send_n_neib + 1)
-    call monolis_palloc_I_1d(dlb%COM_node%send_item, n_item)
+    if(dlb%COM_node%send_n_neib == 0)then
+      call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, 1)
+      call monolis_palloc_I_1d(dlb%COM_node%send_index, 2)
+      call monolis_palloc_I_1d(dlb%COM_node%send_item, 1)
+    else
+      call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, dlb%COM_node%send_n_neib)
+      call monolis_palloc_I_1d(dlb%COM_node%send_index, dlb%COM_node%send_n_neib + 1)
+      call monolis_palloc_I_1d(dlb%COM_node%send_item, n_item)
+    endif
 
     in = 0
     do i = 1, comm_size
@@ -153,9 +159,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
       endif
     enddo
 
-    call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, dlb%COM_node%recv_n_neib)
-    call monolis_palloc_I_1d(dlb%COM_node%recv_index, dlb%COM_node%recv_n_neib + 1)
-    call monolis_palloc_I_1d(dlb%COM_node%recv_item, n_item)
+    if(dlb%COM_node%recv_n_neib == 0)then
+      call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, 1)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_index, 2)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_item, 1)
+    else
+      call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, dlb%COM_node%recv_n_neib)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_index, dlb%COM_node%recv_n_neib + 1)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_item, n_item)
+    endif
 
     in = 0
     do i = 1, comm_size
@@ -168,6 +180,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
 
     call monolis_get_sequence_array_I(dlb%COM_node%recv_item, n_item, 1, 1)
 
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_n_neib", dlb%COM_node%send_n_neib
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_neib_pe", dlb%COM_node%send_neib_pe
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_index", dlb%COM_node%send_index
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_item", dlb%COM_node%send_item
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_n_neib", dlb%COM_node%recv_n_neib
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_neib_pe", dlb%COM_node%recv_neib_pe
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_index", dlb%COM_node%recv_index
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_item", dlb%COM_node%recv_item
+
     !# edge セクション
     !# send table の作成
     n_item = 0
@@ -178,9 +199,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
       endif
     enddo
 
-    call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, dlb%COM_edge%send_n_neib)
-    call monolis_palloc_I_1d(dlb%COM_edge%send_index, dlb%COM_edge%send_n_neib + 1)
-    call monolis_palloc_I_1d(dlb%COM_edge%send_item, n_item)
+    if(dlb%COM_edge%send_n_neib == 0)then
+      call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_index, 2)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_item, 1)
+    else
+      call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, dlb%COM_edge%send_n_neib)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_index, dlb%COM_edge%send_n_neib + 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_item, n_item)
+    endif
 
     in = 0
     do i = 1, comm_size
@@ -193,7 +220,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
 
     in = 0
     do i = 1, comm_size
-      do j = 1, graph%n_vertex
+      do j = 1, graph%index(graph%n_vertex + 1)
         if(update_db(i)%n_send_edge == 0) cycle
         if(update_db(i)%is_send_edge(j) == 1)then
           in = in + 1
@@ -211,9 +238,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
       endif
     enddo
 
-    call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, dlb%COM_edge%recv_n_neib)
-    call monolis_palloc_I_1d(dlb%COM_edge%recv_index, dlb%COM_edge%recv_n_neib + 1)
-    call monolis_palloc_I_1d(dlb%COM_edge%recv_item, n_item)
+    if(dlb%COM_edge%recv_n_neib == 0)then
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_index, 2)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_item, 1)
+    else
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, dlb%COM_edge%recv_n_neib)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_index, dlb%COM_edge%recv_n_neib + 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_item, n_item)
+    endif
 
     in = 0
     do i = 1, comm_size
@@ -225,6 +258,15 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
     enddo
 
     call monolis_get_sequence_array_I(dlb%COM_edge%recv_item, n_item, 1, 1)
+
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_n_neib", dlb%COM_edge%send_n_neib
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_neib_pe", dlb%COM_edge%send_neib_pe
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_index", dlb%COM_edge%send_index
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_item", dlb%COM_edge%send_item
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_n_neib", dlb%COM_edge%recv_n_neib
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_neib_pe", dlb%COM_edge%recv_neib_pe
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_index", dlb%COM_edge%recv_index
+write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_edge%recv_item
   end subroutine gedatsu_dlb_generate_comm_table
 
   !> @ingroup group_dlb
