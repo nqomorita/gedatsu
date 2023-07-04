@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 INPF=driver/input.f
 OUTF=driver/output.f
 INPC=driver/input.c

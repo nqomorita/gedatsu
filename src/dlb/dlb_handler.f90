@@ -62,7 +62,7 @@ contains
 
     call gedatsu_dlb_get_comm_table_main(dlb, graph_org, update_db, COM)
 
-    !call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, update_db, COM)
+    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, update_db, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb

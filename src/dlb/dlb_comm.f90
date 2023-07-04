@@ -270,17 +270,20 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
   end subroutine gedatsu_dlb_generate_comm_table
 
   !> @ingroup group_dlb
-  !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph, update_db, COM)
+  !> 動的負荷分散のためのグラフ構造アップデート
+  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, update_db, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
     !> [in] graph 構造体
-    type(gedatsu_graph), intent(in) :: graph
+    type(gedatsu_graph), intent(in) :: graph_org
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(out) :: graph_new
     !> [in] データベース 構造体
     type(gedatsu_update_db) :: update_db(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
