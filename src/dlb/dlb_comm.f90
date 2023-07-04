@@ -170,9 +170,61 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
 
     !# edge セクション
     !# send table の作成
+    n_item = 0
+    do i = 1, comm_size
+      if(send_n_edge_list(i) /= 0)then
+        dlb%COM_edge%send_n_neib = dlb%COM_edge%send_n_neib + 1
+        n_item = n_item + send_n_edge_list(i)
+      endif
+    enddo
+
+    call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, dlb%COM_edge%send_n_neib)
+    call monolis_palloc_I_1d(dlb%COM_edge%send_index, dlb%COM_edge%send_n_neib + 1)
+    call monolis_palloc_I_1d(dlb%COM_edge%send_item, n_item)
+
+    in = 0
+    do i = 1, comm_size
+      if(send_n_edge_list(i) /= 0)then
+        in = in + 1
+        dlb%COM_edge%send_neib_pe(in) = i - 1
+        dlb%COM_edge%send_index(in + 1) = dlb%COM_edge%send_index(in) + send_n_edge_list(i)
+      endif
+    enddo
+
+    in = 0
+    do i = 1, comm_size
+      do j = 1, graph%n_vertex
+        if(update_db(i)%n_send_edge == 0) cycle
+        if(update_db(i)%is_send_edge(j) == 1)then
+          in = in + 1
+          dlb%COM_edge%send_item(in) = j
+        endif
+      enddo
+    enddo
 
     !# recv table の作成
+    n_item = 0
+    do i = 1, comm_size
+      if(recv_n_edge_list(i) /= 0)then
+        dlb%COM_edge%recv_n_neib = dlb%COM_edge%recv_n_neib + 1
+        n_item = n_item + recv_n_edge_list(i)
+      endif
+    enddo
 
+    call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, dlb%COM_edge%recv_n_neib)
+    call monolis_palloc_I_1d(dlb%COM_edge%recv_index, dlb%COM_edge%recv_n_neib + 1)
+    call monolis_palloc_I_1d(dlb%COM_edge%recv_item, n_item)
+
+    in = 0
+    do i = 1, comm_size
+      if(recv_n_edge_list(i) /= 0)then
+        in = in + 1
+        dlb%COM_edge%recv_neib_pe(in) = i - 1
+        dlb%COM_edge%recv_index(in + 1) = dlb%COM_edge%recv_index(in) + recv_n_edge_list(i)
+      endif
+    enddo
+
+    call monolis_get_sequence_array_I(dlb%COM_edge%recv_item, n_item, 1, 1)
   end subroutine gedatsu_dlb_generate_comm_table
 
   !> @ingroup group_dlb
