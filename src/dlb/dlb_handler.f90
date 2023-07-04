@@ -42,8 +42,8 @@ contains
   end subroutine gedatsu_dlb_update_check
 
   !> @ingroup group_dlb
-  !> 負荷分散：グラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_graph(dlb, graph_org, graph_new, COM)
+  !> 負荷分散：ノードグラフ情報のアップデート（配列のメモリ再確保）
+  subroutine gedatsu_dlb_update_nodal_graph(dlb, graph_org, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
@@ -54,8 +54,24 @@ contains
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
 
-    call gedatsu_dlb_update_graph_main(dlb, graph_org, graph_new, COM)
-  end subroutine gedatsu_dlb_update_graph
+    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, COM)
+  end subroutine gedatsu_dlb_update_nodal_graph
+
+  !> @ingroup group_dlb
+  !> 負荷分散：付随グラフ情報のアップデート（配列のメモリ再確保）
+  subroutine gedatsu_dlb_update_connectivity_graph(dlb, graph_org, graph_new, COM)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb) :: dlb
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: graph_org
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: graph_new
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+
+    !call gedatsu_dlb_update_graph_main(dlb, graph_org, graph_new, COM)
+  end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb
   !> 負荷分散：1 次元整数配列のアップデート（配列のメモリ再確保）

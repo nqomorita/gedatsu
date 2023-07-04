@@ -11,7 +11,7 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_update_graph_main(dlb, graph, graph_new, COM)
+  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
@@ -127,14 +127,33 @@ write(100+monolis_mpi_get_global_my_rank(),*)"move_global_edge_node_all", move_g
 
     !# send table の作成
     !# recv table の作成
-    call gedatsu_dlb_get_comm_table_main()
-  end subroutine gedatsu_dlb_update_graph_main
+    !call gedatsu_dlb_get_comm_table_main(dlb, COM)
+  end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
   !> データ通信のための通信テーブルの作成
-  subroutine gedatsu_dlb_get_comm_table_main()
+  subroutine gedatsu_dlb_get_comm_table_main(dlb, COM)
     implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb), intent(inout) :: dlb
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    integer(kint) :: send_n_node, send_n_edge
+    integer(kint) :: my_rank, comm_size
+    integer(kint), allocatable :: send_n_node_list(:)
+    integer(kint), allocatable :: send_n_edge_list(:)
 
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    comm_size = monolis_mpi_get_local_comm_size(COM%comm)
+
+    call monolis_alloc_I_1d(send_n_node_list, comm_size)
+    call monolis_alloc_I_1d(send_n_edge_list, comm_size)
+
+    send_n_node = 0
+    send_n_edge = 0
+
+    call monolis_alltoall_I1(comm_size, send_n_node_list, COM%comm)
+    call monolis_alltoall_I1(comm_size, send_n_edge_list, COM%comm)
   end subroutine gedatsu_dlb_get_comm_table_main
 
   !> @ingroup group_dlb
