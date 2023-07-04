@@ -53,8 +53,16 @@ contains
     type(gedatsu_graph) :: graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    type(gedatsu_update_db), allocatable :: update_db(:)
+    integer(kint) :: comm_size
 
-    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, COM)
+    comm_size = monolis_mpi_get_local_comm_size(COM%comm)
+
+    allocate(update_db(comm_size))
+
+    call gedatsu_dlb_get_comm_table_main(dlb, graph_org, update_db, COM)
+
+    !call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, update_db, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb

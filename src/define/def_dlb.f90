@@ -15,6 +15,18 @@ module mod_gedatsu_dlb
     logical :: should_update
   end type gedatsu_dlb
 
+  !> dlb データベース構造体
+  type gedatsu_update_db
+    !> 送信計算点数
+    integer(kint) :: n_send_node = 0
+    !> 送信エッジ数
+    integer(kint) :: n_send_edge = 0
+    !> 送信する計算点フラグ
+    integer(kint), allocatable :: is_send_node(:)
+    !> 送信するエッジフラグ
+    integer(kint), allocatable :: is_send_edge(:)
+  end type gedatsu_update_db
+
 contains
 
   !> @ingroup graph_init
