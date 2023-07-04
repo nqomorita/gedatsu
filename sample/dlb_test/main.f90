@@ -34,7 +34,7 @@ program dlb_test
   !> repart section
   call gedatsu_dlb_analysis_with_weight(dlb, graph, COM, node_wgt, edge_wgt)
 
-  call gedatsu_dlb_update_graph(dlb, graph, graph_new, COM)
+  call gedatsu_dlb_update_nodal_graph(dlb, graph, graph_new, COM)
 
   call monolis_mpi_finalize()
 end program dlb_test
