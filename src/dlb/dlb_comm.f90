@@ -271,20 +271,28 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
 
   !> @ingroup group_dlb
   !> 動的負荷分散のためのグラフ構造アップデート
-  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_new, update_db, COM)
+  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, COM, &
+    & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph_org
-    !> [in,out] graph 構造体
-    type(gedatsu_graph), intent(inout) :: graph_new
-    !> [in] データベース 構造体
-    type(gedatsu_update_db) :: update_db(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: my_rank, n_recv_node, n_recv_edge, n_send_edge
-    integer(kint) :: i, j, jS, jE, in
+    !> [in] 自領域候補の計算点数
+    integer(kint) :: n_my_node
+    !> [in] 自領域候補のエッジ数
+    integer(kint) :: n_my_edge
+    !> [in] 自領域候補のエッジ
+    integer(kint), allocatable :: my_edge(:)
+    !> [in] 自領域候補の global id
+    integer(kint), allocatable :: my_global_id(:)
+    !> [in] 自領域候補の領域番号
+    integer(kint), allocatable :: my_domain_id(:)
+    integer(kint) :: n_recv_node, n_recv_edge, n_send_edge
+    integer(kint) :: n_merge_node, n_merge_edge
+    integer(kint) :: i, j, jS, jE, in, my_rank, id
     real(kdouble) :: tcomm
     integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
@@ -292,6 +300,9 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
     integer(kint), allocatable :: recv_domain_org(:)
     integer(kint), allocatable :: send_edge(:)
     integer(kint), allocatable :: recv_edge(:)
+    integer(kint), allocatable :: is_merge_node(:)
+    integer(kint), allocatable :: is_merge_edge(:)
+    integer(kint), allocatable :: global_id_tmp(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
@@ -324,6 +335,10 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
        & domain_id_org, recv_domain_org, 1, dlb%COM_node%comm)
 
+write(100+monolis_mpi_get_global_my_rank(),*)"vertex_domain_id", graph_org%vertex_domain_id
+write(100+monolis_mpi_get_global_my_rank(),*)"domain_id_org   ", domain_id_org
+write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id       ", graph_org%vertex_id
+
 write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_node", n_recv_node
 write(100+monolis_mpi_get_global_my_rank(),*)"recv_global_id", recv_global_id
 write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_new", recv_domain_new
@@ -353,6 +368,30 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
        & send_edge, recv_edge, 2, dlb%COM_edge%comm)
 
 write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
+
+    !# 検索用配列の作成
+    call monolis_alloc_I_1d(global_id_tmp, graph_org%n_vertex)
+    global_id_tmp = graph_org%vertex_id
+    call monolis_qsort_I_1d(global_id_tmp, 1, graph_org%n_vertex)
+
+    !# 計算点のマージ（自領域 + 受信領域）
+    call monolis_alloc_I_1d(is_merge_node, n_recv_node)
+    n_merge_node = 0
+    do i = 1, n_recv_node
+      in = recv_global_id(i)
+      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, in, id)
+      if(id > 1)then
+        is_merge_node(i) = id
+        n_merge_node = n_merge_node + 1
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_node", n_merge_node
+write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
+
+    !# エッジのマージ（自領域 + 受信領域）
+    call monolis_alloc_I_1d(is_merge_edge, n_recv_edge)
+    n_merge_edge = 0
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
