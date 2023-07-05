@@ -292,7 +292,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
     integer(kint), allocatable :: my_domain_id(:)
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge
     integer(kint) :: n_merge_node, n_merge_edge
-    integer(kint) :: i, j, jS, jE, in, my_rank, id
+    integer(kint) :: i, j, jS, jE, in, i1, i2, my_rank, id, id1, id2
     real(kdouble) :: tcomm
     integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
@@ -367,6 +367,7 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
        & dlb%COM_edge%recv_index, dlb%COM_edge%recv_item, &
        & send_edge, recv_edge, 2, dlb%COM_edge%comm)
 
+write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_edge", n_recv_edge
 write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
 
     !# 検索用配列の作成
@@ -380,8 +381,8 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
     do i = 1, n_recv_node
       in = recv_global_id(i)
       call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, in, id)
-      if(id > 1)then
-        is_merge_node(i) = id
+      if(id == -1)then
+        is_merge_node(i) = 1
         n_merge_node = n_merge_node + 1
       endif
     enddo
@@ -392,6 +393,62 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
     !# エッジのマージ（自領域 + 受信領域）
     call monolis_alloc_I_1d(is_merge_edge, n_recv_edge)
     n_merge_edge = 0
+    do i = 1, n_recv_edge
+      i1 = recv_edge(2*i-1)
+      i2 = recv_edge(2*i  )
+      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, i1, id1)
+      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, i2, id2)
+      if(.not.(id1 /= -1 .and. id2 /= -1))then
+        is_merge_edge(i) = 1
+        n_merge_edge = n_merge_edge + 1
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_edge", n_merge_edge
+write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
+
+    !# アップデートされたグラフの作成
+    n_my_node = graph_org%n_vertex + n_merge_node
+    n_my_edge = n_send_edge + n_merge_edge
+
+    call monolis_alloc_I_1d(my_global_id, n_my_node)
+    call monolis_alloc_I_1d(my_domain_id, n_my_node)
+    call monolis_alloc_I_1d(my_edge, 2*n_my_edge)
+
+    do i = 1, graph_org%n_vertex
+      my_global_id(i) = graph_org%vertex_id(i)
+      my_domain_id(i) = graph_org%vertex_domain_id(i)
+    enddo
+
+    in = graph_org%n_vertex
+    do i = 1, n_merge_node
+      if(is_merge_node(i) == 1)then
+        in = in + 1
+        my_global_id(in) = recv_global_id(i)
+        my_domain_id(in) = recv_domain_new(i)
+      endif
+    enddo
+
+    do i = 1, n_send_edge
+      my_edge(2*i-1) = send_edge(2*i-1)
+      my_edge(2*i  ) = send_edge(2*i  )
+    enddo
+
+    in = n_send_edge
+    do i = 1, n_merge_edge
+      if(is_merge_edge(i) == 1)then
+        in = in + 1
+        my_edge(2*in-1) = recv_edge(2*i-1)
+        my_edge(2*in  ) = recv_edge(2*i  )
+      endif
+    enddo
+
+write(100+monolis_mpi_get_global_my_rank(),*)"n_my_node", n_my_node
+write(100+monolis_mpi_get_global_my_rank(),*)"n_my_edge", n_my_edge
+write(100+monolis_mpi_get_global_my_rank(),*)"my_global_id", my_global_id
+write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_id", my_domain_id
+write(100+monolis_mpi_get_global_my_rank(),*)"my_edge"
+write(100+monolis_mpi_get_global_my_rank(),"(4i4)")my_edge
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
