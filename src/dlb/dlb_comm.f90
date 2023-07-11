@@ -452,6 +452,48 @@ write(100+monolis_mpi_get_global_my_rank(),"(4i4)")my_edge
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
+  !> 更新後のグラフの取得
+  subroutine gedatsu_dlb_get_new_graph(dlb, graph_org, graph_new, COM, &
+    & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb), intent(inout) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_org
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_new
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    !> [in] 自領域候補の計算点数
+    integer(kint) :: n_my_node
+    !> [in] 自領域候補のエッジ数
+    integer(kint) :: n_my_edge
+    !> [in] 自領域候補のエッジ
+    integer(kint) :: my_edge(:)
+    !> [in] 自領域候補の global id
+    integer(kint) :: my_global_id(:)
+    !> [in] 自領域候補の領域番号
+    integer(kint) :: my_domain_id(:)
+    integer(kint), allocatable :: is_used(:)
+    integer(kint) :: my_rank, i, i1, i2
+
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+
+    call gedatsu_graph_initialize(graph_new)
+
+    call monolis_alloc_I_1d(is_used, n_my_node)
+
+    do i = 1, n_my_edge
+      i1 = my_edge(2*i-1)
+      i2 = my_edge(2*i  )
+      if(my_domain_id(i1) == my_rank .or. my_domain_id(i2) == my_rank)then
+
+      endif
+    enddo
+
+  end subroutine gedatsu_dlb_get_new_graph
+
+  !> @ingroup group_dlb
   !> オーバーラップ計算点を含む通信する計算点数の取得
   subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, did)
     implicit none

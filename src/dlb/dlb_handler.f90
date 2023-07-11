@@ -70,7 +70,8 @@ contains
     call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, COM, &
       & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
 
-    !call gedatsu_dlb_get_new_graph()
+    call gedatsu_dlb_get_new_graph(dlb, graph_org, graph_new, COM, &
+      &  n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb
