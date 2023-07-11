@@ -271,27 +271,18 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
 
   !> @ingroup group_dlb
   !> 動的負荷分散のためのグラフ構造アップデート
-  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, COM, &
-    & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
+  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph_org
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_tmp
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    !> [in] 自領域候補の計算点数
-    integer(kint) :: n_my_node
-    !> [in] 自領域候補のエッジ数
-    integer(kint) :: n_my_edge
-    !> [in] 自領域候補のエッジ
-    integer(kint), allocatable :: my_edge(:)
-    !> [in] 自領域候補の global id
-    integer(kint), allocatable :: my_global_id(:)
-    !> [in] 自領域候補の領域番号
-    integer(kint), allocatable :: my_domain_id(:)
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge
-    integer(kint) :: n_merge_node, n_merge_edge
+    integer(kint) :: n_merge_node, n_merge_edge, n_my_edge
     integer(kint) :: i, j, jS, jE, in, i1, i2, my_rank, id, id1, id2
     real(kdouble) :: tcomm
     integer(kint), allocatable :: domain_id_org(:)
@@ -303,6 +294,9 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
     integer(kint), allocatable :: is_merge_node(:)
     integer(kint), allocatable :: is_merge_edge(:)
     integer(kint), allocatable :: global_id_tmp(:)
+    integer(kint), allocatable :: my_edge(:,:)
+    integer(kint), allocatable :: ids(:)
+    integer(kint), allocatable :: perm(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
@@ -408,89 +402,96 @@ write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_edge", n_merge_edge
 write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
 
     !# アップデートされたグラフの作成
-    n_my_node = graph_org%n_vertex + n_merge_node
-    n_my_edge = n_send_edge + n_merge_edge
-
-    call monolis_alloc_I_1d(my_global_id, n_my_node)
-    call monolis_alloc_I_1d(my_domain_id, n_my_node)
-    call monolis_alloc_I_1d(my_edge, 2*n_my_edge)
+    call gedatsu_graph_set_n_vertex(graph_tmp, graph_org%n_vertex + n_merge_node)
 
     do i = 1, graph_org%n_vertex
-      my_global_id(i) = graph_org%vertex_id(i)
-      my_domain_id(i) = graph_org%vertex_domain_id(i)
+      graph_tmp%vertex_id(i) = graph_org%vertex_id(i)
+      graph_tmp%vertex_domain_id(i) = graph_org%vertex_domain_id(i)
     enddo
 
     in = graph_org%n_vertex
     do i = 1, n_merge_node
       if(is_merge_node(i) == 1)then
         in = in + 1
-        my_global_id(in) = recv_global_id(i)
-        my_domain_id(in) = recv_domain_new(i)
+        graph_tmp%vertex_id(in) = recv_global_id(i)
+        graph_tmp%vertex_domain_id(in) = recv_domain_new(i)
       endif
     enddo
 
+    n_my_edge = n_send_edge + n_merge_edge
+    call monolis_alloc_I_2d(my_edge, 2,n_my_edge)
+
     do i = 1, n_send_edge
-      my_edge(2*i-1) = send_edge(2*i-1)
-      my_edge(2*i  ) = send_edge(2*i  )
+      my_edge(1,i) = send_edge(2*i-1)
+      my_edge(2,i) = send_edge(2*i  )
     enddo
 
     in = n_send_edge
     do i = 1, n_merge_edge
       if(is_merge_edge(i) == 1)then
         in = in + 1
-        my_edge(2*in-1) = recv_edge(2*i-1)
-        my_edge(2*in  ) = recv_edge(2*i  )
+        my_edge(1,in) = recv_edge(2*i-1)
+        my_edge(2,in) = recv_edge(2*i  )
       endif
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_my_node", n_my_node
-write(100+monolis_mpi_get_global_my_rank(),*)"n_my_edge", n_my_edge
-write(100+monolis_mpi_get_global_my_rank(),*)"my_global_id", my_global_id
-write(100+monolis_mpi_get_global_my_rank(),*)"my_domain_id", my_domain_id
-write(100+monolis_mpi_get_global_my_rank(),*)"my_edge"
-write(100+monolis_mpi_get_global_my_rank(),"(4i4)")my_edge
+    call monolis_alloc_I_1d(ids, graph_tmp%n_vertex)
+
+    call monolis_alloc_I_1d(perm, graph_tmp%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, graph_tmp%n_vertex, 1, 1)
+
+    ids = graph_tmp%vertex_id
+
+    call monolis_qsort_I_2d(ids, perm, 1, graph_tmp%n_vertex)
+
+    do i = 1, n_my_edge
+      call monolis_bsearch_I(ids, 1, graph_tmp%n_vertex, my_edge(1,i), in)
+      my_edge(1,i) = perm(in)
+      call monolis_bsearch_I(ids, 1, graph_tmp%n_vertex, my_edge(2,i), in)
+      my_edge(2,i) = perm(in)
+    enddo
+
+    call gedatsu_graph_set_edge(graph_tmp, n_my_edge, my_edge)
   end subroutine gedatsu_dlb_update_nodal_graph_main
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_new_graph(dlb, graph_org, graph_new, COM, &
-    & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
+  subroutine gedatsu_dlb_get_new_graph(dlb, graph_tmp, graph_new, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
-    type(gedatsu_graph), intent(inout) :: graph_org
+    type(gedatsu_graph), intent(inout) :: graph_tmp
     !> [in] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    !> [in] 自領域候補の計算点数
-    integer(kint) :: n_my_node
-    !> [in] 自領域候補のエッジ数
-    integer(kint) :: n_my_edge
-    !> [in] 自領域候補のエッジ
-    integer(kint) :: my_edge(:)
-    !> [in] 自領域候補の global id
-    integer(kint) :: my_global_id(:)
-    !> [in] 自領域候補の領域番号
-    integer(kint) :: my_domain_id(:)
-    integer(kint), allocatable :: is_used(:)
-    integer(kint) :: my_rank, i, i1, i2
+    integer(kint) :: my_rank, n_vertex, n_edge
+    integer(kint), allocatable :: edge(:,:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
-    call gedatsu_graph_initialize(graph_new)
+    call gedatsu_graph_get_n_vertex_in_internal_region(graph_tmp, my_rank, n_vertex)
 
-    call monolis_alloc_I_1d(is_used, n_my_node)
+    if(n_vertex == 0) call monolis_std_warning_string("gedatsu_get_parted_graph_main")
+    if(n_vertex == 0) call monolis_std_warning_string("n_vertex equals zero")
 
-    do i = 1, n_my_edge
-      i1 = my_edge(2*i-1)
-      i2 = my_edge(2*i  )
-      if(my_domain_id(i1) == my_rank .or. my_domain_id(i2) == my_rank)then
+    graph_new%n_internal_vertex = n_vertex
 
-      endif
-    enddo
+    call gedatsu_graph_set_n_vertex(graph_new, n_vertex)
 
+    call gedatsu_graph_get_n_edge_in_internal_region(graph_tmp, my_rank, n_edge)
+
+    call gedatsu_graph_get_vertex_id_in_internal_region(graph_tmp, my_rank, graph_new%vertex_id)
+
+    if(n_edge == 0) return
+
+    call monolis_alloc_I_2d(edge, 2, n_edge)
+
+    call gedatsu_graph_get_edge_in_internal_region(graph_tmp, my_rank, edge)
+
+    call gedatsu_graph_set_edge(graph_new, n_edge, edge)
   end subroutine gedatsu_dlb_get_new_graph
 
   !> @ingroup group_dlb

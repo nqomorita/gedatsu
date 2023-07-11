@@ -73,15 +73,15 @@ contains
 
     write(*,*)"--- gedatsu_graph_debug_write"
     write(*,*)"graph%n_vertex"
-    write(*,*)graph%n_vertex
+    write(*,"(100i4)")graph%n_vertex
     write(*,*)"graph%vertex_id"
-    write(*,*)graph%vertex_id
+    write(*,"(100i4)")graph%vertex_id
     write(*,*)"graph%vertex_domain_id"
-    write(*,*)graph%vertex_domain_id
+    write(*,"(100i4)")graph%vertex_domain_id
     write(*,*)"graph%index"
-    write(*,*)graph%index
+    write(*,"(100i4)")graph%index
     write(*,*)"graph%item"
-    write(*,*)graph%item
+    write(*,"(100i4)")graph%item
   end subroutine gedatsu_graph_debug_write
 
   !> @ingroup dev_graph

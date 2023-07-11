@@ -51,15 +51,12 @@ contains
     type(gedatsu_graph) :: graph_org
     !> [in,out] graph 構造体
     type(gedatsu_graph) :: graph_new
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: graph_tmp
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
     type(gedatsu_update_db), allocatable :: update_db(:)
-    integer(kint) :: n_my_node
-    integer(kint) :: n_my_edge
     integer(kint) :: comm_size
-    integer(kint), allocatable :: my_edge(:)
-    integer(kint), allocatable :: my_global_id(:)
-    integer(kint), allocatable :: my_domain_id(:)
 
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 
@@ -67,11 +64,9 @@ contains
 
     call gedatsu_dlb_get_comm_table_main(dlb, graph_org, update_db, COM)
 
-    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, COM, &
-      & n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
+    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, COM)
 
-    call gedatsu_dlb_get_new_graph(dlb, graph_org, graph_new, COM, &
-      &  n_my_node, n_my_edge, my_edge, my_global_id, my_domain_id)
+    call gedatsu_dlb_get_new_graph(dlb, graph_tmp, graph_new, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb

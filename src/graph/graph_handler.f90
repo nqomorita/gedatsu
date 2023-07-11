@@ -309,7 +309,7 @@ contains
     integer(kint), intent(out) :: edge(:,:)
 
     integer(kint) :: i, nid, idx, j, jS, jE
-    integer(kint) :: n_vertex, n_edge, e1, e2
+    integer(kint) :: n_vertex, n_edge, e1, e2, n1, n2
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
 
@@ -334,10 +334,17 @@ contains
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) == domain_id)then
           n_edge = n_edge + 1
-          call monolis_bsearch_I(ids, 1, n_vertex, i, idx)
+
+          n1 = graph%vertex_id(i)
+          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 1"
           e1 = perm(idx)
-          call monolis_bsearch_I(ids, 1, n_vertex, nid, idx)
+
+          n2 = graph%vertex_id(nid)
+          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
           e2 = perm(idx)
+
           edge(1,n_edge) = e1
           edge(2,n_edge) = e2
         endif
@@ -390,6 +397,10 @@ contains
           n_edge = n_edge + 1
           call monolis_bsearch_I(ids, 1, n_vertex, i, idx1)
           call monolis_bsearch_I(ids, 1, n_vertex, nid, idx2)
+
+          if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region"
+          if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region"
+
           edge(1,n_edge) = perm(idx1)
           edge(2,n_edge) = perm(idx2)
 
@@ -446,7 +457,7 @@ contains
 
     in = graph%index(graph%n_vertex + 1)
 
-    call monolis_dealloc_I_1d(graph%item)
+    if(allocated(graph%item)) call monolis_dealloc_I_1d(graph%item)
 
     call monolis_alloc_I_1d(graph%item, in)
 
