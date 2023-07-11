@@ -333,7 +333,6 @@ contains
       do j = jS, jE
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) == domain_id)then
-          n_edge = n_edge + 1
 
           n1 = graph%vertex_id(i)
           call monolis_bsearch_I(ids, 1, n_vertex, n1, idx)
@@ -345,6 +344,7 @@ contains
           if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
           e2 = perm(idx)
 
+          n_edge = n_edge + 1
           edge(1,n_edge) = e1
           edge(2,n_edge) = e2
         endif
@@ -394,13 +394,17 @@ contains
       do j = jS, jE
         nid = graph%item(j)
         if(graph%vertex_domain_id(nid) /= domain_id)then
+
+          n1 = graph%vertex_id(i)
+          n2 = graph%vertex_id(nid)
+
+          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx1)
+          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx2)
+
+          if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 1"
+          if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 2"
+
           n_edge = n_edge + 1
-          call monolis_bsearch_I(ids, 1, n_vertex, i, idx1)
-          call monolis_bsearch_I(ids, 1, n_vertex, nid, idx2)
-
-          if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region"
-          if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region"
-
           edge(1,n_edge) = perm(idx1)
           edge(2,n_edge) = perm(idx2)
 

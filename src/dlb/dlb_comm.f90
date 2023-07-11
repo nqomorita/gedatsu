@@ -468,10 +468,12 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: my_rank, n_vertex, n_edge
+    integer(kint), allocatable :: OVL_vertex_id(:)
     integer(kint), allocatable :: edge(:,:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
+    !> internal region
     call gedatsu_graph_get_n_vertex_in_internal_region(graph_tmp, my_rank, n_vertex)
 
     if(n_vertex == 0) call monolis_std_warning_string("gedatsu_get_parted_graph_main")
@@ -492,6 +494,29 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
     call gedatsu_graph_get_edge_in_internal_region(graph_tmp, my_rank, edge)
 
     call gedatsu_graph_set_edge(graph_new, n_edge, edge)
+
+    !> overlap region
+    call gedatsu_graph_get_n_vertex_in_overlap_region(graph_tmp, my_rank, n_vertex)
+
+    if(n_vertex == 0) return
+
+    call gedatsu_graph_get_n_edge_in_overlap_region(graph_tmp, my_rank, n_edge)
+
+    call monolis_alloc_I_1d(OVL_vertex_id, n_vertex)
+
+    call gedatsu_graph_get_vertex_id_in_overlap_region(graph_tmp, my_rank, OVL_vertex_id)
+
+    call gedatsu_graph_add_n_vertex_with_vertex_id(graph_new, n_vertex, OVL_vertex_id)
+
+    if(n_edge == 0) return
+
+    call monolis_dealloc_I_2d(edge)
+
+    call monolis_alloc_I_2d(edge, 2, n_edge)
+
+    call gedatsu_graph_get_edge_in_overlap_region(graph_tmp, my_rank, edge)
+
+    call gedatsu_graph_add_edge(graph_new, n_edge, edge)
   end subroutine gedatsu_dlb_get_new_graph
 
   !> @ingroup group_dlb
