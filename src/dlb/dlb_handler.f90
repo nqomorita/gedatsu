@@ -30,12 +30,14 @@ contains
 
   !> @ingroup group_dlb
   !> 負荷分散：負荷分散の実行チェック
-  subroutine gedatsu_dlb_update_check(dlb, graph, should_update)
+  subroutine gedatsu_dlb_update_check(dlb, graph, COM, should_update)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
     !> [in] graph 構造体
     logical :: should_update
     should_update = .true.
@@ -43,7 +45,7 @@ contains
 
   !> @ingroup group_dlb
   !> 負荷分散：ノードグラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_nodal_graph(dlb, graph_org, graph_new, COM)
+  subroutine gedatsu_dlb_update_nodal_graph(dlb, graph_org, COM, graph_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
@@ -55,6 +57,8 @@ contains
     type(gedatsu_graph) :: graph_tmp
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    integer(kint), allocatable :: recv_global_id(:)
+    integer(kint), allocatable :: recv_domain_org(:)
     type(gedatsu_update_db), allocatable :: update_db(:)
     integer(kint) :: comm_size
 
@@ -64,14 +68,18 @@ contains
 
     call gedatsu_dlb_get_comm_table_main(dlb, graph_org, update_db, COM)
 
-    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, COM)
+    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, &
+      & recv_global_id, recv_domain_org, COM)
 
-    call gedatsu_dlb_get_new_graph(dlb, graph_tmp, graph_new, COM)
+    call gedatsu_dlb_get_new_graph(graph_tmp, graph_new, COM)
+
+    call gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, &
+      & recv_global_id, recv_domain_org)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb
   !> 負荷分散：付随グラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_connectivity_graph(dlb, graph_org, graph_new, COM)
+  subroutine gedatsu_dlb_update_connectivity_graph(dlb, graph_org, COM, graph_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb

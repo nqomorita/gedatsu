@@ -271,7 +271,7 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のためのグラフ構造アップデート
-  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, COM)
+  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, recv_global_id, recv_domain_org, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
@@ -457,10 +457,8 @@ contains
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_new_graph(dlb, graph_tmp, graph_new, COM)
+  subroutine gedatsu_dlb_get_new_graph(graph_tmp, graph_new, COM)
     implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph_tmp
     !> [in] graph 構造体
@@ -563,6 +561,47 @@ contains
 
     call gedatsu_graph_add_edge(graph_new, n_edge, edge)
   end subroutine gedatsu_dlb_get_new_graph
+
+  !> @ingroup group_dlb
+  !> 更新後のグラフの取得
+  subroutine gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, recv_global_id, recv_domain_org)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb), intent(inout) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_tmp
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_new
+    !> [in] recv 計算点のグローバル id
+    integer(kint) :: recv_global_id(:)
+    !> [in] recv 計算点の領域番号
+    integer(kint) :: recv_domain_org(:)
+    integer(kint) :: i, n_recv_node, id, pos
+    integer(kint), allocatable :: ids(:), perm(:)
+
+    n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
+
+    call monolis_alloc_I_1d(ids, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(perm, graph_new%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+
+    ids = graph_new%vertex_id
+
+    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_vertex)
+
+    do i = 1, n_recv_node
+      id = recv_global_id(i)
+      call monolis_bsearch_I(ids, 1, graph_new%n_vertex, id, pos)
+
+      if(pos == -1)then
+        dlb%COM_node%recv_item(i) = -1
+      else
+        dlb%COM_node%recv_item(i) = perm(pos)
+      endif
+    enddo
+  end subroutine gedatsu_dlb_get_comm_table_modify
 
   !> @ingroup group_dlb
   !> オーバーラップ計算点を含む通信する計算点数の取得
