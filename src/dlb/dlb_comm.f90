@@ -11,16 +11,15 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_get_comm_table_main(dlb, graph, update_db, COM)
+  subroutine gedatsu_dlb_get_comm_table_main(dlb, graph, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
-    !> [in] データベース 構造体
-    type(gedatsu_update_db) :: update_db(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    type(gedatsu_update_db), allocatable :: update_db(:)
     integer(kint) :: i, comm_size, my_rank
     integer(kint), allocatable :: send_n_node_list(:)
     integer(kint), allocatable :: recv_n_node_list(:)
@@ -30,6 +29,8 @@ contains
     !# 送信計算点の情報取得
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
+
+    allocate(update_db(comm_size))
 
     do i = 1, comm_size
       if(my_rank == i - 1) cycle
@@ -271,7 +272,7 @@ contains
 
   !> @ingroup group_dlb
   !> 動的負荷分散のためのグラフ構造アップデート
-  subroutine gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, recv_global_id, recv_domain_org, COM)
+  subroutine gedatsu_dlb_get_temporary_nodal_graph(dlb, graph_org, graph_tmp, recv_global_id, recv_domain_org, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
@@ -453,11 +454,11 @@ contains
     enddo
 
     call gedatsu_graph_set_edge(graph_tmp, n_my_edge, my_edge)
-  end subroutine gedatsu_dlb_update_nodal_graph_main
+  end subroutine gedatsu_dlb_get_temporary_nodal_graph
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_new_graph(graph_tmp, graph_new, COM)
+  subroutine gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph_tmp
@@ -560,7 +561,7 @@ contains
     enddo
 
     call gedatsu_graph_add_edge(graph_new, n_edge, edge)
-  end subroutine gedatsu_dlb_get_new_graph
+  end subroutine gedatsu_dlb_get_new_nodal_graph
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得

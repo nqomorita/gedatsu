@@ -59,19 +59,16 @@ contains
     type(monolis_COM), intent(in) :: COM
     integer(kint), allocatable :: recv_global_id(:)
     integer(kint), allocatable :: recv_domain_org(:)
-    type(gedatsu_update_db), allocatable :: update_db(:)
     integer(kint) :: comm_size
 
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 
-    allocate(update_db(comm_size))
+    call gedatsu_dlb_get_comm_table_main(dlb, graph_org, COM)
 
-    call gedatsu_dlb_get_comm_table_main(dlb, graph_org, update_db, COM)
-
-    call gedatsu_dlb_update_nodal_graph_main(dlb, graph_org, graph_tmp, &
+    call gedatsu_dlb_get_temporary_nodal_graph(dlb, graph_org, graph_tmp, &
       & recv_global_id, recv_domain_org, COM)
 
-    call gedatsu_dlb_get_new_graph(graph_tmp, graph_new, COM)
+    call gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
 
     call gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, &
       & recv_global_id, recv_domain_org)
