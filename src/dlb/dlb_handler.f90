@@ -98,8 +98,9 @@ contains
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
-    !> [in,out] アップデートする配列
+    !> [in,out] アップデート前の配列
     integer(kint) :: var_org(:)
+    !> [in,out] アップデート後の配列
     integer(kint) :: var_new(:)
 
     call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
@@ -117,8 +118,9 @@ contains
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
-    !> [in,out] アップデートする配列
+    !> [in,out] アップデート前の配列
     real(kdouble) :: var_org(:)
+    !> [in,out] アップデート後の配列
     real(kdouble) :: var_new(:)
 
     call monolis_SendRecv_R(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
@@ -136,8 +138,9 @@ contains
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
-    !> [in,out] アップデートする配列
+    !> [in,out] アップデート前の配列
     complex(kdouble) :: var_org(:)
+    !> [in,out] アップデート後の配列
     complex(kdouble) :: var_new(:)
 
     call monolis_SendRecv_C(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
@@ -155,8 +158,9 @@ contains
     type(gedatsu_dlb) :: dlb
     !> [in] 1 節点あたりの自由度
     integer(kint) :: ndof
-    !> [in,out] アップデートする配列
+    !> [in,out] アップデート前の配列
     logical :: var_org(:)
+    !> [in,out] アップデート後の配列
     logical :: var_new(:)
 
     call monolis_SendRecv_L(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
