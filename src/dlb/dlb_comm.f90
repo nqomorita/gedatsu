@@ -467,7 +467,8 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
     type(gedatsu_graph), intent(inout) :: graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: my_rank, n_vertex, n_edge
+    integer(kint) :: my_rank, n_vertex, n_edge, i
+    integer(kint), allocatable :: perm(:), iperm(:), ids(:)
     integer(kint), allocatable :: OVL_vertex_id(:)
     integer(kint), allocatable :: edge(:,:)
 
@@ -489,9 +490,30 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
 
     if(n_edge == 0) return
 
+    call monolis_alloc_I_1d(ids, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(perm, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+
+    ids = graph_new%vertex_id
+
+    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_internal_vertex)
+
+    do i = 1, graph_new%n_vertex
+      iperm(perm(i)) = i
+    enddo
+
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_edge_in_internal_region(graph_tmp, my_rank, edge)
+
+    do i = 1, n_edge
+      edge(1,i) = iperm(edge(1,i))
+      edge(2,i) = iperm(edge(2,i))
+    enddo
 
     call gedatsu_graph_set_edge(graph_new, n_edge, edge)
 
@@ -510,11 +532,34 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
 
     if(n_edge == 0) return
 
+    call monolis_dealloc_I_1d(perm)
+
+    call monolis_dealloc_I_1d(iperm)
+
+    call monolis_alloc_I_1d(perm, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+
+    call monolis_qsort_I_2d(graph_new%vertex_id, perm, 1, graph_new%n_internal_vertex)
+
+    call monolis_qsort_I_2d(graph_new%vertex_id, perm, graph_new%n_internal_vertex + 1, graph_new%n_vertex)
+
+    do i = 1, graph_new%n_vertex
+      iperm(perm(i)) = i
+    enddo
+
     call monolis_dealloc_I_2d(edge)
 
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_edge_in_overlap_region(graph_tmp, my_rank, edge)
+
+    do i = 1, n_edge
+      edge(1,i) = iperm(edge(1,i))
+      edge(2,i) = iperm(edge(2,i))
+    enddo
 
     call gedatsu_graph_add_edge(graph_new, n_edge, edge)
   end subroutine gedatsu_dlb_get_new_graph

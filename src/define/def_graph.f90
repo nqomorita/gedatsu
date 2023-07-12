@@ -74,6 +74,8 @@ contains
     write(*,*)"--- gedatsu_graph_debug_write"
     write(*,*)"graph%n_vertex"
     write(*,"(100i4)")graph%n_vertex
+    write(*,*)"graph%n_internal_vertex"
+    write(*,"(100i4)")graph%n_internal_vertex
     write(*,*)"graph%vertex_id"
     write(*,"(100i4)")graph%vertex_id
     write(*,*)"graph%vertex_domain_id"
