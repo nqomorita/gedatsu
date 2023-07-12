@@ -565,7 +565,7 @@ contains
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, recv_global_id, recv_domain_org)
+  subroutine gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, recv_global_id, recv_domain_org, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
@@ -577,8 +577,12 @@ contains
     integer(kint) :: recv_global_id(:)
     !> [in] recv 計算点の領域番号
     integer(kint) :: recv_domain_org(:)
-    integer(kint) :: i, n_recv_node, id, pos
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    integer(kint) :: i, n_recv_node, id, pos, my_rank
     integer(kint), allocatable :: ids(:), perm(:)
+
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
     n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
 
@@ -596,7 +600,7 @@ contains
       id = recv_global_id(i)
       call monolis_bsearch_I(ids, 1, graph_new%n_vertex, id, pos)
 
-      if(pos == -1)then
+      if(pos == -1 .or. recv_domain_org(i) == my_rank)then
         dlb%COM_node%recv_item(i) = -1
       else
         dlb%COM_node%recv_item(i) = perm(pos)

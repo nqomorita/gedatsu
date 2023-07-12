@@ -71,7 +71,7 @@ contains
     call gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
 
     call gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, &
-      & recv_global_id, recv_domain_org)
+      & recv_global_id, recv_domain_org, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb
@@ -102,6 +102,11 @@ contains
     integer(kint) :: var_org(:)
     integer(kint) :: var_new(:)
 
+    call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_I_1d
 
   !> @ingroup group_dlb
@@ -116,6 +121,11 @@ contains
     real(kdouble) :: var_org(:)
     real(kdouble) :: var_new(:)
 
+    call monolis_SendRecv_R(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_R_1d
 
   !> @ingroup group_dlb
@@ -130,6 +140,11 @@ contains
     complex(kdouble) :: var_org(:)
     complex(kdouble) :: var_new(:)
 
+    call monolis_SendRecv_C(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_C_1d
 
   !> @ingroup group_dlb
@@ -144,65 +159,10 @@ contains
     logical :: var_org(:)
     logical :: var_new(:)
 
+    call monolis_SendRecv_L(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+       & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_L_1d
-
-  !> @ingroup group_dlb
-  !> 負荷分散：1 次元整数配列の情報送受信
-  subroutine gedatsu_dlb_SendRecv_I_1d(dlb, ndof, var_send, var_recv)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] 1 節点あたりの自由度
-    integer(kint) :: ndof
-    !> [in] 元の配列
-    integer(kint) :: var_send(:)
-    !> [out] 負荷分散後の配列
-    integer(kint) :: var_recv(:)
-
-  end subroutine gedatsu_dlb_SendRecv_I_1d
-
-  !> @ingroup group_dlb
-  !> 負荷分散：1 次元実数配列の情報送受信
-  subroutine gedatsu_dlb_SendRecv_R_1d(dlb, ndof, var_send, var_recv)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] 1 節点あたりの自由度
-    integer(kint) :: ndof
-    !> [in] 元の配列
-    real(kdouble) :: var_send(:)
-    !> [out] 負荷分散後の配列
-    real(kdouble) :: var_recv(:)
-
-  end subroutine gedatsu_dlb_SendRecv_R_1d
-
-  !> @ingroup group_dlb
-  !> 負荷分散：1 次元複素数配列の情報送受信
-  subroutine gedatsu_dlb_SendRecv_C_1d(dlb, ndof, var_send, var_recv)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] 1 節点あたりの自由度
-    integer(kint) :: ndof
-    !> [in] 元の配列
-    real(kdouble) :: var_send(:)
-    !> [out] 負荷分散後の配列
-    complex(kdouble) :: var_recv(:)
-
-  end subroutine gedatsu_dlb_SendRecv_C_1d
-
-  !> @ingroup group_dlb
-  !> 負荷分散：1 次元論理型配列の情報送受信
-  subroutine gedatsu_dlb_SendRecv_L_1d(dlb, ndof, var_send, var_recv)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] 1 節点あたりの自由度
-    integer(kint) :: ndof
-    !> [in] 元の配列
-    logical :: var_send(:)
-    !> [out] 負荷分散後の配列
-    logical :: var_recv(:)
-
-  end subroutine gedatsu_dlb_SendRecv_L_1d
 end module mod_gedatsu_dlb_handler
