@@ -64,10 +64,10 @@ contains
     recv_n_edge_list = send_n_edge_list
     call monolis_alltoall_I1(comm_size, recv_n_edge_list, COM%comm)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"send_n_node_list", send_n_node_list
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_node_list", recv_n_node_list
-write(100+monolis_mpi_get_global_my_rank(),*)"send_n_edge_list", send_n_edge_list
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_list
+!write(100+monolis_mpi_get_global_my_rank(),*)"send_n_node_list", send_n_node_list
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_node_list", recv_n_node_list
+!write(100+monolis_mpi_get_global_my_rank(),*)"send_n_edge_list", send_n_edge_list
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_list
 
     call gedatsu_dlb_generate_comm_table(dlb, graph, update_db, &
       & send_n_node_list, recv_n_node_list, &
@@ -180,14 +180,14 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_n_edge_list", recv_n_edge_lis
 
     call monolis_get_sequence_array_I(dlb%COM_node%recv_item, n_item, 1, 1)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_n_neib", dlb%COM_node%send_n_neib
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_neib_pe", dlb%COM_node%send_neib_pe
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_index", dlb%COM_node%send_index
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_item", dlb%COM_node%send_item
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_n_neib", dlb%COM_node%recv_n_neib
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_neib_pe", dlb%COM_node%recv_neib_pe
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_index", dlb%COM_node%recv_index
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_item", dlb%COM_node%recv_item
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_n_neib", dlb%COM_node%send_n_neib
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_neib_pe", dlb%COM_node%send_neib_pe
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_index", dlb%COM_node%send_index
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%send_item", dlb%COM_node%send_item
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_n_neib", dlb%COM_node%recv_n_neib
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_neib_pe", dlb%COM_node%recv_neib_pe
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_index", dlb%COM_node%recv_index
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_item", dlb%COM_node%recv_item
 
     !# edge セクション
     !# send table の作成
@@ -259,14 +259,14 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_node%recv_item", dlb%COM_n
 
     call monolis_get_sequence_array_I(dlb%COM_edge%recv_item, n_item, 1, 1)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_n_neib", dlb%COM_edge%send_n_neib
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_neib_pe", dlb%COM_edge%send_neib_pe
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_index", dlb%COM_edge%send_index
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_item", dlb%COM_edge%send_item
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_n_neib", dlb%COM_edge%recv_n_neib
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_neib_pe", dlb%COM_edge%recv_neib_pe
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_index", dlb%COM_edge%recv_index
-write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_edge%recv_item
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_n_neib", dlb%COM_edge%send_n_neib
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_neib_pe", dlb%COM_edge%send_neib_pe
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_index", dlb%COM_edge%send_index
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%send_item", dlb%COM_edge%send_item
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_n_neib", dlb%COM_edge%recv_n_neib
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_neib_pe", dlb%COM_edge%recv_neib_pe
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_index", dlb%COM_edge%recv_index
+!write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_edge%recv_item
   end subroutine gedatsu_dlb_generate_comm_table
 
   !> @ingroup group_dlb
@@ -329,14 +329,14 @@ write(100+monolis_mpi_get_global_my_rank(),*)"dlb%COM_edge%recv_item", dlb%COM_e
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
        & domain_id_org, recv_domain_org, 1, dlb%COM_node%comm)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"vertex_domain_id", graph_org%vertex_domain_id
-write(100+monolis_mpi_get_global_my_rank(),*)"domain_id_org   ", domain_id_org
-write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id       ", graph_org%vertex_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"vertex_domain_id", graph_org%vertex_domain_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"domain_id_org   ", domain_id_org
+!write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id       ", graph_org%vertex_id
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_node", n_recv_node
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_global_id", recv_global_id
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_new", recv_domain_new
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_node", n_recv_node
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_global_id", recv_global_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_new", recv_domain_new
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
 
     !# エッジの送受信
     n_send_edge = graph_org%index(graph_org%n_vertex + 1)
@@ -361,8 +361,8 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
        & dlb%COM_edge%recv_index, dlb%COM_edge%recv_item, &
        & send_edge, recv_edge, 2, dlb%COM_edge%comm)
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_edge", n_recv_edge
-write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_edge", n_recv_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
 
     !# 検索用配列の作成
     call monolis_alloc_I_1d(global_id_tmp, graph_org%n_vertex)
@@ -381,8 +381,8 @@ write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
       endif
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_node", n_merge_node
-write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_node", n_merge_node
+!write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
 
     !# エッジのマージ（自領域 + 受信領域）
     call monolis_alloc_I_1d(is_merge_edge, n_recv_edge)
@@ -398,8 +398,8 @@ write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
       endif
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_edge", n_merge_edge
-write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_edge", n_merge_edge
+!write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_edge", is_merge_edge
 
     !# アップデートされたグラフの作成
     call gedatsu_graph_set_n_vertex(graph_tmp, graph_org%n_vertex + n_merge_node)
