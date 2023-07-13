@@ -1,4 +1,5 @@
 !> グラフ操作モジュール
+!> ノードの組を渡してエッジ番号を得る関数
 !# gedatsu_graph_set_n_vertex(graph, n_vertex)
 !# gedatsu_graph_add_n_vertex(graph, n_vertex_add)
 !# gedatsu_graph_add_n_vertex_with_vertex_id(graph, n_vertex_add, vertex_id)

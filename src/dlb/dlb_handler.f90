@@ -30,6 +30,7 @@ contains
 
   !> @ingroup group_dlb
   !> 負荷分散：負荷分散の実行チェック
+  !> 負荷分散の実行チェックのための基本機能を洗い出し、提供していれば、ユーザー側で対応可能
   subroutine gedatsu_dlb_update_check(dlb, graph, COM, should_update)
     implicit none
     !> [in] dlb 構造体
@@ -163,10 +164,10 @@ contains
     !> [in,out] アップデート後の配列
     logical :: var_new(:)
 
-    call monolis_SendRecv_L(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
-       & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
-       & dlb%COM_node%send_index, dlb%COM_node%send_item, &
-       & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-       & var_org, var_new, ndof, dlb%COM_node%comm)
+    !call monolis_SendRecv_L(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
+    !   & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
+    !   & dlb%COM_node%send_index, dlb%COM_node%send_item, &
+    !   & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
+    !   & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_L_1d
 end module mod_gedatsu_dlb_handler

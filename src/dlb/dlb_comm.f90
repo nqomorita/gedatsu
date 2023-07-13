@@ -21,6 +21,8 @@ contains
     type(monolis_COM), intent(in) :: COM
     type(gedatsu_update_db), allocatable :: update_db(:)
     integer(kint) :: i, comm_size, my_rank
+    real(kdouble) :: tcomm
+    integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: send_n_node_list(:)
     integer(kint), allocatable :: recv_n_node_list(:)
     integer(kint), allocatable :: send_n_edge_list(:)
@@ -30,13 +32,15 @@ contains
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 
+    call gedatsu_dlb_get_domain_id_org(graph, COM, domain_id_org)
+
     allocate(update_db(comm_size))
 
     do i = 1, comm_size
       if(my_rank == i - 1) cycle
       call monolis_alloc_I_1d(update_db(i)%is_send_node, graph%n_vertex)
       call gedatsu_dlb_get_n_move_vertex(graph, update_db(i)%n_send_node, &
-        & update_db(i)%is_send_node, i - 1)
+        & update_db(i)%is_send_node, domain_id_org, i - 1)
 
       call monolis_alloc_I_1d(update_db(i)%is_send_edge, graph%index(graph%n_vertex + 1))
       call gedatsu_dlb_get_n_move_edge(graph, update_db(i)%n_send_edge, &
@@ -320,9 +324,7 @@ contains
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
        & graph_org%vertex_domain_id, recv_domain_new, 1, dlb%COM_node%comm)
 
-    call monolis_alloc_I_1d(domain_id_org, graph_org%n_vertex)
-    domain_id_org = my_rank
-    call monolis_mpi_update_I(COM, 1, domain_id_org, tcomm)
+    call gedatsu_dlb_get_domain_id_org(graph_org, COM, domain_id_org)
 
     call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
@@ -609,15 +611,17 @@ contains
   end subroutine gedatsu_dlb_get_comm_table_modify
 
   !> @ingroup group_dlb
-  !> オーバーラップ計算点を含む通信する計算点数の取得
-  subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, did)
+  !> オーバーラップ計算点を含まない送信する計算点数の取得
+  subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, domain_id_org, did)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
-    !> [in] オーバーラップ計算点を含む通信する計算点数
+    !> [in] オーバーラップ計算点を含まない送信する計算点数
     integer(kint) :: n_move_vertex
-    !> [in] オーバーラップ計算点を含む通信する計算点のフラグ
+    !> [in] オーバーラップ計算点を含まない送信する計算点のフラグ
     integer(kint) :: is_move(:)
+    !> [in] 元の領域番号
+    integer(kint) :: domain_id_org(:)
     !> [in] 領域番号
     integer(kint), intent(in) :: did
     integer(kint) :: i, j, jS, jE, jn
@@ -632,7 +636,7 @@ contains
       jE = graph%index(i + 1)
       do j = jS, jE
         jn = graph%item(j)
-        is_move(jn) = 1
+        if(domain_id_org(jn) /= did) is_move(jn) = 1
       enddo
     enddo
 
@@ -672,4 +676,26 @@ contains
       if(is_move(i) == 1) n_move_edge = n_move_edge + 1
     enddo
   end subroutine gedatsu_dlb_get_n_move_edge
+
+  !> @ingroup group_dlb
+  !> 元の領域番号の取得
+  subroutine gedatsu_dlb_get_domain_id_org(graph, COM, domain_id_org)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    !> [out] 元の領域番号
+    integer(kint), allocatable :: domain_id_org(:)
+    integer(kint) :: my_rank
+    real(kdouble) :: tcomm
+
+    call monolis_alloc_I_1d(domain_id_org, graph%n_vertex)
+
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+
+    domain_id_org = my_rank
+
+    call monolis_mpi_update_I(COM, 1, domain_id_org, tcomm)
+  end subroutine gedatsu_dlb_get_domain_id_org
 end module mod_gedatsu_dlb_comm
