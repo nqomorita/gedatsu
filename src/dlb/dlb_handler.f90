@@ -151,23 +151,4 @@ contains
        & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_C_1d
 
-  !> @ingroup group_dlb
-  !> 負荷分散：1 次元論理型配列のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_L_1d(dlb, ndof, var_org, var_new)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] 1 節点あたりの自由度
-    integer(kint) :: ndof
-    !> [in,out] アップデート前の配列
-    logical :: var_org(:)
-    !> [in,out] アップデート後の配列
-    logical :: var_new(:)
-
-    !call monolis_SendRecv_L(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
-    !   & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
-    !   & dlb%COM_node%send_index, dlb%COM_node%send_item, &
-    !   & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-    !   & var_org, var_new, ndof, dlb%COM_node%comm)
-  end subroutine gedatsu_dlb_update_L_1d
 end module mod_gedatsu_dlb_handler

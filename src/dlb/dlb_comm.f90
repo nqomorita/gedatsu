@@ -412,14 +412,20 @@ contains
       graph_tmp%vertex_domain_id(i) = graph_org%vertex_domain_id(i)
     enddo
 
+!write(100+monolis_mpi_get_global_my_rank(),*)"graph_tmp%vertex_id A", graph_tmp%vertex_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_node", n_merge_node
+!write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
+
     in = graph_org%n_vertex
-    do i = 1, n_merge_node
+    do i = 1, n_recv_node
       if(is_merge_node(i) == 1)then
         in = in + 1
         graph_tmp%vertex_id(in) = recv_global_id(i)
         graph_tmp%vertex_domain_id(in) = recv_domain_new(i)
       endif
     enddo
+
+!write(100+monolis_mpi_get_global_my_rank(),*)"graph_tmp%vertex_id B", graph_tmp%vertex_id
 
     n_my_edge = n_send_edge + n_merge_edge
     call monolis_alloc_I_2d(my_edge, 2,n_my_edge)
@@ -430,7 +436,7 @@ contains
     enddo
 
     in = n_send_edge
-    do i = 1, n_merge_edge
+    do i = 1, n_recv_edge
       if(is_merge_edge(i) == 1)then
         in = in + 1
         my_edge(1,in) = recv_edge(2*i-1)
@@ -443,6 +449,8 @@ contains
     call monolis_alloc_I_1d(perm, graph_tmp%n_vertex)
 
     call monolis_get_sequence_array_I(perm, graph_tmp%n_vertex, 1, 1)
+
+!write(100+monolis_mpi_get_global_my_rank(),*)"graph_tmp%vertex_id C", graph_tmp%vertex_id
 
     ids = graph_tmp%vertex_id
 
