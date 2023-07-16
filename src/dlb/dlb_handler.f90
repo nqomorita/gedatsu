@@ -29,22 +29,6 @@ contains
   end subroutine gedatsu_dlb_analysis_with_weight
 
   !> @ingroup group_dlb
-  !> 負荷分散：負荷分散の実行チェック
-  !> 負荷分散の実行チェックのための基本機能を洗い出し、提供していれば、ユーザー側で対応可能
-  subroutine gedatsu_dlb_update_check(dlb, graph, COM, should_update)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb) :: dlb
-    !> [in] graph 構造体
-    type(gedatsu_graph) :: graph
-    !> [in] COM 構造体
-    type(monolis_COM), intent(in) :: COM
-    !> [in] graph 構造体
-    logical :: should_update
-    should_update = .true.
-  end subroutine gedatsu_dlb_update_check
-
-  !> @ingroup group_dlb
   !> 負荷分散：ノードグラフ情報のアップデート（配列のメモリ再確保）
   subroutine gedatsu_dlb_update_nodal_graph(dlb, graph_org, COM, graph_new)
     implicit none
@@ -64,31 +48,36 @@ contains
 
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 
-    call gedatsu_dlb_get_comm_table_main(dlb, graph_org, COM)
+    call gedatsu_dlb_get_nodal_graph_comm_table(dlb, graph_org, COM)
 
     call gedatsu_dlb_get_temporary_nodal_graph(dlb, graph_org, graph_tmp, &
       & recv_global_id, recv_domain_org, COM)
 
     call gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
 
-    call gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, &
+    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_tmp, graph_new, &
       & recv_global_id, recv_domain_org, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb
   !> 負荷分散：付随グラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_connectivity_graph(dlb, graph_org, COM, graph_new)
+  subroutine gedatsu_dlb_update_connectivity_graph(dlb, nodal_graph_org, conn_graph_org, COM, conn_graph_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in,out] graph 構造体
-    type(gedatsu_graph) :: graph_org
+    type(gedatsu_graph) :: nodal_graph_org
     !> [in,out] graph 構造体
-    type(gedatsu_graph) :: graph_new
+    type(gedatsu_graph) :: conn_graph_org
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: conn_graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
+    integer(kint) :: comm_size
 
-    !call gedatsu_dlb_update_graph_main(dlb, graph_org, graph_new, COM)
+    comm_size = monolis_mpi_get_local_comm_size(COM%comm)
+
+    call gedatsu_dlb_get_conn_graph_comm_table(dlb, nodal_graph_org, conn_graph_org, COM)
   end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb

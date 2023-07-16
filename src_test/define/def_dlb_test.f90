@@ -10,7 +10,6 @@ contains
     implicit none
     call gedatsu_dlb_initialize_test()
     call gedatsu_dlb_finalize_test()
-    call gedatsu_dlb_should_update_test()
   end subroutine gedatsu_def_dlb_test
 
   subroutine gedatsu_dlb_initialize_test()
@@ -20,8 +19,6 @@ contains
     call monolis_std_log_string("gedatsu_dlb_initialize")
 
     call gedatsu_dlb_initialize(dlb)
-
-    call monolis_test_check_eq_L1("gedatsu_dlb_initialize case 1", dlb%should_update, .false.)
   end subroutine gedatsu_dlb_initialize_test
 
   subroutine gedatsu_dlb_finalize_test()
@@ -31,21 +28,6 @@ contains
     call monolis_std_log_string("gedatsu_dlb_finalize")
 
     call gedatsu_dlb_finalize(dlb)
-
-    call monolis_test_check_eq_L1("gedatsu_dlb_finalize case 1", dlb%should_update, .false.)
   end subroutine gedatsu_dlb_finalize_test
 
-  subroutine gedatsu_dlb_should_update_test()
-    implicit none
-    type(gedatsu_dlb) :: dlb
-    logical :: should_update
-
-    call monolis_std_log_string("gedatsu_dlb_should_update")
-
-    call gedatsu_dlb_initialize(dlb)
-
-    call gedatsu_dlb_should_update(dlb, should_update)
-
-    call monolis_test_check_eq_L1("gedatsu_dlb_should_update case 1", should_update, .false.)
-  end subroutine gedatsu_dlb_should_update_test
 end module mod_gedatsu_def_dlb_test

@@ -11,8 +11,6 @@ module mod_gedatsu_dlb
     type(monolis_COM) :: COM_edge
     !> 更新後の計算点のグローバル id
     integer(kint), allocatable :: global_id(:)
-    !> 負荷分散の実行判定
-    logical :: should_update
   end type gedatsu_dlb
 
   !> dlb データベース構造体
@@ -35,8 +33,6 @@ contains
     implicit none
     !> [out] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
-
-    dlb%should_update = .false.
   end subroutine gedatsu_dlb_initialize
 
   !> @ingroup graph_init
@@ -45,18 +41,5 @@ contains
     implicit none
     !> [out] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
-
-    dlb%should_update = .false.
   end subroutine gedatsu_dlb_finalize
-
-  !> @ingroup graph_dlb
-  !> dlb 構造体の負荷分散フラグの取得関数
-  subroutine gedatsu_dlb_should_update(dlb, should_update)
-    implicit none
-    !> [in] dlb 構造体
-    type(gedatsu_dlb), intent(in) :: dlb
-    !> [out] 負荷分散の実行判定
-    logical, intent(out) :: should_update
-    should_update = dlb%should_update
-  end subroutine gedatsu_dlb_should_update
 end module mod_gedatsu_dlb

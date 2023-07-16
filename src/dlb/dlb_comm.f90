@@ -10,8 +10,100 @@ module mod_gedatsu_dlb_comm
 contains
 
   !> @ingroup group_dlb
+  !> 動的負荷分散のための通信テーブル作成（付随グラフ）
+  subroutine gedatsu_dlb_get_conn_graph_comm_table(dlb, nodal_graph, conn_graph, COM)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb), intent(out) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: nodal_graph
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: conn_graph
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    type(gedatsu_update_db), allocatable :: update_db(:)
+    integer(kint) :: i, comm_size, my_rank
+    real(kdouble) :: tcomm
+    integer(kint), allocatable :: is_send_node(:)
+    integer(kint), allocatable :: domain_id_org(:)
+    integer(kint), allocatable :: send_n_edge_list(:)
+    integer(kint), allocatable :: recv_n_edge_list(:)
+
+    !# 送信計算点の情報取得
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    comm_size = monolis_mpi_get_local_comm_size(COM%comm)
+
+    call gedatsu_dlb_get_domain_id_org(nodal_graph, COM, domain_id_org)
+
+    allocate(update_db(comm_size))
+
+    do i = 1, comm_size
+      if(my_rank == i - 1) cycle
+
+      call monolis_alloc_I_1d(is_send_node, nodal_graph%n_vertex)
+      call gedatsu_dlb_get_n_move_vertex(nodal_graph, update_db(i)%n_send_node, &
+        & is_send_node, domain_id_org, i - 1)
+
+      call monolis_alloc_I_1d(update_db(i)%is_send_edge, nodal_graph%n_vertex)
+      call gedatsu_dlb_get_n_move_connectivity(conn_graph, update_db(i)%n_send_edge, &
+        & update_db(i)%is_send_edge, is_send_node)
+    enddo
+
+    !# エッジの全体情報取得
+!    call monolis_alloc_I_1d(send_n_edge_list, comm_size)
+!    call monolis_alloc_I_1d(recv_n_edge_list, comm_size)
+
+    do i = 1, comm_size
+!      send_n_edge_list(i) = update_db(i)%n_send_edge
+    enddo
+
+!    recv_n_edge_list = send_n_edge_list
+!    call monolis_alltoall_I1(comm_size, recv_n_edge_list, COM%comm)
+
+!    call gedatsu_dlb_generate_comm_table(dlb, graph, update_db, &
+!      & send_n_node_list, recv_n_node_list, &
+!      & send_n_edge_list, recv_n_edge_list, COM)
+  end subroutine gedatsu_dlb_get_conn_graph_comm_table
+
+  !> @ingroup group_dlb
+  !> オーバーラップ計算点を含む通信するエッジ数の取得
+  subroutine gedatsu_dlb_get_n_move_connectivity(graph, n_move_conn, is_move, is_send_node)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] オーバーラップ計算点を含む通信するエッジ数
+    integer(kint) :: n_move_conn
+    !> [in] オーバーラップ計算点を含む通信するエッジのフラグ
+    integer(kint) :: is_move(:)
+    !> [in] オーバーラップ計算点を含む通信する節点のフラグ
+    integer(kint) :: is_send_node(:)
+    integer(kint) :: i, j, jS, jE, jn
+    logical :: is_move_tmp
+
+    is_move = 0
+
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      is_move_tmp = .true.
+      do j = jS, jE
+        jn = graph%item(j)
+        if(is_send_node(jn) == 0)then
+          is_move_tmp = .false.
+        endif
+      enddo
+      if(is_move_tmp) is_move(i) = 1
+    enddo
+
+    n_move_conn = 0
+    do i = 1, graph%n_vertex
+      if(is_move(i) == 1) n_move_conn = n_move_conn + 1
+    enddo
+  end subroutine gedatsu_dlb_get_n_move_connectivity
+
+  !> @ingroup group_dlb
   !> 動的負荷分散のための通信テーブル作成（節点グラフ）
-  subroutine gedatsu_dlb_get_comm_table_main(dlb, graph, COM)
+  subroutine gedatsu_dlb_get_nodal_graph_comm_table(dlb, graph, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(out) :: dlb
@@ -38,6 +130,7 @@ contains
 
     do i = 1, comm_size
       if(my_rank == i - 1) cycle
+
       call monolis_alloc_I_1d(update_db(i)%is_send_node, graph%n_vertex)
       call gedatsu_dlb_get_n_move_vertex(graph, update_db(i)%n_send_node, &
         & update_db(i)%is_send_node, domain_id_org, i - 1)
@@ -77,7 +170,7 @@ contains
     call gedatsu_dlb_generate_comm_table(dlb, graph, update_db, &
       & send_n_node_list, recv_n_node_list, &
       & send_n_edge_list, recv_n_edge_list, COM)
-  end subroutine gedatsu_dlb_get_comm_table_main
+  end subroutine gedatsu_dlb_get_nodal_graph_comm_table
 
   !> @ingroup group_dlb
   !> データ通信のための通信テーブルの作成
@@ -575,7 +668,7 @@ contains
 
   !> @ingroup group_dlb
   !> 更新後のグラフの取得
-  subroutine gedatsu_dlb_get_comm_table_modify(dlb, graph_tmp, graph_new, recv_global_id, recv_domain_org, COM)
+  subroutine gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_tmp, graph_new, recv_global_id, recv_domain_org, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
@@ -616,7 +709,7 @@ contains
         dlb%COM_node%recv_item(i) = perm(pos)
       endif
     enddo
-  end subroutine gedatsu_dlb_get_comm_table_modify
+  end subroutine gedatsu_dlb_get_nodal_graph_comm_table_modify
 
   !> @ingroup group_dlb
   !> オーバーラップ計算点を含まない送信する計算点数の取得
