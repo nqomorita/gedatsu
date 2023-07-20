@@ -15,6 +15,7 @@ program dlb_test
   !> »Î¡¶•’•°•§•Î√˚
   character(monolis_charlen) :: finame
   integer(kint), allocatable :: node_wgt(:,:), edge_wgt(:,:)
+  integer(kint), allocatable :: var_org(:), var_new(:)
 
   call monolis_mpi_initialize()
   call gedatsu_dlb_initialize(dlb)
@@ -35,6 +36,11 @@ program dlb_test
   call gedatsu_dlb_analysis_with_weight(dlb, graph, COM, node_wgt, edge_wgt)
 
   call gedatsu_dlb_update_nodal_graph(dlb, graph, COM, graph_new)
+
+  call monolis_alloc_I_1d(var_org, graph%n_vertex)
+  call monolis_alloc_I_1d(var_new, graph_new%n_vertex)
+
+  call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
 
   call monolis_mpi_finalize()
 end program dlb_test
