@@ -7,6 +7,7 @@ module mod_gedatsu_driver_test_c
 contains
 
   subroutine gedatsu_driver_c_test()
+    call monolis_std_global_log_string("C Language section: gedatsu_driver_c_test")
     call gedatsu_simple_mesh2graph_convertor_test()
     call gedatsu_nodal_graph_partitioner_test()
     call gedatsu_conn_graph_partitioner_test()
