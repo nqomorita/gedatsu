@@ -99,6 +99,8 @@ program gedatsu_nodal_graph_partitioner
     if(.not. is_1_origin) id1 = id1 - 1
     if(.not. is_1_origin) subgraphs(i)%item = subgraphs(i)%item - 1
     if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
+    if(.not. is_1_origin) com(i)%send_item = com(i)%send_item - 1
+    if(.not. is_1_origin) com(i)%recv_item = com(i)%recv_item - 1
 
     call monolis_output_graph(foname_full, subgraphs(i)%n_vertex, id1, subgraphs(i)%index, subgraphs(i)%item)
     call monolis_dealloc_I_1d(id1)

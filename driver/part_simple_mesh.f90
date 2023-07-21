@@ -202,6 +202,8 @@ contains
 
       !> global vertex_id
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id - 1
+      if(.not. is_1_origin) com(i)%send_item = com(i)%send_item - 1
+      if(.not. is_1_origin) com(i)%recv_item = com(i)%recv_item - 1
 
       foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finname)//".id", i - 1)
       call monolis_output_global_id(foname_full, subgraphs(i)%n_vertex, subgraphs(i)%vertex_id)

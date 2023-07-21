@@ -145,7 +145,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org d-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org d-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -174,7 +174,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org e-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org e-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -203,7 +203,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org f-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org f-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -231,7 +231,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org g-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_simple_mesh_partitioner_test 0org g-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -881,7 +881,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org d-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org d-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -910,7 +910,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org e-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org e-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -939,7 +939,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org f-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org f-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
 
 
@@ -967,7 +967,7 @@ contains
     enddo
 
     do i = 1, indexp(n_neib + 1)
-      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org g-0 4", itemp(i), itemp_ans(i))
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner_test 0org g-0 4", itemp(i), itemp_ans(i) - 1)
     enddo
   end subroutine gedatsu_nodal_graph_partitioner_test
 
