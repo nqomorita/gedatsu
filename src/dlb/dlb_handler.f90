@@ -55,7 +55,7 @@ contains
 
     call gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
 
-    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_tmp, graph_new, &
+    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_new, &
       & recv_global_id, recv_domain_org, COM)
   end subroutine gedatsu_dlb_update_nodal_graph
 
