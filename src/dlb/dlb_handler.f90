@@ -3,7 +3,8 @@ module mod_gedatsu_dlb_handler
   use mod_gedatsu_graph
   use mod_gedatsu_graph_repart
   use mod_gedatsu_dlb
-  use mod_gedatsu_dlb_comm
+  use mod_gedatsu_dlb_comm_nodal
+  use mod_gedatsu_dlb_comm_conn
   implicit none
 
 contains

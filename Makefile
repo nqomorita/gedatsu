@@ -78,7 +78,8 @@ SRC_GRAPH = \
 
 SRC_DLB = \
   graph_repart.f90 \
-  dlb_comm.f90 \
+  dlb_comm_nodal.f90 \
+  dlb_comm_conn.f90 \
   dlb_handler.f90
 
 ##> C wrapper section

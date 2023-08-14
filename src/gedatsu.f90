@@ -13,7 +13,8 @@ module mod_gedatsu
   !> DBL section
   use mod_gedatsu_dlb
   use mod_gedatsu_dlb_handler
-  use mod_gedatsu_dlb_comm
+  use mod_gedatsu_dlb_comm_nodal
+  use mod_gedatsu_dlb_comm_conn
 
   !> @defgroup graph_init 初期化・終了処理関数群
   !> 初期化・終了処理に関連する関数グループ
