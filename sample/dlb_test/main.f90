@@ -2,19 +2,19 @@ program dlb_test
   use mod_gedatsu
   use mod_monolis_utils
   implicit none
-  !> dlb 構造体
+  !> dlb ????
   type(gedatsu_dlb) :: dlb
-  !> graph 構造体
+  !> graph ????
   type(gedatsu_graph) :: node_graph_org
-  !> graph 構造体
+  !> graph ????
   type(gedatsu_graph) :: node_graph_new
   type(gedatsu_graph) :: conn_graph_org
   type(gedatsu_graph) :: conn_graph_new
-  !> コミュニケータ 構造体
+  !> ???撺????`?? ????
   type(monolis_COM) :: COM
-  !> 分割数
+  !> ?指??
   integer(kint) :: n_domain
-  !> 入力ファイル名
+  !> ????榨??????
   character(monolis_charlen) :: finame
   integer(kint), allocatable :: node_wgt(:,:), edge_wgt(:,:)
   integer(kint), allocatable :: var_org(:), var_new(:)
@@ -35,6 +35,10 @@ program dlb_test
   call monolis_com_initialize_by_parted_files(COM, monolis_mpi_get_global_comm(), &
     & MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "graph.dat")
 
+  finame = monolis_get_global_input_file_name(MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "conn.dat")
+  call monolis_input_graph(finame, conn_graph_org%n_vertex, conn_graph_org%vertex_id, &
+    & conn_graph_org%index, conn_graph_org%item)
+
   !> repart section
   write(*,*)"gedatsu_dlb_analysis_with_weight"
   call gedatsu_dlb_analysis_with_weight(dlb, node_graph_org, COM, node_wgt, edge_wgt)
@@ -51,6 +55,11 @@ program dlb_test
   !> connectivity graph
   write(*,*)"gedatsu_dlb_update_connectivity_graph"
   call gedatsu_dlb_update_connectivity_graph(dlb, node_graph_org, conn_graph_org, COM, conn_graph_new)
+
+!  call monolis_alloc_I_1d(var_org, conn_graph_org%n_vertex)
+!  call monolis_alloc_I_1d(var_new, conn_graph_new%n_vertex)
+
+!  call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
 
   call monolis_mpi_finalize()
 end program dlb_test
