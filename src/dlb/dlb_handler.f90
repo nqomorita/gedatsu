@@ -84,13 +84,13 @@ contains
 
     call gedatsu_dlb_get_conn_graph_comm_table(dlb, nodal_graph_org, conn_graph_org, COM)
 
-    call gedatsu_dlb_get_temporary_conn_graph(dlb, conn_graph_org, graph_tmp, &
+    call gedatsu_dlb_get_temporary_nodal_graph(dlb, conn_graph_org, graph_tmp, &
       & recv_global_id, recv_domain_org, COM)
 
-!    call gedatsu_dlb_get_new_nodal_graph(graph_tmp, graph_new, COM)
+    call gedatsu_dlb_get_new_nodal_graph(graph_tmp, conn_graph_new, COM)
 
-!    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_new, &
-!      & recv_global_id, recv_domain_org, COM)
+    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, conn_graph_new, &
+      & recv_global_id, recv_domain_org, COM)
   end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb
