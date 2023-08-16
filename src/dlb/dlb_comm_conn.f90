@@ -43,7 +43,7 @@ contains
       !# 各領域番号に送る要素とエッジ数を格納
       call monolis_alloc_I_1d(is_send_nodal_vertex, nodal_graph%n_vertex)
       call gedatsu_dlb_get_n_move_vertex(nodal_graph, no_use, &
-        & is_send_nodal_vertex, domain_id_org, i - 1)
+        & is_send_nodal_vertex, domain_id_org, my_rank, i - 1)
 
       call monolis_alloc_I_1d(update_db(i)%is_send_node, conn_graph%n_vertex)
       call monolis_alloc_I_1d(update_db(i)%is_send_edge, conn_graph%index(conn_graph%n_vertex + 1))
