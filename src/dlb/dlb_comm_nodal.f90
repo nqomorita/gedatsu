@@ -40,7 +40,7 @@ contains
 
       call monolis_alloc_I_1d(update_db(i)%is_send_node, graph%n_vertex)
       call gedatsu_dlb_get_n_move_vertex(graph, update_db(i)%n_send_node, &
-        & update_db(i)%is_send_node, domain_id_org, i - 1)
+        & update_db(i)%is_send_node, domain_id_org, my_rank, i - 1)
 
       call monolis_alloc_I_1d(update_db(i)%is_send_edge, graph%index(graph%n_vertex + 1))
       call gedatsu_dlb_get_n_move_edge(graph, update_db(i)%n_send_edge, &
@@ -617,7 +617,7 @@ contains
 
   !> @ingroup group_dlb
   !> オーバーラップ計算点を含まない送信する計算点数の取得
-  subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, domain_id_org, did)
+  subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, domain_id_org, my_rank, did)
     implicit none
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
@@ -628,15 +628,17 @@ contains
     !> [in] 元の領域番号
     integer(kint) :: domain_id_org(:)
     !> [in] 領域番号
+    integer(kint), intent(in) :: my_rank
     integer(kint), intent(in) :: did
     integer(kint) :: i, j, jS, jE, jn
 
     do i = 1, graph%n_vertex
-      if(graph%vertex_domain_id(i) == did)then
+      if(domain_id_org(i) == my_rank .and. graph%vertex_domain_id(i) == did)then
         is_move(i) = 1
       else
         cycle
       endif
+
       jS = graph%index(i) + 1
       jE = graph%index(i + 1)
       do j = jS, jE

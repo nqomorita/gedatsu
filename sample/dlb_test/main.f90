@@ -50,6 +50,9 @@ program dlb_test
   call monolis_alloc_I_1d(var_org, node_graph_org%n_vertex)
   call monolis_alloc_I_1d(var_new, node_graph_new%n_vertex)
 
+  var_org = monolis_mpi_get_global_my_rank()
+  var_new = monolis_mpi_get_global_my_rank()
+
   call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
 
   !> connectivity graph
