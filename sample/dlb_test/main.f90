@@ -2,25 +2,26 @@ program dlb_test
   use mod_gedatsu
   use mod_monolis_utils
   implicit none
-  !> dlb ????
-  type(gedatsu_dlb) :: dlb
-  !> graph ????
+  !> dlb 構造体
+  type(gedatsu_dlb) :: dlb_node
+  type(gedatsu_dlb) :: dlb_conn
+  !> graph 構造体
   type(gedatsu_graph) :: node_graph_org
-  !> graph ????
   type(gedatsu_graph) :: node_graph_new
   type(gedatsu_graph) :: conn_graph_org
   type(gedatsu_graph) :: conn_graph_new
-  !> ???撺????`?? ????
+  !> 通信構造体
   type(monolis_COM) :: COM
-  !> ?指??
+  !> 領域数
   integer(kint) :: n_domain
-  !> ????榨??????
+  !> ファイル名
   character(monolis_charlen) :: finame
   integer(kint), allocatable :: node_wgt(:,:), edge_wgt(:,:)
   integer(kint), allocatable :: var_org(:), var_new(:)
 
   call monolis_mpi_initialize()
-  call gedatsu_dlb_initialize(dlb)
+  call gedatsu_dlb_initialize(dlb_node)
+  call gedatsu_dlb_initialize(dlb_conn)
 
   n_domain = monolis_mpi_get_global_comm_size()
 
@@ -41,11 +42,11 @@ program dlb_test
 
   !> repart section
   write(*,*)"gedatsu_dlb_analysis_with_weight"
-  call gedatsu_dlb_analysis_with_weight(dlb, node_graph_org, COM, node_wgt, edge_wgt)
+  call gedatsu_dlb_analysis_with_weight(dlb_node, node_graph_org, COM, node_wgt, edge_wgt)
 
   !> nodal graph
   write(*,*)"gedatsu_dlb_update_nodal_graph"
-  call gedatsu_dlb_update_nodal_graph(dlb, node_graph_org, COM, node_graph_new)
+  call gedatsu_dlb_update_nodal_graph(dlb_node, node_graph_org, COM, node_graph_new)
 
   call monolis_alloc_I_1d(var_org, node_graph_org%n_vertex)
   call monolis_alloc_I_1d(var_new, node_graph_new%n_vertex)
@@ -53,16 +54,16 @@ program dlb_test
   var_org = monolis_mpi_get_global_my_rank()
   var_new = monolis_mpi_get_global_my_rank()
 
-  call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
+  call gedatsu_dlb_update_I_1d(dlb_node, 1, var_org, var_new)
 
   !> connectivity graph
   write(*,*)"gedatsu_dlb_update_connectivity_graph"
-  call gedatsu_dlb_update_connectivity_graph(dlb, node_graph_org, conn_graph_org, COM, conn_graph_new)
+  call gedatsu_dlb_update_connectivity_graph(dlb_conn, node_graph_org, conn_graph_org, COM, conn_graph_new)
 
 !  call monolis_alloc_I_1d(var_org, conn_graph_org%n_vertex)
 !  call monolis_alloc_I_1d(var_new, conn_graph_new%n_vertex)
 
-!  call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
+!  call gedatsu_dlb_update_I_1d(dlb_conn, 1, var_org, var_new)
 
   call monolis_mpi_finalize()
 end program dlb_test
