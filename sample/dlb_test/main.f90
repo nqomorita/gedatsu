@@ -40,6 +40,9 @@ program dlb_test
   call monolis_alloc_I_1d(var_org, graph%n_vertex)
   call monolis_alloc_I_1d(var_new, graph_new%n_vertex)
 
+  var_org = monolis_mpi_get_global_my_rank()
+  var_new = monolis_mpi_get_global_my_rank()
+
   call gedatsu_dlb_update_I_1d(dlb, 1, var_org, var_new)
 
   call monolis_mpi_finalize()
