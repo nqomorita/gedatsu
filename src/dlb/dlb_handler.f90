@@ -62,33 +62,32 @@ contains
 
   !> @ingroup group_dlb
   !> 負荷分散：付随グラフ情報のアップデート（配列のメモリ再確保）
-  subroutine gedatsu_dlb_update_connectivity_graph(dlb, nodal_graph_org, conn_graph_org, COM, conn_graph_new)
+  subroutine gedatsu_dlb_update_connectivity_graph(dlb, nodal_graph_org, nodal_graph_new, &
+    & conn_graph_org, COM, conn_graph_new)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb) :: dlb
     !> [in,out] graph 構造体
     type(gedatsu_graph) :: nodal_graph_org
     !> [in,out] graph 構造体
+    type(gedatsu_graph) :: nodal_graph_new
+    !> [in,out] graph 構造体
     type(gedatsu_graph) :: conn_graph_org
-    !> [in,out] graph 構造体
-    type(gedatsu_graph) :: conn_graph_new
-    !> [in,out] graph 構造体
-    type(gedatsu_graph) :: graph_tmp
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint), allocatable :: recv_global_id(:)
-    integer(kint), allocatable :: recv_domain_org(:)
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: conn_graph_new
+    !integer(kint), allocatable :: recv_global_id(:)
+    !integer(kint), allocatable :: recv_domain_org(:)
     integer(kint) :: comm_size
 
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
 write(*,*)"A1"
     call gedatsu_dlb_get_conn_graph_comm_table(dlb, nodal_graph_org, conn_graph_org, COM)
 write(*,*)"A2"
-!    call gedatsu_dlb_get_temporary_nodal_graph(dlb, conn_graph_org, graph_tmp, &
-!      & recv_global_id, recv_domain_org, COM)
+    call gedatsu_dlb_get_temporary_conn_graph(dlb, nodal_graph_org, nodal_graph_new, &
+      & conn_graph_org, conn_graph_new, COM)
 write(*,*)"A3"
-!    call gedatsu_dlb_get_new_nodal_graph(graph_tmp, conn_graph_new, COM)
-write(*,*)"A4"
 !    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, conn_graph_new, &
 !      & recv_global_id, recv_domain_org, COM)
   end subroutine gedatsu_dlb_update_connectivity_graph
