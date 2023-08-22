@@ -40,6 +40,9 @@ program dlb_test
   call monolis_input_graph(finame, conn_graph_org%n_vertex, conn_graph_org%vertex_id, &
     & conn_graph_org%index, conn_graph_org%item)
 
+  finame = monolis_get_global_input_file_name(MONOLIS_DEFAULT_TOP_DIR, MONOLIS_DEFAULT_PART_DIR, "conn.dat.id")
+  call monolis_input_global_id(finame, conn_graph_org%n_vertex, conn_graph_org%vertex_id)
+
   !> repart section
   call gedatsu_dlb_analysis_with_weight(dlb_node, node_graph_org, COM, node_wgt, edge_wgt)
 
@@ -58,6 +61,16 @@ program dlb_test
   call gedatsu_dlb_update_connectivity_graph(dlb_conn, node_graph_org, node_graph_new, &
     & conn_graph_org, COM, conn_graph_new)
 
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%n_vertex", conn_graph_org%n_vertex
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%vertex_id", conn_graph_org%vertex_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%index", conn_graph_org%index
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%item", conn_graph_org%item
+
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%n_vertex", conn_graph_new%n_vertex
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%vertex_id", conn_graph_new%vertex_id
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%index", conn_graph_new%index
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%item", conn_graph_new%item
+
   call monolis_dealloc_I_1d(var_org)
   call monolis_dealloc_I_1d(var_new)
 
@@ -67,7 +80,13 @@ program dlb_test
   var_org = monolis_mpi_get_global_my_rank()
   var_new = monolis_mpi_get_global_my_rank()
 
+!write(100+monolis_mpi_get_global_my_rank(),*)"var_org", var_org
+!write(100+monolis_mpi_get_global_my_rank(),*)"var_new", var_new
+
   call gedatsu_dlb_update_I_1d(dlb_conn, 1, var_org, var_new)
+
+!write(100+monolis_mpi_get_global_my_rank(),*)"var_org", var_org
+!write(100+monolis_mpi_get_global_my_rank(),*)"var_new", var_new
 
   call monolis_mpi_finalize()
 end program dlb_test
