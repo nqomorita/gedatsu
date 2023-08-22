@@ -82,7 +82,7 @@ contains
   !> @ingroup group_dlb
   !> 動的負荷分散のためのグラフ構造アップデート
   subroutine gedatsu_dlb_get_temporary_conn_graph(dlb, nodal_graph_org, nodal_graph_new, &
-    & conn_graph_org, conn_graph_new, COM)
+    & conn_graph_org, conn_graph_new, recv_global_id, COM)
     implicit none
     !> [in] dlb 構造体
     type(gedatsu_dlb), intent(inout) :: dlb
@@ -195,10 +195,15 @@ contains
     !# graph_temp に global ID のまま結合
     graph_temp%n_vertex = conn_graph_org%n_vertex + n_recv_conn
 
+    call monolis_alloc_I_1d(graph_temp%vertex_id, graph_temp%n_vertex)
     call monolis_alloc_I_1d(graph_temp%index, graph_temp%n_vertex + 1)
     call monolis_alloc_I_1d(graph_temp%item, n_send_edge + n_recv_edge)
 
     !# conn_graph_org section
+    do i = 1, conn_graph_org%n_vertex
+      graph_temp%vertex_id(i) = conn_graph_org%vertex_id(i)
+    enddo
+
     do i = 1, conn_graph_org%n_vertex + 1
       graph_temp%index(i) = conn_graph_org%index(i)
     enddo
@@ -209,6 +214,10 @@ contains
     enddo
 
     !# recv_conn section
+    do i = conn_graph_org%n_vertex + 1, graph_temp%n_vertex
+      graph_temp%vertex_id(i) = recv_global_id(i - conn_graph_org%n_vertex)
+    enddo
+
     do i = conn_graph_org%n_vertex + 1, graph_temp%n_vertex
       graph_temp%index(i + 1) = recv_conn_index(i - conn_graph_org%n_vertex + 1) + graph_temp%index(conn_graph_org%n_vertex + 1)
     enddo
@@ -267,6 +276,7 @@ contains
 
     !# conn_graph_new の作成
     conn_graph_new%n_vertex = n_merge_edge
+    call monolis_alloc_I_1d(conn_graph_new%vertex_id, conn_graph_new%n_vertex)
     call monolis_alloc_I_1d(conn_graph_new%index, conn_graph_new%n_vertex + 1)
     call monolis_alloc_I_1d(conn_graph_new%item, n_item)
 
@@ -277,6 +287,7 @@ contains
       jE = graph_temp%index(i + 1)
       if(is_merge_edge(i) == 1)then
         in = in + 1
+        conn_graph_new%vertex_id(in) = graph_temp%vertex_id(i)
         conn_graph_new%index(in + 1) = conn_graph_new%index(in) + jE - jS + 1
         do j = jS, jE
           jn = jn + 1
@@ -293,9 +304,9 @@ contains
       conn_graph_new%item(i) = id1
     enddo
 
-write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%n_vertex", conn_graph_new%n_vertex
-write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%index", conn_graph_new%index
-write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%item", conn_graph_new%item
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%n_vertex", conn_graph_new%n_vertex
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%index", conn_graph_new%index
+!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%item", conn_graph_new%item
   end subroutine gedatsu_dlb_get_temporary_conn_graph
 
   !> @ingroup group_dlb
@@ -351,4 +362,44 @@ write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%item", conn_graph_n
     enddo
   end subroutine gedatsu_dlb_get_n_move_connectivity
 
+  !> @ingroup group_dlb
+  !> 更新後のグラフの取得
+  subroutine gedatsu_dlb_get_conn_graph_comm_table_modify(dlb, graph_new, recv_global_id, COM)
+    implicit none
+    !> [in] dlb 構造体
+    type(gedatsu_dlb), intent(inout) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph_new
+    !> [in] COM 構造体
+    type(monolis_COM), intent(in) :: COM
+    !> [in] recv 計算点のグローバル id
+    integer(kint) :: recv_global_id(:)
+    integer(kint) :: i, n_recv_node, id, pos, my_rank
+    integer(kint), allocatable :: ids(:), perm(:)
+
+    my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+
+    n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
+
+    call monolis_alloc_I_1d(ids, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(perm, graph_new%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+
+    ids = graph_new%vertex_id
+
+    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_vertex)
+
+    do i = 1, n_recv_node
+      id = recv_global_id(i)
+      call monolis_bsearch_I(ids, 1, graph_new%n_vertex, id, pos)
+
+      if(pos == -1)then
+        dlb%COM_node%recv_item(i) = -1
+      else
+        dlb%COM_node%recv_item(i) = perm(pos)
+      endif
+    enddo
+  end subroutine gedatsu_dlb_get_conn_graph_comm_table_modify
 end module mod_gedatsu_dlb_comm_conn

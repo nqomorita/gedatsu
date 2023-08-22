@@ -77,19 +77,17 @@ contains
     type(monolis_COM), intent(in) :: COM
     !> [in,out] graph 構造体
     type(gedatsu_graph) :: conn_graph_new
-    !integer(kint), allocatable :: recv_global_id(:)
-    !integer(kint), allocatable :: recv_domain_org(:)
+    integer(kint), allocatable :: recv_global_id(:)
     integer(kint) :: comm_size
 
     comm_size = monolis_mpi_get_local_comm_size(COM%comm)
-write(*,*)"A1"
+
     call gedatsu_dlb_get_conn_graph_comm_table(dlb, nodal_graph_org, conn_graph_org, COM)
-write(*,*)"A2"
+
     call gedatsu_dlb_get_temporary_conn_graph(dlb, nodal_graph_org, nodal_graph_new, &
-      & conn_graph_org, conn_graph_new, COM)
-write(*,*)"A3"
-!    call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, conn_graph_new, &
-!      & recv_global_id, recv_domain_org, COM)
+      & conn_graph_org, conn_graph_new, recv_global_id, COM)
+
+    call gedatsu_dlb_get_conn_graph_comm_table_modify(dlb, conn_graph_new, recv_global_id, COM)
   end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb

@@ -41,17 +41,13 @@ program dlb_test
     & conn_graph_org%index, conn_graph_org%item)
 
   !> repart section
-  write(*,*)"gedatsu_dlb_analysis_with_weight"
   call gedatsu_dlb_analysis_with_weight(dlb_node, node_graph_org, COM, node_wgt, edge_wgt)
 
   !> nodal graph
-  write(*,*)"gedatsu_dlb_update_nodal_graph"
   call gedatsu_dlb_update_nodal_graph(dlb_node, node_graph_org, COM, node_graph_new)
 
   call monolis_alloc_I_1d(var_org, node_graph_org%n_vertex)
   call monolis_alloc_I_1d(var_new, node_graph_new%n_vertex)
-
-write(*,*)"node_graph_new%n_vertex", node_graph_new%n_vertex
 
   var_org = monolis_mpi_get_global_my_rank()
   var_new = monolis_mpi_get_global_my_rank()
@@ -59,14 +55,19 @@ write(*,*)"node_graph_new%n_vertex", node_graph_new%n_vertex
   call gedatsu_dlb_update_I_1d(dlb_node, 1, var_org, var_new)
 
   !> connectivity graph
-  write(*,*)"gedatsu_dlb_update_connectivity_graph"
   call gedatsu_dlb_update_connectivity_graph(dlb_conn, node_graph_org, node_graph_new, &
     & conn_graph_org, COM, conn_graph_new)
 
-!  call monolis_alloc_I_1d(var_org, conn_graph_org%n_vertex)
-!  call monolis_alloc_I_1d(var_new, conn_graph_new%n_vertex)
+  call monolis_dealloc_I_1d(var_org)
+  call monolis_dealloc_I_1d(var_new)
 
-!  call gedatsu_dlb_update_I_1d(dlb_conn, 1, var_org, var_new)
+  call monolis_alloc_I_1d(var_org, conn_graph_org%n_vertex)
+  call monolis_alloc_I_1d(var_new, conn_graph_new%n_vertex)
+
+  var_org = monolis_mpi_get_global_my_rank()
+  var_new = monolis_mpi_get_global_my_rank()
+
+  call gedatsu_dlb_update_I_1d(dlb_conn, 1, var_org, var_new)
 
   call monolis_mpi_finalize()
 end program dlb_test
