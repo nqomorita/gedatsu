@@ -4,7 +4,7 @@ program gedatsu_nodal_graph_partitioner
   implicit none
   type(gedatsu_graph) :: graph
   integer(kint) :: n_domain, i
-  integer(kint) :: n_nw_dof, n_ew_dof, n_vertex
+  integer(kint) :: n_nw_dof, n_ew_dof, n_vertex, n_edge
   character(monolis_charlen) :: finame, dirname, foname_full
   character(monolis_charlen) :: finwname, fiewname, label
   logical :: is_get, is_inw, is_iew, is_1_origin
@@ -76,7 +76,7 @@ program gedatsu_nodal_graph_partitioner
 
   if(is_iew)then
     call monolis_std_log_string2("[input edge weight filename]", fiewname)
-    call monolis_input_distval_i(fiewname, label, n_vertex, n_ew_dof, edge_wgt)
+    call monolis_input_distval_i(fiewname, label, n_edge, n_ew_dof, edge_wgt)
   endif
 
   allocate(subgraphs(n_domain))

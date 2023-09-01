@@ -6,9 +6,13 @@ program gedatsu_partitioner_simple_mesh
   type(gedatsu_graph) :: conn_graph
   type(gedatsu_graph), allocatable :: subgraphs(:)
   integer(kint) :: n_node, n_elem, n_base, n_domain
+  integer(kint) :: n_nw_dof, n_ew_dof, n_edge
   character(monolis_charlen) :: finname, fiename, dirname
-  logical :: is_get, is_1_origin
+  character(monolis_charlen) :: finwname, fiewname, label
+  logical :: is_get, is_inw, is_iew, is_1_origin
   integer(kint), allocatable :: elem(:,:)
+  integer(kint), allocatable :: node_wgt(:,:)
+  integer(kint), allocatable :: edge_wgt(:,:)
   real(kdouble), allocatable :: node(:,:)
 
   call monolis_mpi_initialize()
@@ -24,6 +28,8 @@ program gedatsu_partitioner_simple_mesh
     write(*,"(a)")""
     write(*,"(a)")"-in {input node filename}: (default) node.dat"
     write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
+    write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h  : help"
     stop monolis_success
@@ -39,6 +45,8 @@ program gedatsu_partitioner_simple_mesh
     write(*,"(a)")""
     write(*,"(a)")"-in {input node filename}: (default) node.dat"
     write(*,"(a)")"-ie {input elem filename}: (default) elem.dat"
+    write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
+    write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
     write(*,"(a)")"-h  : help"
   endif
@@ -61,6 +69,22 @@ program gedatsu_partitioner_simple_mesh
   call monolis_check_fortran_1_origin_elem(elem, is_1_origin)
 
   if(.not. is_1_origin) elem = elem + 1
+
+  finwname = "node_weight.dat"
+  call monolis_get_arg_input_S("-inw", finwname, is_inw)
+
+  if(is_inw)then
+    call monolis_std_log_string2("[input node weight filename]", finwname)
+    call monolis_input_distval_i(finwname, label, n_node, n_nw_dof, node_wgt)
+  endif
+
+  fiewname = "edge_weight.dat"
+  call monolis_get_arg_input_S("-iew", fiewname, is_iew)
+
+  if(is_iew)then
+    call monolis_std_log_string2("[input edge weight filename]", fiewname)
+    call monolis_input_distval_i(fiewname, label, n_edge, n_ew_dof, edge_wgt)
+  endif
 
   call node_partition()
 
@@ -178,7 +202,7 @@ contains
 
     allocate(subgraphs(n_domain))
 
-    call gedatsu_graph_partition(node_graph, n_domain, subgraphs)
+    call gedatsu_graph_partition_with_weight(node_graph, n_domain, node_wgt, edge_wgt, subgraphs)
 
     allocate(com(n_domain))
 
