@@ -811,6 +811,37 @@ contains
 
 
 
+
+    call monolis_dealloc_I_1d(vertex_id)
+    call monolis_dealloc_I_1d(vertex_id_ans)
+    call monolis_dealloc_I_1d(index)
+    call monolis_dealloc_I_1d(index_ans)
+    call monolis_dealloc_I_1d(item)
+    call monolis_dealloc_I_1d(item_ans)
+
+    fname = "parted.0.f/metagraph.dat"
+    call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
+
+    fname = "parted.0.ans/metagraph.dat"
+    call monolis_input_graph(fname, n_vertex_ans, vertex_id_ans, index_ans, item_ans)
+
+    call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-meta 1", n_vertex, n_vertex_ans)
+
+    do i = 1, n_vertex
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-meta 2", vertex_id(i), vertex_id_ans(i))
+    enddo
+
+    do i = 1, n_vertex + 1
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-meta 3", index(i), index_ans(i))
+    enddo
+
+    do i = 1, index(n_vertex + 1)
+      call monolis_test_check_eq_I1("gedatsu_nodal_graph_partitioner a-meta 4", item(i), item_ans(i))
+    enddo
+
+
+
+
     call monolis_dealloc_I_1d(vertex_id)
     call monolis_dealloc_I_1d(vertex_id_ans)
 
