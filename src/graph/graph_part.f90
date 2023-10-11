@@ -7,6 +7,7 @@
 !# gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
 !# gedatsu_com_get_comm_table_serial(graph, n_domain, subgraphs, com)
 !# gedatsu_comm_get_all_external_node_serial(subgraphs, n_domain, outer_node_id_all_global, displs)
+!# gedatsu_get_metagraph(com, n_domain, metagraph)
 module mod_gedatsu_graph_part
   use mod_monolis_utils
   use mod_gedatsu_graph
@@ -355,4 +356,43 @@ contains
       l_id(l_n_vertex) = g_id(i)
     enddo cc
   end subroutine gedatsu_get_parted_connectivity_main
+
+  !> @ingroup graph_part
+  !> グラフ分割結果のメタグラフを出力
+  subroutine gedatsu_get_metagraph(com, n_domain, metagraph)
+    implicit none
+    !> [in] com 構造体
+    type(monolis_COM) :: com(:)
+    !> [in] 分割数
+    integer(kint) :: n_domain
+    !> [out] graph 構造体
+    type(gedatsu_graph) :: metagraph
+    integer(kint) :: n_neib, i, j, in
+
+    call gedatsu_graph_finalize(metagraph)
+
+    metagraph%n_vertex = n_domain
+    call monolis_alloc_I_1d(metagraph%vertex_id, n_domain)
+    call monolis_alloc_I_1d(metagraph%index, n_domain + 1)
+
+    do i = 1, n_domain
+      metagraph%vertex_id(i) = i
+    enddo
+
+    n_neib = 0
+    do i = 1, n_domain
+      n_neib = n_neib + com(i)%recv_n_neib
+      metagraph%index(i + 1) = n_neib
+    enddo
+
+    call monolis_alloc_I_1d(metagraph%item, n_neib)
+
+    in = 0
+    do i = 1, n_domain
+      do j = 1, com(i)%recv_n_neib
+        in = in + 1
+        metagraph%item(in) = com(i)%recv_neib_pe(j)
+      enddo
+    enddo
+  end subroutine gedatsu_get_metagraph
 end module mod_gedatsu_graph_part

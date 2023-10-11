@@ -181,6 +181,7 @@ contains
 
   subroutine node_partition()
     implicit none
+    type(gedatsu_graph) :: metagraph
     integer(kint) :: i, j, in
     character(monolis_charlen) :: foname_full
     type(monolis_COM), allocatable :: com(:)
@@ -207,6 +208,10 @@ contains
     allocate(com(n_domain))
 
     call gedatsu_com_get_comm_table_serial(node_graph, n_domain, subgraphs, com)
+
+    foname_full = trim(dirname)//"/metagraph.dat"
+    call gedatsu_get_metagraph(com, n_domain, metagraph)
+    call monolis_output_graph(foname_full, metagraph%n_vertex, metagraph%vertex_id, metagraph%index, metagraph%item)
 
     do i = 1, n_domain
       !> node.dat

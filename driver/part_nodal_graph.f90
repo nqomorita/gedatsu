@@ -3,6 +3,7 @@ program gedatsu_nodal_graph_partitioner
   use mod_gedatsu
   implicit none
   type(gedatsu_graph) :: graph
+  type(gedatsu_graph) :: metagraph
   integer(kint) :: n_domain, i
   integer(kint) :: n_nw_dof, n_ew_dof, n_vertex, n_edge
   character(monolis_charlen) :: finame, dirname, foname_full
@@ -89,6 +90,10 @@ program gedatsu_nodal_graph_partitioner
 
   dirname = "./parted.0"
   call monolis_get_arg_input_d_tag(dirname, is_get)
+
+  foname_full = trim(dirname)//"/metagraph.dat"
+  call gedatsu_get_metagraph(com, n_domain, metagraph)
+  call monolis_output_graph(foname_full, metagraph%n_vertex, metagraph%vertex_id, metagraph%index, metagraph%item)
 
   do i = 1, n_domain
     !> graph.dat
