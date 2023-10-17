@@ -532,7 +532,7 @@ contains
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
     !> [in] グラフエッジ
-    integer(kint), intent(out) :: edge(:)
+    integer(kint), intent(in) :: edge(:)
     !> [in] グラフエッジ
     logical, intent(out) :: is_exist
     integer(kint) :: i, j, jS, jE, e1, e2

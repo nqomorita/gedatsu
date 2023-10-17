@@ -59,6 +59,15 @@ contains
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
     type(c_ptr) :: xadj, adjncy
+
+    interface
+      subroutine gedatsu_c_free(ptr) bind(c, name="free")
+        use iso_c_binding
+        implicit none
+        type(c_ptr), value :: ptr
+      end subroutine gedatsu_c_free
+    end interface
+
 !#if WITH_METIS64
 !    integer(c_int64_t) :: n_elem8, n_node8, numflag8
 !    integer(c_int64_t), pointer :: mesh_index8(:), mesh_item8(:)
@@ -90,9 +99,11 @@ contains
 
     nodal_item = item_c
 
-    deallocate(index_c)
+    call gedatsu_c_free(xadj)
+    call gedatsu_c_free(adjncy)
+    nullify(index_c)
+    nullify(item_c)
 
-    deallocate(item_c)
 !#elif WITH_METIS64
 !    n_node8 = n_node
 !    n_elem8 = n_elem
