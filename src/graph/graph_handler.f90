@@ -238,6 +238,38 @@ contains
   end subroutine gedatsu_graph_get_vertex_id_in_overlap_region
 
   !> @ingroup graph_basic
+  !> 領域番号 domain_id に属するノードのフラグ配列を取得
+  subroutine gedatsu_graph_get_flag_in_subdomain(graph, domain_id, is_in, is_border)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph), intent(in) :: graph
+    !> [in] 領域番号
+    integer(kint), intent(in) :: domain_id
+    !> [out] オーバーラッピング領域に属するノードのフラグ
+    logical, intent(out) :: is_in(:)
+    !> [out] オーバーラッピング領域に接するノードのフラグ
+    logical, intent(out) :: is_border(:)
+    integer(kint) :: i, j, jS, jE, nid
+    logical :: is_find
+
+    is_in = .false.
+    is_border = .false.
+    do i = 1, graph%n_vertex
+      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      is_find = .false.
+      do j = jS, jE
+        nid = graph%item(j)
+        if(graph%vertex_domain_id(nid) == domain_id) cycle
+        is_in(nid) = .true.
+        is_find = .true.
+      enddo
+      if(is_find) is_border(i) = .true.
+    enddo
+  end subroutine gedatsu_graph_get_flag_in_subdomain
+
+  !> @ingroup graph_basic
   !> グラフのエッジ数を取得
   subroutine gedatsu_graph_get_n_edge(graph, n_edge)
     implicit none
@@ -283,16 +315,32 @@ contains
     !> [out] グラフのエッジ数
     integer(kint), intent(out) :: n_edge
     integer(kint) :: i, j, jS, jE, nid
+    logical, allocatable :: is_in(:)
+    logical, allocatable :: is_border(:)
+
+    call monolis_alloc_L_1d(is_in, graph%n_vertex)
+    call monolis_alloc_L_1d(is_border, graph%n_vertex)
+
+    call gedatsu_graph_get_flag_in_subdomain(graph, domain_id, is_in, is_border)
 
     n_edge = 0
     do i = 1, graph%n_vertex
-      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      if(.not. is_border(i)) cycle
       jS = graph%index(i) + 1
       jE = graph%index(i + 1)
       do j = jS, jE
         nid = graph%item(j)
-        !> 無向グラフのため 2 を加算
-        if(graph%vertex_domain_id(nid) /= domain_id) n_edge = n_edge + 2
+        if(is_in(nid)) n_edge = n_edge + 1
+      enddo
+    enddo
+
+    do i = 1, graph%n_vertex
+      if(.not. is_in(i)) cycle
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        nid = graph%item(j)
+        if(is_in(nid) .or. is_border(nid)) n_edge = n_edge + 1
       enddo
     enddo
   end subroutine gedatsu_graph_get_n_edge_in_overlap_region
@@ -364,10 +412,12 @@ contains
     integer(kint), intent(in) :: domain_id
     !> [out] グラフエッジ
     integer(kint), intent(out) :: edge(:,:)
-    integer(kint) :: i, j, jS, jE, nid, idx1, idx2
+    integer(kint) :: i, j, jS, jE, gid, idx1, idx2, lid1, lid2
     integer(kint) :: n_edge, n1, n2, n_vertex
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
+    logical, allocatable :: is_in(:)
+    logical, allocatable :: is_border(:)
 
     call gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n1)
 
@@ -387,17 +437,22 @@ contains
 
     call monolis_qsort_I_2d(ids, perm, 1, n_vertex)
 
+    call monolis_alloc_L_1d(is_in, graph%n_vertex)
+    call monolis_alloc_L_1d(is_border, graph%n_vertex)
+
+    call gedatsu_graph_get_flag_in_subdomain(graph, domain_id, is_in, is_border)
+
     n_edge = 0
     do i = 1, graph%n_vertex
-      if(graph%vertex_domain_id(i) /= domain_id) cycle
+      if(.not. is_border(i)) cycle
+
       jS = graph%index(i) + 1
       jE = graph%index(i + 1)
       do j = jS, jE
-        nid = graph%item(j)
-        if(graph%vertex_domain_id(nid) /= domain_id)then
-
+        gid = graph%item(j)
+        if(is_in(gid))then
           n1 = graph%vertex_id(i)
-          n2 = graph%vertex_id(nid)
+          n2 = graph%vertex_id(gid)
 
           call monolis_bsearch_I(ids, 1, n_vertex, n1, idx1)
           call monolis_bsearch_I(ids, 1, n_vertex, n2, idx2)
@@ -405,13 +460,39 @@ contains
           if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 1"
           if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 2"
 
-          n_edge = n_edge + 1
-          edge(1,n_edge) = perm(idx1)
-          edge(2,n_edge) = perm(idx2)
+          lid1 = perm(idx1)
+          lid2 = perm(idx2)
 
           n_edge = n_edge + 1
-          edge(1,n_edge) = perm(idx2)
-          edge(2,n_edge) = perm(idx1)
+          edge(1,n_edge) = lid1
+          edge(2,n_edge) = lid2
+        endif
+      enddo
+    enddo
+
+    do i = 1, graph%n_vertex
+      if(.not. is_in(i)) cycle
+
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        gid = graph%item(j)
+        if(is_in(gid) .or. is_border(gid))then
+          n1 = graph%vertex_id(i)
+          n2 = graph%vertex_id(gid)
+
+          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx1)
+          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx2)
+
+          if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 1"
+          if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 2"
+
+          lid1 = perm(idx1)
+          lid2 = perm(idx2)
+
+          n_edge = n_edge + 1
+          edge(1,n_edge) = lid1
+          edge(2,n_edge) = lid2
         endif
       enddo
     enddo
