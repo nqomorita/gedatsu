@@ -37,6 +37,9 @@ module mod_gedatsu
   !> @defgroup dev_graph_part 開発者用：グラフデータ処理関数群（グラフ分割関数）
   !> グラフ分割に関連する関数グループ（開発者用）
 
+  !> @defgroup dev_graph_dlb 開発者用：動的負荷分散関数群（開発者用）
+  !> 動的負荷分散に関連する関数グループ（開発者用）
+
   !> @defgroup dev_graph 開発者用関数
   !> 開発者用関数群
 end module mod_gedatsu

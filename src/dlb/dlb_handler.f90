@@ -58,6 +58,8 @@ contains
 
     call gedatsu_dlb_get_nodal_graph_comm_table_modify(dlb, graph_new, &
       & recv_global_id, recv_domain_org, COM)
+
+    call gedatsu_dlb_get_perm_array(dlb, graph_org, graph_new)
   end subroutine gedatsu_dlb_update_nodal_graph
 
   !> @ingroup group_dlb
@@ -88,6 +90,8 @@ contains
       & conn_graph_org, conn_graph_new, recv_global_id, COM)
 
     call gedatsu_dlb_get_conn_graph_comm_table_modify(dlb, conn_graph_new, recv_global_id, COM)
+
+    call gedatsu_dlb_get_perm_array(dlb, conn_graph_org, conn_graph_new)
   end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb
@@ -149,5 +153,43 @@ contains
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
        & var_org, var_new, ndof, dlb%COM_node%comm)
   end subroutine gedatsu_dlb_update_C_1d
+
+  !> @ingroup dev_graph_dlb
+  !> TBA
+  subroutine gedatsu_dlb_get_perm_array(dlb, graph_org, graph_new)
+    implicit none
+    !> [in,out] dlb 構造体
+    type(gedatsu_dlb) :: dlb
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph_org
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: graph_new
+    integer(kint) :: i, val, pos
+    integer(kint), allocatable :: gid(:), idx(:)
+
+    dlb%n_vertex_old = graph_org%n_vertex
+    dlb%n_vertex_new = graph_new%n_vertex
+
+    call monolis_alloc_I_1d(dlb%global_id_old, graph_org%n_vertex)
+    call monolis_alloc_I_1d(dlb%global_id_new, graph_new%n_vertex)
+    call monolis_alloc_I_1d(dlb%perm, graph_new%n_vertex)
+
+    call monolis_alloc_I_1d(gid, graph_org%n_vertex)
+    call monolis_alloc_I_1d(idx, graph_org%n_vertex)
+
+    gid = graph_org%vertex_id
+    call monolis_get_sequence_array_I(idx, graph_org%n_vertex, 1, 1)
+    call monolis_qsort_I_2d(gid, idx, 1, graph_org%n_vertex)
+
+    do i = 1, graph_new%n_vertex
+      val = graph_new%vertex_id(i)
+      call monolis_bsearch_I(gid, 1, graph_org%n_vertex, val, pos)
+      if(pos == -1)then
+        dlb%perm(i) = -1
+      else
+        dlb%perm(i) = idx(pos)
+      endif
+    enddo
+  end subroutine gedatsu_dlb_get_perm_array
 
 end module mod_gedatsu_dlb_handler
