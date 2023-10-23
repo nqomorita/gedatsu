@@ -106,6 +106,15 @@ contains
     integer(kint) :: var_org(:)
     !> [in,out] アップデート後の配列
     integer(kint) :: var_new(:)
+    integer(kint) :: i, in, j
+
+    do i = 1, dlb%n_vertex_new
+      in = dlb%perm(i)
+      if(in == -1) cycle
+      do j = 1, ndof
+        var_new(ndof*(i-1) + j) = var_org(ndof*(in-1) + j)
+      enddo
+    enddo
 
     call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
@@ -126,6 +135,15 @@ contains
     real(kdouble) :: var_org(:)
     !> [in,out] アップデート後の配列
     real(kdouble) :: var_new(:)
+    integer(kint) :: i, in, j
+
+    do i = 1, dlb%n_vertex_new
+      in = dlb%perm(i)
+      if(in == -1) cycle
+      do j = 1, ndof
+        var_new(ndof*(i-1) + j) = var_org(ndof*(in-1) + j)
+      enddo
+    enddo
 
     call monolis_SendRecv_R(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
@@ -146,6 +164,15 @@ contains
     complex(kdouble) :: var_org(:)
     !> [in,out] アップデート後の配列
     complex(kdouble) :: var_new(:)
+    integer(kint) :: i, in, j
+
+    do i = 1, dlb%n_vertex_new
+      in = dlb%perm(i)
+      if(in == -1) cycle
+      do j = 1, ndof
+        var_new(ndof*(i-1) + j) = var_org(ndof*(in-1) + j)
+      enddo
+    enddo
 
     call monolis_SendRecv_C(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
