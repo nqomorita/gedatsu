@@ -281,8 +281,27 @@ contains
     integer(kint), allocatable, intent(out) :: l_item(:)
     !> [out] ローカルコネクティビティの id 配列
     integer(kint), allocatable, intent(out) :: l_id(:)
-    integer(kint) :: i, j, jS, jE, in, n_conn
+    integer(kint) :: i, j, jS, jE, in, n_conn, n_nodal_vertex
     logical :: is_inner, is_outer
+    logical, allocatable :: is_used(:)
+
+    n_nodal_vertex = maxval(g_item)
+    call monolis_alloc_L_1d(is_used, n_nodal_vertex)
+
+    a1:do i = 1, g_n_vertex
+      jS = g_index(i) + 1
+      jE = g_index(i + 1)
+      is_inner = .false.
+      do j = jS, jE
+        in = g_item(j)
+        if(domain_id(in) == id) is_inner = .true.
+      enddo
+      if(.not. is_inner) cycle a1
+      do j = jS, jE
+        in = g_item(j)
+        is_used(in) = .true.
+      enddo
+    enddo a1
 
     l_n_vertex = 0
     n_conn = 0
@@ -294,9 +313,8 @@ contains
       is_inner = .false.
       do j = jS, jE
         in = g_item(j)
-        if(domain_id(in) == id) is_inner = .true.
+        if(.not. is_used(in)) cycle aa
       enddo
-      if(.not. is_inner) cycle aa
       do j = jS, jE
         n_conn = n_conn + 1
       enddo
@@ -315,14 +333,12 @@ contains
     bb:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
-      is_inner = .false.
       is_outer = .false.
       do j = jS, jE
         in = g_item(j)
-        if(domain_id(in) == id) is_inner = .true.
+        if(.not. is_used(in)) cycle bb
         if(domain_id(in) /= id) is_outer = .true.
       enddo
-      if(.not. is_inner) cycle bb
       if(is_outer) cycle bb
       do j = jS, jE
         n_conn = n_conn + 1
@@ -338,14 +354,12 @@ contains
     cc:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
-      is_inner = .false.
       is_outer = .false.
       do j = jS, jE
         in = g_item(j)
-        if(domain_id(in) == id) is_inner = .true.
+        if(.not. is_used(in)) cycle cc
         if(domain_id(in) /= id) is_outer = .true.
       enddo
-      if(.not. is_inner) cycle cc
       if(.not. is_outer) cycle cc
       do j = jS, jE
         n_conn = n_conn + 1
