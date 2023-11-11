@@ -281,12 +281,14 @@ contains
     integer(kint), allocatable, intent(out) :: l_item(:)
     !> [out] ローカルコネクティビティの id 配列
     integer(kint), allocatable, intent(out) :: l_id(:)
-    integer(kint) :: i, j, jS, jE, in, n_conn, n_nodal_vertex
-    logical :: is_inner, is_outer
-    logical, allocatable :: is_used(:)
+    integer(kint) :: i, j, jS, jE, minid, in, n_conn, n_nodal_vertex
+    logical :: is_inner
+    integer(kint), allocatable :: list(:)
+    integer(kint), allocatable :: is_conn_flag(:)
+    logical, allocatable :: is_used_node(:)
 
     n_nodal_vertex = maxval(g_item)
-    call monolis_alloc_L_1d(is_used, n_nodal_vertex)
+    call monolis_alloc_L_1d(is_used_node, n_nodal_vertex)
 
     a1:do i = 1, g_n_vertex
       jS = g_index(i) + 1
@@ -299,25 +301,44 @@ contains
       if(.not. is_inner) cycle a1
       do j = jS, jE
         in = g_item(j)
-        is_used(in) = .true.
+        is_used_node(in) = .true.
       enddo
     enddo a1
 
     l_n_vertex = 0
     n_conn = 0
 
-    !! 要素数と節点数を数える
+    !# 要素数と節点数を数える
+    !# is_conn_flag = 0：領域外
+    !# is_conn_flag = 1：領域内・内部
+    !# is_conn_flag = 2：領域内・外部
+    call monolis_alloc_I_1d(is_conn_flag, g_n_vertex)
+
     aa:do i = 1, g_n_vertex
       jS = g_index(i) + 1
       jE = g_index(i + 1)
-      is_inner = .false.
+
+      call monolis_alloc_I_1d(list, jE - jS + 1)
+      do j = jS, jE
+        list(j - jS + 1) = domain_id(g_item(j))
+      enddo
+      minid = minval(list)
+      call monolis_dealloc_I_1d(list)
+
+      !# 領域外判定
       do j = jS, jE
         in = g_item(j)
-        if(.not. is_used(in)) cycle aa
+        if(.not. is_used_node(in)) cycle aa
       enddo
-      do j = jS, jE
-        n_conn = n_conn + 1
-      enddo
+
+      !# 内部・外部判定
+      if(minid == id)then
+        is_conn_flag(i) = 1
+      else
+        is_conn_flag(i) = 2
+      endif
+
+      n_conn = n_conn + jE - jS + 1
       l_n_vertex = l_n_vertex + 1
     enddo aa
 
@@ -330,45 +351,39 @@ contains
     n_conn = 0
 
     !! 内部要素の取得
-    bb:do i = 1, g_n_vertex
-      jS = g_index(i) + 1
-      jE = g_index(i + 1)
-      is_outer = .false.
-      do j = jS, jE
-        in = g_item(j)
-        if(.not. is_used(in)) cycle bb
-        if(domain_id(in) /= id) is_outer = .true.
-      enddo
-      if(is_outer) cycle bb
-      do j = jS, jE
-        n_conn = n_conn + 1
-        l_item(n_conn) = g_item(j)
-      enddo
-      l_n_vertex = l_n_vertex + 1
-      l_n_internal_vertex = l_n_internal_vertex + 1
-      l_index(l_n_vertex + 1) = n_conn
-      l_id(l_n_vertex) = g_id(i)
-    enddo bb
+    do i = 1, g_n_vertex
+      if(is_conn_flag(i) == 1)then
+        jS = g_index(i) + 1
+        jE = g_index(i + 1)
 
-    !! 境界要素の取得
-    cc:do i = 1, g_n_vertex
-      jS = g_index(i) + 1
-      jE = g_index(i + 1)
-      is_outer = .false.
-      do j = jS, jE
-        in = g_item(j)
-        if(.not. is_used(in)) cycle cc
-        if(domain_id(in) /= id) is_outer = .true.
-      enddo
-      if(.not. is_outer) cycle cc
-      do j = jS, jE
-        n_conn = n_conn + 1
-        l_item(n_conn) = g_item(j)
-      enddo
-      l_n_vertex = l_n_vertex + 1
-      l_index(l_n_vertex + 1) = n_conn
-      l_id(l_n_vertex) = g_id(i)
-    enddo cc
+        do j = jS, jE
+          n_conn = n_conn + 1
+          l_item(n_conn) = g_item(j)
+        enddo
+
+        l_n_vertex = l_n_vertex + 1
+        l_n_internal_vertex = l_n_internal_vertex + 1
+        l_index(l_n_vertex + 1) = n_conn
+        l_id(l_n_vertex) = g_id(i)
+      endif
+    enddo
+
+    !! 外部要素の取得
+    do i = 1, g_n_vertex
+      if(is_conn_flag(i) == 2)then
+        jS = g_index(i) + 1
+        jE = g_index(i + 1)
+
+        do j = jS, jE
+          n_conn = n_conn + 1
+          l_item(n_conn) = g_item(j)
+        enddo
+
+        l_n_vertex = l_n_vertex + 1
+        l_index(l_n_vertex + 1) = n_conn
+        l_id(l_n_vertex) = g_id(i)
+      endif
+    enddo
   end subroutine gedatsu_get_parted_connectivity_main
 
   !> @ingroup graph_part
