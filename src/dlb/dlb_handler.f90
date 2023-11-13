@@ -92,7 +92,39 @@ contains
     call gedatsu_dlb_get_conn_graph_comm_table_modify(dlb, conn_graph_new, recv_global_id, COM)
 
     call gedatsu_dlb_get_perm_array(dlb, conn_graph_org, conn_graph_new)
+
+    call gedatsi_dlb_get_local_conn(nodal_graph_new, conn_graph_new)
   end subroutine gedatsu_dlb_update_connectivity_graph
+
+  !> @ingroup group_dlb
+  !> TBA
+  subroutine gedatsi_dlb_get_local_conn(nodal_graph_new, conn_graph_new)
+    implicit none
+    !> [in] graph 構造体
+    type(gedatsu_graph) :: nodal_graph_new
+    !> [in,out] graph 構造体
+    type(gedatsu_graph) :: conn_graph_new
+    integer(kint) :: i, id, idx
+    integer(kint), allocatable :: perm(:)
+    integer(kint), allocatable :: ids(:)
+
+    call monolis_alloc_I_1d(perm, nodal_graph_new%n_vertex)
+
+    call monolis_get_sequence_array_I(perm, nodal_graph_new%n_vertex, 1, 1)
+
+    call monolis_alloc_I_1d(ids, nodal_graph_new%n_vertex)
+
+    ids = nodal_graph_new%vertex_id
+
+    call monolis_qsort_I_2d(ids, perm, 1, nodal_graph_new%n_vertex)
+
+    do i = 1, conn_graph_new%index(conn_graph_new%n_vertex + 1)
+      id = conn_graph_new%item(i)
+      call monolis_bsearch_I(ids, 1, nodal_graph_new%n_vertex, id, idx)
+      if(idx == -1) stop "gedatsi_dlb_get_local_conn 1"
+      conn_graph_new%item(i) = perm(idx)
+    enddo
+  end subroutine gedatsi_dlb_get_local_conn
 
   !> @ingroup group_dlb
   !> 負荷分散：1 次元整数配列のアップデート（配列のメモリ再確保）
