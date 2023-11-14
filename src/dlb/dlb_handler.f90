@@ -89,11 +89,11 @@ contains
     call gedatsu_dlb_get_temporary_conn_graph(dlb, nodal_graph_org, nodal_graph_new, &
       & conn_graph_org, conn_graph_new, recv_global_id, COM)
 
+    call gedatsi_dlb_get_local_conn(nodal_graph_new, conn_graph_new)
+
     call gedatsu_dlb_get_conn_graph_comm_table_modify(dlb, conn_graph_new, recv_global_id, COM)
 
     call gedatsu_dlb_get_perm_array(dlb, conn_graph_org, conn_graph_new)
-
-    call gedatsi_dlb_get_local_conn(nodal_graph_new, conn_graph_new)
   end subroutine gedatsu_dlb_update_connectivity_graph
 
   !> @ingroup group_dlb

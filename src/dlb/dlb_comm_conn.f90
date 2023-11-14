@@ -122,21 +122,9 @@ contains
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
        & conn_graph_org%vertex_id, recv_global_id, 1, dlb%COM_node%comm)
 
-!write(100+monolis_mpi_get_global_my_rank(),*)"vertex_domain_id", graph_org%vertex_domain_id
-!write(100+monolis_mpi_get_global_my_rank(),*)"domain_id_org   ", domain_id_org
-!write(100+monolis_mpi_get_global_my_rank(),*)"vertex_id       ", graph_org%vertex_id
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_node", n_recv_node
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_global_id", recv_global_id
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_new", recv_domain_new
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_domain_org", recv_domain_org
-
     !# エッジの送受信
     n_send_edge = conn_graph_org%index(conn_graph_org%n_vertex + 1)
     n_recv_edge = dlb%COM_edge%recv_index(dlb%COM_edge%recv_n_neib + 1)
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_send_edge", n_send_edge
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_edge", n_recv_edge
 
     call monolis_alloc_I_1d(send_edge, 2*n_send_edge)
     call monolis_alloc_I_1d(recv_edge, 2*n_recv_edge)
@@ -187,11 +175,6 @@ contains
       call monolis_alloc_I_1d(recv_conn_item, 1)
     endif
 
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_conn", n_recv_conn
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_conn_index", recv_conn_index
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_conn_item", recv_conn_item
-
     !# graph_temp に global ID のまま結合
     graph_temp%n_vertex = conn_graph_org%n_vertex + n_recv_conn
 
@@ -226,20 +209,6 @@ contains
       graph_temp%item(i) = recv_conn_item(i - n_send_edge)
     enddo
 
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%n_vertex", conn_graph_org%n_vertex
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%index", conn_graph_org%index
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_org%item", conn_graph_org%item
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"graph_temp%n_vertex", graph_temp%n_vertex
-!write(100+monolis_mpi_get_global_my_rank(),*)"graph_temp%index", graph_temp%index
-!write(100+monolis_mpi_get_global_my_rank(),*)"graph_temp%item", graph_temp%item
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_recv_edge", n_recv_edge
-!write(100+monolis_mpi_get_global_my_rank(),*)"recv_edge", recv_edge
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_node", n_merge_node
-!write(100+monolis_mpi_get_global_my_rank(),*)"is_merge_node", is_merge_node
-
     !# 検索用配列の作成（nodal_graph_new のグローバル節点 id）
     call monolis_alloc_I_1d(global_conn_id_tmp, nodal_graph_new%n_vertex)
     global_conn_id_tmp = nodal_graph_new%vertex_id
@@ -271,9 +240,6 @@ contains
       endif
     enddo
 
-!write(100+monolis_mpi_get_global_my_rank(),*)"n_merge_edge", n_merge_edge
-!write(100+monolis_mpi_get_global_my_rank(),*)"graph_tmp%vertex_id", nodal_graph_new%vertex_id
-
     !# conn_graph_new の作成
     conn_graph_new%n_vertex = n_merge_edge
     call monolis_alloc_I_1d(conn_graph_new%vertex_id, conn_graph_new%n_vertex)
@@ -295,18 +261,6 @@ contains
         enddo
       endif
     enddo
-
-    !# ローカル node ID への変換
-    do i = 1, n_item
-      i1 = conn_graph_new%item(i)
-      call monolis_bsearch_I(global_conn_id_tmp, 1, nodal_graph_new%n_vertex, i1, id1)
-      if(id1 == -1) stop "gedatsu_dlb_get_temporary_conn_graph"
-      conn_graph_new%item(i) = id1
-    enddo
-
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%n_vertex", conn_graph_new%n_vertex
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%index", conn_graph_new%index
-!write(100+monolis_mpi_get_global_my_rank(),*)"conn_graph_new%item", conn_graph_new%item
   end subroutine gedatsu_dlb_get_temporary_conn_graph
 
   !> @ingroup group_dlb
