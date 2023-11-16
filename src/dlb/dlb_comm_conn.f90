@@ -50,6 +50,8 @@ contains
       call gedatsu_dlb_get_n_move_connectivity(conn_graph, is_send_nodal_vertex, &
         & update_db(i)%n_send_node, update_db(i)%is_send_node, &
         & update_db(i)%n_send_edge, update_db(i)%is_send_edge)
+
+      call monolis_dealloc_I_1d(is_send_nodal_vertex)
     enddo
 
     !# 送信計算点（要素）の全体情報取得
