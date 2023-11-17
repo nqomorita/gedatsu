@@ -131,9 +131,7 @@ contains
       call monolis_get_sequence_array_I(conn_graph%vertex_id, conn_graph%n_vertex, 1, 1)
 
       call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
-        & conn_graph%n_vertex, conn_graph%index, conn_graph%item, conn_graph%vertex_id, &
-        & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
-        & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
+        & node_graph, conn_graph, local_conn_graph)
 
       !> graph.dat
       call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)

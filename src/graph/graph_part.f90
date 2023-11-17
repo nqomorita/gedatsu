@@ -257,50 +257,37 @@ contains
   !> @ingroup dev_graph_part
   !> グローバルコネクティビティからローカルコネクティビティを取得
   subroutine gedatsu_get_parted_connectivity_main(id, domain_id, &
-    & g_n_vertex, g_index, g_item, g_id, l_n_vertex, l_n_internal_vertex, l_index, l_item, l_id)
+    & global_node_graph, global_conn_graph, local_conn_graph)
     implicit none
     !> [in] 取得する分割番号
     integer(kint), intent(in) :: id
     !> [in] 節点が所属する領域番号配列
     integer(kint), intent(in) :: domain_id(:)
-    !> [in] グローバルコネクティビティの要素数
-    integer(kint), intent(in) :: g_n_vertex
-    !> [in] グローバルコネクティビティの index 配列
-    integer(kint), intent(in) :: g_index(:)
-    !> [in] グローバルコネクティビティの item 配列
-    integer(kint), intent(in) :: g_item(:)
-    !> [in] グローバルコネクティビティの id 配列
-    integer(kint), intent(in) :: g_id(:)
-    !> [out] ローカルコネクティビティの要素数
-    integer(kint), intent(out) :: l_n_vertex
-    !> [out] ローカルコネクティビティの内部要素数
-    integer(kint), intent(out) :: l_n_internal_vertex
-    !> [out] ローカルコネクティビティの index 配列
-    integer(kint), allocatable, intent(out) :: l_index(:)
-    !> [out] ローカルコネクティビティの item 配列
-    integer(kint), allocatable, intent(out) :: l_item(:)
-    !> [out] ローカルコネクティビティの id 配列
-    integer(kint), allocatable, intent(out) :: l_id(:)
-    integer(kint) :: i, j, jS, jE, minid, in, n_conn, n_nodal_vertex
+    !>
+    type(gedatsu_graph) :: global_node_graph
+    !>
+    type(gedatsu_graph) :: global_conn_graph
+    !>
+    type(gedatsu_graph) :: local_conn_graph
+    integer(kint) :: i, j, jS, jE, minid, in, n_conn, l_n_vertex, l_n_internal_vertex
     logical :: is_inner
     integer(kint), allocatable :: list(:)
     integer(kint), allocatable :: is_conn_flag(:)
     logical, allocatable :: is_used_node(:)
 
-    n_nodal_vertex = maxval(g_item)
-    call monolis_alloc_L_1d(is_used_node, n_nodal_vertex)
+    call monolis_alloc_L_1d(is_used_node, global_node_graph%n_vertex)
 
-    a1:do i = 1, g_n_vertex
-      jS = g_index(i) + 1
-      jE = g_index(i + 1)
+    a1:do i = 1, global_node_graph%n_vertex
+      jS = global_node_graph%index(i) + 1
+      jE = global_node_graph%index(i + 1)
       is_inner = .false.
       do j = jS, jE
-        in = g_item(j)
+        in = global_node_graph%item(j)
         if(domain_id(in) == id) is_inner = .true.
       enddo
       if(.not. is_inner) cycle a1
       do j = jS, jE
-        in = g_item(j)
+        in = global_node_graph%item(j)
         is_used_node(in) = .true.
       enddo
     enddo a1
@@ -312,22 +299,23 @@ contains
     !# is_conn_flag = 0：領域外
     !# is_conn_flag = 1：領域内・内部
     !# is_conn_flag = 2：領域内・外部
-    call monolis_alloc_I_1d(is_conn_flag, g_n_vertex)
+    call monolis_alloc_I_1d(is_conn_flag, global_conn_graph%n_vertex)
 
-    aa:do i = 1, g_n_vertex
-      jS = g_index(i) + 1
-      jE = g_index(i + 1)
+    aa:do i = 1, global_conn_graph%n_vertex
+      jS = global_conn_graph%index(i) + 1
+      jE = global_conn_graph%index(i + 1)
 
       call monolis_alloc_I_1d(list, jE - jS + 1)
       do j = jS, jE
-        list(j - jS + 1) = domain_id(g_item(j))
+        in = global_conn_graph%item(j)
+        list(j - jS + 1) = domain_id(in)
       enddo
       minid = minval(list)
       call monolis_dealloc_I_1d(list)
 
       !# 領域外判定
       do j = jS, jE
-        in = g_item(j)
+        in = global_conn_graph%item(j)
         if(.not. is_used_node(in)) cycle aa
       enddo
 
@@ -342,46 +330,49 @@ contains
       l_n_vertex = l_n_vertex + 1
     enddo aa
 
-    call monolis_alloc_I_1d(l_id, l_n_vertex)
-    call monolis_alloc_I_1d(l_index, l_n_vertex + 1)
-    call monolis_alloc_I_1d(l_item, n_conn)
+    local_conn_graph%n_vertex = l_n_vertex
+    call monolis_alloc_I_1d(local_conn_graph%vertex_id, l_n_vertex)
+    call monolis_alloc_I_1d(local_conn_graph%index, l_n_vertex + 1)
+    call monolis_alloc_I_1d(local_conn_graph%item, n_conn)
 
     l_n_vertex = 0
     l_n_internal_vertex = 0
     n_conn = 0
 
     !! 内部要素の取得
-    do i = 1, g_n_vertex
+    do i = 1, global_conn_graph%n_vertex
       if(is_conn_flag(i) == 1)then
-        jS = g_index(i) + 1
-        jE = g_index(i + 1)
+        jS = global_conn_graph%index(i) + 1
+        jE = global_conn_graph%index(i + 1)
 
         do j = jS, jE
           n_conn = n_conn + 1
-          l_item(n_conn) = g_item(j)
+          local_conn_graph%item(n_conn) = global_conn_graph%item(j)
         enddo
 
         l_n_vertex = l_n_vertex + 1
         l_n_internal_vertex = l_n_internal_vertex + 1
-        l_index(l_n_vertex + 1) = n_conn
-        l_id(l_n_vertex) = g_id(i)
+        local_conn_graph%index(l_n_vertex + 1) = n_conn
+        local_conn_graph%vertex_id(l_n_vertex) = global_conn_graph%vertex_id(i)
       endif
     enddo
 
+    local_conn_graph%n_internal_vertex = l_n_internal_vertex
+
     !! 外部要素の取得
-    do i = 1, g_n_vertex
+    do i = 1, global_conn_graph%n_vertex
       if(is_conn_flag(i) == 2)then
-        jS = g_index(i) + 1
-        jE = g_index(i + 1)
+        jS = global_conn_graph%index(i) + 1
+        jE = global_conn_graph%index(i + 1)
 
         do j = jS, jE
           n_conn = n_conn + 1
-          l_item(n_conn) = g_item(j)
+          local_conn_graph%item(n_conn) = global_conn_graph%item(j)
         enddo
 
         l_n_vertex = l_n_vertex + 1
-        l_index(l_n_vertex + 1) = n_conn
-        l_id(l_n_vertex) = g_id(i)
+        local_conn_graph%index(l_n_vertex + 1) = n_conn
+        local_conn_graph%vertex_id(l_n_vertex) = global_conn_graph%vertex_id(i)
       endif
     enddo
   end subroutine gedatsu_get_parted_connectivity_main

@@ -11,6 +11,7 @@ program gedatsu_connectivity_graph_partitioner
   character(monolis_charlen) :: finname
   logical :: is_get, is_valid, is_1_origin
   integer(kint), allocatable :: domain_id(:), id1(:), perm(:)
+  logical, allocatable :: is_used(:)
 
   call monolis_mpi_initialize()
 
@@ -81,6 +82,7 @@ program gedatsu_connectivity_graph_partitioner
   endif
 
   call monolis_alloc_I_1d(domain_id, global_node_graph%n_vertex)
+  call monolis_alloc_L_1d(is_used, global_node_graph%n_vertex)
 
   !> get domain id array
   do i = 1, n_domain
@@ -94,7 +96,9 @@ program gedatsu_connectivity_graph_partitioner
 
     do j = 1, local_node_graph%n_internal_vertex
       in = local_node_graph%vertex_id(j)
+      if(is_used(in)) stop "flag: already used"
       domain_id(in) = i
+      is_used(in) = .true.
     enddo
     call monolis_dealloc_I_1d(local_node_graph%vertex_id)
   enddo
@@ -110,9 +114,7 @@ program gedatsu_connectivity_graph_partitioner
     if(.not. is_1_origin) local_node_graph%vertex_id = local_node_graph%vertex_id + 1
 
     call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
-      & global_conn_graph%n_vertex, global_conn_graph%index, global_conn_graph%item, global_conn_graph%vertex_id, &
-      & local_conn_graph%n_vertex, local_conn_graph%n_internal_vertex, &
-      & local_conn_graph%index, local_conn_graph%item, local_conn_graph%vertex_id)
+      & global_node_graph, global_conn_graph, local_conn_graph)
 
     call monolis_alloc_I_1d(id1, local_conn_graph%n_vertex)
     call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
