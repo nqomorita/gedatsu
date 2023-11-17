@@ -270,7 +270,6 @@ contains
     !>
     type(gedatsu_graph) :: local_conn_graph
     integer(kint) :: i, j, jS, jE, minid, in, n_conn, l_n_vertex, l_n_internal_vertex
-    logical :: is_inner
     integer(kint), allocatable :: list(:)
     integer(kint), allocatable :: is_conn_flag(:)
     logical, allocatable :: is_used_node(:)
@@ -280,12 +279,7 @@ contains
     a1:do i = 1, global_node_graph%n_vertex
       jS = global_node_graph%index(i) + 1
       jE = global_node_graph%index(i + 1)
-      is_inner = .false.
-      do j = jS, jE
-        in = global_node_graph%item(j)
-        if(domain_id(in) == id) is_inner = .true.
-      enddo
-      if(.not. is_inner) cycle a1
+      if(domain_id(i) /= id) cycle
       do j = jS, jE
         in = global_node_graph%item(j)
         is_used_node(in) = .true.

@@ -104,6 +104,7 @@ contains
     integer(kint), allocatable :: domain_id(:)
     integer(kint), allocatable :: perm(:)
     integer(kint), allocatable :: local_elem(:,:)
+    logical, allocatable :: is_used(:)
 
     call gedatsu_check_connectivity_graph(node_graph, conn_graph, is_valid)
 
@@ -113,16 +114,18 @@ contains
     endif
 
     call monolis_alloc_I_1d(domain_id, node_graph%n_vertex)
+    call monolis_alloc_L_1d(is_used, node_graph%n_vertex)
 
     !> get domain id array
     do i = 1, n_domain
       do j = 1, subgraphs(i)%n_internal_vertex
         in = subgraphs(i)%vertex_id(j)
         if(.not. is_1_origin) in = in + 1
-        domain_id(in) = i
+        if(is_used(in)) stop "flag: already used"
+        domain_id(in) = i - 1
+        is_used(in) = .true.
       enddo
     enddo
-    domain_id = domain_id - 1
 
     do i = 1, n_domain
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id + 1
