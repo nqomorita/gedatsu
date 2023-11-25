@@ -13,10 +13,10 @@ module mod_gedatsu_dlb
     integer(kint) :: n_vertex_old
     !> 更新後の計算点数
     integer(kint) :: n_vertex_new
-    !> 更新前の計算点のグローバル id
-    integer(kint), allocatable :: global_id_old(:)
-    !> 更新後の計算点のグローバル id
-    integer(kint), allocatable :: global_id_new(:)
+    !> 更新前の計算点の領域番号
+    integer(kint), allocatable :: domain_id_old(:)
+    !> 更新後の計算点の領域番号
+    integer(kint), allocatable :: domain_id_new(:)
     !> 更新前後の計算点の対応関係
     integer(kint), allocatable :: perm(:)
   end type gedatsu_dlb
@@ -43,8 +43,8 @@ contains
     type(gedatsu_dlb), intent(out) :: dlb
     dlb%n_vertex_old = 0
     dlb%n_vertex_new = 0
-    call monolis_dealloc_I_1d(dlb%global_id_old)
-    call monolis_dealloc_I_1d(dlb%global_id_new)
+    call monolis_dealloc_I_1d(dlb%domain_id_old)
+    call monolis_dealloc_I_1d(dlb%domain_id_new)
     call monolis_dealloc_I_1d(dlb%perm)
   end subroutine gedatsu_dlb_initialize
 

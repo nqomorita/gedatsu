@@ -27,6 +27,10 @@ contains
     call monolis_com_get_n_internal_vertex(COM, graph%n_internal_vertex)
 
     call gedatsu_graph_repartition_with_weight(graph, COM, node_wgt, edge_wgt)
+
+    call gedatsu_dlb_get_domain_id_org(graph, COM, dlb%domain_id_old)
+    call monolis_alloc_I_1d(dlb%domain_id_new, graph%n_vertex)
+    dlb%domain_id_new = graph%vertex_domain_id
   end subroutine gedatsu_dlb_analysis_with_weight
 
   !> @ingroup group_dlb
@@ -229,8 +233,6 @@ contains
     dlb%n_vertex_old = graph_org%n_vertex
     dlb%n_vertex_new = graph_new%n_vertex
 
-    call monolis_alloc_I_1d(dlb%global_id_old, graph_org%n_vertex)
-    call monolis_alloc_I_1d(dlb%global_id_new, graph_new%n_vertex)
     call monolis_alloc_I_1d(dlb%perm, graph_new%n_vertex)
 
     call monolis_alloc_I_1d(gid, graph_org%n_vertex)

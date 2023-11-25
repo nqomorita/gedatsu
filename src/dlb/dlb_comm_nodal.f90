@@ -14,7 +14,7 @@ contains
   subroutine gedatsu_dlb_get_nodal_graph_comm_table(dlb, graph, COM)
     implicit none
     !> [in] dlb 構造体
-    type(gedatsu_dlb), intent(out) :: dlb
+    type(gedatsu_dlb), intent(inout) :: dlb
     !> [in] graph 構造体
     type(gedatsu_graph), intent(in) :: graph
     !> [in] COM 構造体
@@ -265,7 +265,7 @@ contains
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge
     integer(kint) :: n_merge_node, n_merge_edge, n_my_edge
-    integer(kint) :: i, j, jS, jE, in, i1, i2, my_rank, id, id1, id2
+    integer(kint) :: i, j, jS, jE, in, i1, i2, my_rank, id1, id2
     integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
     integer(kint), allocatable :: recv_domain_new(:)
@@ -275,6 +275,8 @@ contains
     integer(kint), allocatable :: is_merge_node(:)
     integer(kint), allocatable :: is_merge_edge(:)
     integer(kint), allocatable :: global_id_tmp(:)
+    integer(kint), allocatable :: recv_global_id_tmp(:)
+    integer(kint), allocatable :: recv_global_id_used(:)
     integer(kint), allocatable :: my_edge(:,:)
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
@@ -336,13 +338,20 @@ contains
     global_id_tmp = graph_org%vertex_id
     call monolis_qsort_I_1d(global_id_tmp, 1, graph_org%n_vertex)
 
+    call monolis_alloc_I_1d(recv_global_id_used, n_recv_node)
+    call monolis_alloc_I_1d(recv_global_id_tmp, n_recv_node)
+    recv_global_id_tmp = recv_global_id
+    call monolis_qsort_I_1d(recv_global_id_tmp, 1, n_recv_node)
+
     !# 計算点のマージ（自領域 + 受信領域）
     call monolis_alloc_I_1d(is_merge_node, n_recv_node)
     n_merge_node = 0
     do i = 1, n_recv_node
       in = recv_global_id(i)
-      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, in, id)
-      if(id == -1)then
+      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, in, id1)
+      call monolis_bsearch_I(recv_global_id_tmp, 1, n_recv_node, in, id2)
+      recv_global_id_used(id2) = recv_global_id_used(id2) + 1
+      if(id1 == -1 .and. recv_global_id_used(id2) == 1)then
         is_merge_node(i) = 1
         n_merge_node = n_merge_node + 1
       endif
@@ -367,7 +376,7 @@ contains
 
     do i = 1, graph_org%n_vertex
       graph_tmp%vertex_id(i) = graph_org%vertex_id(i)
-      graph_tmp%vertex_domain_id(i) = graph_org%vertex_domain_id(i)
+      graph_tmp%vertex_domain_id(i) = dlb%domain_id_new(i)
     enddo
 
     in = graph_org%n_vertex
@@ -450,15 +459,11 @@ contains
     if(n_edge == 0) return
 
     call monolis_alloc_I_1d(ids, graph_new%n_vertex)
-
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
-
     call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
 
     call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
-
     ids = graph_new%vertex_id
-
     call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_internal_vertex)
 
     do i = 1, graph_new%n_vertex
@@ -492,17 +497,11 @@ contains
     if(n_edge == 0) return
 
     call monolis_dealloc_I_1d(perm)
-
     call monolis_dealloc_I_1d(iperm)
-
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
-
     call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
-
     call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
-
     call monolis_qsort_I_2d(graph_new%vertex_id, perm, 1, graph_new%n_internal_vertex)
-
     call monolis_qsort_I_2d(graph_new%vertex_id, perm, graph_new%n_internal_vertex + 1, graph_new%n_vertex)
 
     do i = 1, graph_new%n_vertex
@@ -510,7 +509,6 @@ contains
     enddo
 
     call monolis_dealloc_I_2d(edge)
-
     call monolis_alloc_I_2d(edge, 2, n_edge)
 
     call gedatsu_graph_get_edge_in_overlap_region(graph_tmp, my_rank, edge)
@@ -567,7 +565,7 @@ contains
   end subroutine gedatsu_dlb_get_nodal_graph_comm_table_modify
 
   !> @ingroup group_dlb
-  !> オーバーラップ計算点を含まない送信する計算点数の取得
+  !> オーバーラップ計算点を含む、送信する計算点数の取得
   subroutine gedatsu_dlb_get_n_move_vertex(graph, n_move_vertex, is_move, domain_id_org, my_rank, did)
     implicit none
     !> [in] graph 構造体
@@ -605,7 +603,7 @@ contains
   end subroutine gedatsu_dlb_get_n_move_vertex
 
   !> @ingroup group_dlb
-  !> オーバーラップ計算点を含む通信するエッジ数の取得
+  !> オーバーラップ計算点を含む、送信するエッジ数の取得
   subroutine gedatsu_dlb_get_n_move_edge(graph, n_move_edge, is_move_node, is_move)
     implicit none
     !> [in] graph 構造体
