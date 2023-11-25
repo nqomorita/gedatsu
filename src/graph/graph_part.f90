@@ -280,6 +280,7 @@ contains
       jS = global_node_graph%index(i) + 1
       jE = global_node_graph%index(i + 1)
       if(domain_id(i) /= id) cycle
+      is_used_node(i) = .true.
       do j = jS, jE
         in = global_node_graph%item(j)
         is_used_node(in) = .true.
@@ -299,6 +300,12 @@ contains
       jS = global_conn_graph%index(i) + 1
       jE = global_conn_graph%index(i + 1)
 
+      !# 領域外判定
+      do j = jS, jE
+        in = global_conn_graph%item(j)
+        if(.not. is_used_node(in)) cycle aa
+      enddo
+
       call monolis_alloc_I_1d(list, jE - jS + 1)
       do j = jS, jE
         in = global_conn_graph%item(j)
@@ -306,12 +313,6 @@ contains
       enddo
       minid = minval(list)
       call monolis_dealloc_I_1d(list)
-
-      !# 領域外判定
-      do j = jS, jE
-        in = global_conn_graph%item(j)
-        if(.not. is_used_node(in)) cycle aa
-      enddo
 
       !# 内部・外部判定
       if(minid == id)then
