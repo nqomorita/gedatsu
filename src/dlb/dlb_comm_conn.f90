@@ -98,7 +98,7 @@ contains
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge, n_recv_conn
     integer(kint) :: n_merge_edge, n_item
-    integer(kint) :: i, j, jS, jE, in, jn, i1, my_rank, id1
+    integer(kint) :: i, j, jS, jE, in, jn, i1, my_rank, id1, id2
     !integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
     integer(kint), allocatable :: send_edge(:)
@@ -110,6 +110,9 @@ contains
     !integer(kint), allocatable :: my_edge(:,:)
     integer(kint), allocatable :: recv_conn_index(:)
     integer(kint), allocatable :: recv_conn_item(:)
+    integer(kint), allocatable :: recv_global_id_tmp(:)
+    integer(kint), allocatable :: recv_global_id_used(:)
+    integer(kint), allocatable :: is_dup(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
 
@@ -211,6 +214,28 @@ contains
       graph_temp%item(i) = recv_conn_item(i - n_send_edge)
     enddo
 
+    !# recv_conn 中の重複削除
+    call monolis_alloc_I_1d(global_conn_id_tmp, conn_graph_org%n_vertex)
+    global_conn_id_tmp = conn_graph_org%vertex_id
+    call monolis_qsort_I_1d(global_conn_id_tmp, 1, conn_graph_org%n_vertex)
+
+    call monolis_alloc_I_1d(recv_global_id_tmp, n_recv_conn)
+    recv_global_id_tmp = recv_global_id
+    call monolis_qsort_I_1d(recv_global_id_tmp, 1, n_recv_conn)
+    call monolis_alloc_I_1d(recv_global_id_used, n_recv_conn)
+
+    call monolis_alloc_I_1d(is_dup, graph_temp%n_vertex)
+    do i = conn_graph_org%n_vertex + 1, graph_temp%n_vertex
+      in = graph_temp%vertex_id(i)
+      call monolis_bsearch_I(global_conn_id_tmp, 1, conn_graph_org%n_vertex, in, id1)
+      call monolis_bsearch_I(recv_global_id_tmp, 1, n_recv_conn, in, id2)
+      recv_global_id_used(id2) = recv_global_id_used(id2) + 1
+      if(id1 /= -1 .or. recv_global_id_used(id2) > 1)then
+        is_dup(i) = 1
+      endif
+    enddo
+    call monolis_dealloc_I_1d(global_conn_id_tmp)
+
     !# 検索用配列の作成（nodal_graph_new のグローバル節点 id）
     call monolis_alloc_I_1d(global_conn_id_tmp, nodal_graph_new%n_vertex)
     global_conn_id_tmp = nodal_graph_new%vertex_id
@@ -220,6 +245,7 @@ contains
     call monolis_alloc_I_1d(is_merge_edge, graph_temp%n_vertex)
 
     aa:do i = 1, graph_temp%n_vertex
+      if(is_dup(i) == 1) cycle
       jS = graph_temp%index(i) + 1
       jE = graph_temp%index(i + 1)
       is_merge_edge(i) = 1

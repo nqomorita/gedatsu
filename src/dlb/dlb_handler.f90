@@ -218,7 +218,7 @@ contains
   end subroutine gedatsu_dlb_update_C_1d
 
   !> @ingroup dev_graph_dlb
-  !> TBA
+  !> var_org から var_new にコピーする際の permtation 配列（-1 は送信してなくなる計算点であり、スキップする）
   subroutine gedatsu_dlb_get_perm_array(dlb, graph_org, graph_new)
     implicit none
     !> [in,out] dlb 構造体
