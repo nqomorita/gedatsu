@@ -55,7 +55,7 @@ contains
     integer(kint), allocatable, intent(out) :: nodal_index(:)
     !> [out] 節点グラフの item 配列
     integer(kint), allocatable :: nodal_item(:)
-    integer(kint) :: i, jS, jE, numflag
+    integer(kint) :: i, jS, jE, numflag, nz
     integer(c_int), pointer :: index_c(:) => null()
     integer(c_int), pointer :: item_c(:) => null()
     type(c_ptr) :: xadj, adjncy
@@ -98,7 +98,8 @@ contains
     call c_f_pointer(xadj, index8, shape=[n_node + 1])
     call c_f_pointer(adjncy, item8, shape=[index8(n_node + 1)])
     call monolis_alloc_I_1d(nodal_index, n_node + 1)
-    call monolis_alloc_I_1d(nodal_item, index8(n_node + 1))
+    nz = index8(n_node + 1)
+    call monolis_alloc_I_1d(nodal_item, nz)
     nodal_index = index8
     nodal_item = item8
 #else

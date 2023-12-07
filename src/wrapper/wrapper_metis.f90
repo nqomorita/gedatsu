@@ -79,24 +79,25 @@ contains
 
 #if METIS_INT64
       !# allocate section
-      allocate(index_c8(n_vertex + 1), source = 0)
+      allocate(index_c8(n_vertex + 1))
       index_c8 = index
 
-      nz8 = index8(n_vertex + 1)
-      allocate(item_c8(nz8), source = 0)
+      nz8 = index_c8(n_vertex + 1)
+      allocate(item_c8(nz8))
       item_c8 = item
 
-      allocate(part_id_c8(n_vertex), source = 0)
+      allocate(part_id_c8(n_vertex))
+      part_id_c8 = 0
 
       if(allocated(node_wgt))then
-        allocate(node_wgt_c8(n_vertex), source = 0)
+        allocate(node_wgt_c8(n_vertex))
         node_wgt_c8 = node_wgt(1,:)
       else
         node_wgt_c8 => null()
       endif
 
       if(allocated(edge_wgt))then
-        allocate(edge_wgt_c8(nz), source = 0)
+        allocate(edge_wgt_c8(nz))
         edge_wgt_c8 = edge_wgt(1,:)
       else
         edge_wgt_c8 => null()

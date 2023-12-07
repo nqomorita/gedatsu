@@ -19,7 +19,6 @@ WRAP_DIR= ./wrapper
 TST_WRAP_DIR = ./wrapper_test
 DRV_DIR = ./driver
 LIBRARY = libgedatsu.a
-CPP     = -cpp $(FLAG_DEBUG)
 
 ##> option setting
 ifdef FLAGS
@@ -41,8 +40,8 @@ ifdef FLAGS
 		MOD_DIR = -module ./include
 	endif
 
-	ifeq ($(findstring INT64, $(DFLAGS)), INT64)
-		FLAG_INT64 = -DINT64
+	ifeq ($(findstring METIS_INT64, $(DFLAGS)), METIS_INT64)
+		PPFLAGS = -DMETIS_INT64
 	endif
 
 	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
@@ -57,6 +56,7 @@ CD   = cd
 CP   = cp
 RM   = rm -rf
 AR   = - ar ruv
+CPP  = -cpp $(PPFLAGS)
 
 ##> **********
 ##> target (1)
