@@ -56,8 +56,8 @@ contains
     !> [out] 節点グラフの item 配列
     integer(kint), allocatable :: nodal_item(:)
     integer(kint) :: i, jS, jE, numflag, nz
-    integer(c_int), pointer :: index_c(:) => null()
-    integer(c_int), pointer :: item_c(:) => null()
+    integer(kint_c), pointer :: index_c(:) => null()
+    integer(kint_c), pointer :: item_c(:) => null()
     type(c_ptr) :: xadj, adjncy
 
     interface
@@ -67,12 +67,6 @@ contains
         type(c_ptr), value :: ptr
       end subroutine gedatsu_c_free
     end interface
-
-#ifdef METIS_INT64
-    integer(c_int64_t) :: n_elem8, n_node8, numflag8
-    integer(c_int64_t), pointer :: conn_index8(:), conn_item8(:)
-    integer(c_int64_t), pointer :: index8(:), item8(:)
-#endif
 
 #ifdef NO_METIS
       call monolis_std_error_string("gedatsu_convert_connectivity_graph_to_nodal_graph")
@@ -84,25 +78,6 @@ contains
     !> convert to 0 origin
     conn_item = conn_item - 1
 
-#ifdef METIS_INT64
-    n_node8 = n_node
-    n_elem8 = n_elem
-    numflag8 = numflag
-    allocate(conn_index8(n_elem+1))
-    allocate(conn_item8(conn_index(n_elem+1)))
-    conn_index8 = conn_index
-    conn_item8 = conn_item
-
-    call METIS_MESHTONODAL(n_elem8, n_node8, conn_index8, conn_item8, numflag8, xadj, adjncy)
-
-    call c_f_pointer(xadj, index8, shape=[n_node + 1])
-    call c_f_pointer(adjncy, item8, shape=[index8(n_node + 1)])
-    call monolis_alloc_I_1d(nodal_index, n_node + 1)
-    nz = index8(n_node + 1)
-    call monolis_alloc_I_1d(nodal_item, nz)
-    nodal_index = index8
-    nodal_item = item8
-#else
     call METIS_MESHTONODAL(n_elem, n_node, conn_index, conn_item, numflag, xadj, adjncy)
 
     call c_f_pointer(xadj, index_c, shape = [n_node + 1])
@@ -111,7 +86,6 @@ contains
     call monolis_alloc_I_1d(nodal_item, index_c(n_node + 1))
     nodal_index = index_c
     nodal_item = item_c
-#endif
 
     call gedatsu_c_free(xadj)
     call gedatsu_c_free(adjncy)

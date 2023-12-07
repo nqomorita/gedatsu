@@ -62,16 +62,16 @@ contains
     integer(kint), intent(out) :: part_id(:)
     !> [in] MPI コミュニケータ
     integer(kint), intent(in) :: comm
-    integer(c_int) :: ncon, nz, nflag, wflag, i
-    integer(c_int), pointer :: vtxdist_c(:) => null()
-    integer(c_int), pointer :: index_c(:) => null()
-    integer(c_int), pointer :: item_c(:) => null()
-    integer(c_int), pointer :: node_wgt_c(:) => null()
-    integer(c_int), pointer :: edge_wgt_c(:) => null()
-    integer(c_int), pointer :: part_id_c(:) => null()
-    integer(c_int), pointer :: vsize(:) => null()
-    integer(c_int), pointer :: edgecut(:) => null()
-    integer(c_int), pointer :: options(:) => null()
+    integer(kint_c) :: ncon, nz, nflag, wflag, i
+    integer(kint_c), pointer :: vtxdist_c(:) => null()
+    integer(kint_c), pointer :: index_c(:) => null()
+    integer(kint_c), pointer :: item_c(:) => null()
+    integer(kint_c), pointer :: node_wgt_c(:) => null()
+    integer(kint_c), pointer :: edge_wgt_c(:) => null()
+    integer(kint_c), pointer :: part_id_c(:) => null()
+    integer(kint_c), pointer :: vsize(:) => null()
+    integer(kint_c), pointer :: edgecut(:) => null()
+    integer(kint_c), pointer :: options(:) => null()
     real(c_float), pointer :: tpwgts(:) => null()
     real(c_float), pointer :: ubvec(:) => null()
     real(c_float), pointer :: itr(:) => null()
