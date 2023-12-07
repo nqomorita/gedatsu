@@ -57,6 +57,16 @@ contains
     integer(c_int), pointer :: ubvec(:) => null()
     real(c_float), pointer :: options(:) => null()
     real(c_float), pointer :: tpwgts(:) => null()
+#if METIS_INT64
+    integer(c_int64_t) :: n_vertex8, ncon8, n_part8, objval8, nz8
+    integer(c_int64_t), pointer :: index_c8(:) => null()
+    integer(c_int64_t), pointer :: item_c8(:) => null()
+    integer(c_int64_t), pointer :: node_wgt_c8(:) => null()
+    integer(c_int64_t), pointer :: edge_wgt_c8(:) => null()
+    integer(c_int64_t), pointer :: part_id_c8(:) => null()
+    integer(c_int64_t), pointer :: vsize8(:) => null()
+    integer(c_int64_t), pointer :: ubvec8(:) => null()
+#endif
 
     if(n_part /= 1)then
 #ifdef NO_METIS
@@ -67,6 +77,48 @@ contains
       !# convert to 0 origin
       item = item - 1
 
+#if METIS_INT64
+      !# allocate section
+      allocate(index_c8(n_vertex + 1), source = 0)
+      index_c8 = index
+
+      nz8 = index8(n_vertex + 1)
+      allocate(item_c8(nz8), source = 0)
+      item_c8 = item
+
+      allocate(part_id_c8(n_vertex), source = 0)
+
+      if(allocated(node_wgt))then
+        allocate(node_wgt_c8(n_vertex), source = 0)
+        node_wgt_c8 = node_wgt(1,:)
+      else
+        node_wgt_c8 => null()
+      endif
+
+      if(allocated(edge_wgt))then
+        allocate(edge_wgt_c8(nz), source = 0)
+        edge_wgt_c8 = edge_wgt(1,:)
+      else
+        edge_wgt_c8 => null()
+      endif
+
+      n_vertex8 = n_vertex
+      ncon8 = 1
+      n_part8 = n_part
+
+      !# metis call
+      call METIS_PARTGRAPHRECURSIVE(n_vertex8, ncon8, index_c8, item_c8, &
+        & node_wgt_c8, vsize8, edge_wgt_c8, n_part8, tpwgts, ubvec8, options, objval8, part_id_c8)
+
+      part_id = part_id_c8
+
+      !# deallocate section
+      deallocate(index_c8)
+      deallocate(item_c8)
+      deallocate(part_id_c8)
+      if(associated(node_wgt_c8)) deallocate(node_wgt_c8)
+      if(associated(edge_wgt_c8)) deallocate(edge_wgt_c8)
+#else
       !# allocate section
       allocate(index_c(n_vertex+1), source = 0)
       index_c = index
@@ -105,6 +157,7 @@ contains
       deallocate(part_id_c)
       if(associated(node_wgt_c)) deallocate(node_wgt_c)
       if(associated(edge_wgt_c)) deallocate(edge_wgt_c)
+#endif
 
       !# convert to 1 origin
       item = item + 1
