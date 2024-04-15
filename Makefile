@@ -9,7 +9,8 @@ LINK   = $(FC)
 
 ##> directory setting
 MOD_DIR = -J ./include
-INCLUDE = -I /usr/include -I ./include -I ./submodule/monolis_utils/include
+INCLUDE_1 = -I /usr/include -I ./include
+INCLUDE_2 = -I ./submodule/monolis_utils/include
 USE_LIB = -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 BIN_DIR = ./bin
 SRC_DIR = ./src
@@ -49,6 +50,7 @@ ifdef FLAGS
 		CFLAGS  = -Kfast
 		MOD_DIR = -M ./include
 		LINK    = mpiFCCpx --linkfortran -SSL2
+		INCLUDE_1 = -I ./include
 	endif
 
 	ifeq ($(findstring METIS_INT64, $(DFLAGS)), METIS_INT64)
@@ -56,10 +58,12 @@ ifdef FLAGS
 	endif
 
 	ifeq ($(findstring SUBMODULE, $(DFLAGS)), SUBMODULE)
-		INCLUDE = -I /usr/include -I ./include -I ../monolis_utils/include -I ../../include
+		INCLUDE_2 = -I ../monolis_utils/include -I ../../include
 		USE_LIB = -L./lib -lgedatsu -L../monolis_utils/lib -lmonolis_utils -L../../lib -lmetis
 	endif
 endif
+
+INCLUDE = $(INCLUDE_1) $(INCLUDE_2)
 
 ##> other commands
 MAKE = make
@@ -186,10 +190,10 @@ $(LIB_TARGET): $(LIB_OBJS)
 	$(AR) $@ $(LIB_OBJS)
 
 $(TEST_TARGET): $(TST_OBJS)
-	$(FC) $(FFLAGS) -o $@ $(TST_OBJS) $(USE_LIB)
+	$(LINK) $(FFLAGS) -o $@ $(TST_OBJS) $(USE_LIB)
 
 $(TEST_C_TARGET): $(TST_C_OBJS)
-	$(FC) $(FFLAGS) $(INCLUDE) -o $@ $(TST_C_OBJS) $(USE_LIB)
+	$(LINK) $(FFLAGS) $(INCLUDE) -o $@ $(TST_C_OBJS) $(USE_LIB)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.f90
 	$(FC) $(FFLAGS) $(CPP) $(INCLUDE) $(MOD_DIR) -o $@ -c $<
