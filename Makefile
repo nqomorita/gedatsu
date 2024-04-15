@@ -42,7 +42,7 @@ ifdef FLAGS
 		LINK   = $(FC)
 	endif
 
-	ifeq ($(findstring INTEL, $(DFLAGS)), A64FX)
+	ifeq ($(findstring A64FX, $(DFLAGS)), A64FX)
 		FC      = mpifrtpx
 		FFLAGS  = -Nalloc_assign -Kfast -SCALAPACK -SSL2
 		CC      = mpifccpx -Nclang 
