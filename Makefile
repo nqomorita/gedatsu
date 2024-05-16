@@ -2,14 +2,14 @@
 
 ##> compiler setting
 FC     = mpif90
-FFLAGS = -fPIC -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
+FFLAGS = -fPIC -O2 -mtune=native -std=legacy -Wno-missing-include-dirs
 CC     = mpicc
 CFLAGS = -fPIC -O2
 LINK   = $(FC)
 
 ##> directory setting
 MOD_DIR = -J ./include
-INCLUDE_1 = -I /usr/include -I ./include
+INCLUDE_1 = -I ./include -I /usr/include
 INCLUDE_2 = -I ./submodule/monolis_utils/include
 USE_LIB = -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 BIN_DIR = ./bin
