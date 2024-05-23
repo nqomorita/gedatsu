@@ -111,4 +111,66 @@ contains
 #endif
     endif
   end subroutine gedatsu_part_graph_metis_with_weight
+
+  !> @ingroup dev_graph_warp
+  !> metis reordering ラッパー関数
+  subroutine gedatsu_part_graph_metis_reordering(n_vertex, index, item, perm, iperm)
+    use iso_c_binding
+    implicit none
+    !> [in] グラフのノード数
+    integer(kint), intent(in) :: n_vertex
+    !> [in] graph の CSR 圧縮形式の index 配列
+    integer(kint), intent(in) :: index(:)
+    !> [in,out] graph の CSR 圧縮形式の item 配列
+    integer(kint), intent(inout) :: item(:)
+    !> [out] 領域番号
+    integer(kint), intent(out) :: perm(:)
+    !> [out] 領域番号
+    integer(kint), intent(out) :: iperm(:)
+    integer(kint) :: nz
+    integer(kint_c), pointer :: index_c(:) => null()
+    integer(kint_c), pointer :: item_c(:) => null()
+    integer(kint_c), pointer :: node_wgt_c(:) => null()
+    integer(kint_c), pointer :: perm_c(:) => null()
+    integer(kint_c), pointer :: iperm_c(:) => null()
+    real(c_float), pointer :: options(:) => null()
+
+#ifdef NO_METIS
+    call monolis_std_error_string("gedatsu_part_graph_metis_reordering")
+    call monolis_std_error_string("METIS is NOT enabled")
+    call monolis_std_error_stop()
+#else
+    !# convert to 0 origin
+    item = item - 1
+
+    !# allocate section
+    allocate(index_c(n_vertex+1), source = 0)
+    index_c = index
+
+    nz = index(n_vertex+1)
+    allocate(item_c(nz), source = 0)
+    item_c = item
+
+    allocate(perm_c(n_vertex), source = 0)
+    allocate(iperm_c(n_vertex), source = 0)
+
+    node_wgt_c => null()
+
+    !# metis call
+    call METIS_NodeND(n_vertex, index_c, item_c, node_wgt_c, options, perm_c, iperm_c)
+
+    perm = perm_c + 1
+    iperm = iperm_c + 1
+
+    !# deallocate section
+    deallocate(index_c)
+    deallocate(item_c)
+    deallocate(perm_c)
+    deallocate(iperm_c)
+    if(associated(node_wgt_c)) deallocate(node_wgt_c)
+
+    !# convert to 1 origin
+    item = item + 1
+#endif
+  end subroutine gedatsu_part_graph_metis_reordering
 end module mod_gedatsu_wrapper_metis
