@@ -55,7 +55,7 @@ contains
     integer(kint), allocatable, intent(out) :: nodal_index(:)
     !> [out] 節点グラフの item 配列
     integer(kint), allocatable :: nodal_item(:)
-    integer(kint) :: i, jS, jE, numflag, nz
+    integer(kint) :: i, jS, jE, numflag
     integer(kint_c), pointer :: index_c(:) => null()
     integer(kint_c), pointer :: item_c(:) => null()
     type(c_ptr) :: xadj, adjncy
