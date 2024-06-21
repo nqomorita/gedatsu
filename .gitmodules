@@ -2,3 +2,6 @@
 	path = submodule/monolis_utils
 	url = https://gitlab.com/morita/monolis_utils.git
 
+[submodule "submodule/METIS"]
+	path = submodule/METIS
+	url = https://github.com/KarypisLab/METIS.git
