@@ -89,7 +89,8 @@ SRC_WRAP = \
 SRC_GRAPH = \
   graph_handler.f90 \
   graph_convert.f90 \
-  graph_part.f90
+  graph_part.f90 \
+  graph_merge.f90
 
 SRC_DLB = \
   graph_repart.f90 \
