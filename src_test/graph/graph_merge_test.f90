@@ -7,17 +7,12 @@ module mod_gedatsu_graph_merge_test
 contains
   subroutine gedatsu_graph_merge_test()
     implicit none
-    ! call qsort_I_1d_overlap_test()
     call gedatsu_merge_nodal_subgraphs_test()
     call gedatsu_merge_connectivity_subgraphs_test()
     call gedatsu_merge_distval_R_test()
     call gedatsu_merge_distval_I_test()
     call gedatsu_merge_distval_C_test()
   end subroutine gedatsu_graph_merge_test
-
-  ! subroutine qsort_I_1d_overlap_test()
-  !   implicit none
-  ! end subroutine qsort_I_1d_overlap_test
 
   subroutine gedatsu_merge_nodal_subgraphs_test()
     implicit none
