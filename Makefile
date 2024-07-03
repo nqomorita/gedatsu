@@ -8,8 +8,9 @@ CFLAGS = -fPIC -O2
 LINK   = $(FC)
 
 ##> directory setting
-MOD_DIR = -J ./include
-INCLUDE_1 = -I ./include -I /usr/include
+INC_DIR = ./include
+MOD_DIR = -J $(INC_DIR)
+INCLUDE_1 = -I $(INC_DIR) -I /usr/include
 INCLUDE_2 = -I ./submodule/monolis_utils/include
 USE_LIB = -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 BIN_DIR = ./bin
@@ -39,7 +40,7 @@ ifdef FLAGS
 		FFLAGS  = -fPIC -O2 -align array64byte  -nofor-main
 		CC      = mpiicc
 		CFLAGS  = -fPIC -O2 -no-multibyte-chars
-		MOD_DIR = -module ./include
+		MOD_DIR = -module $(INC_DIR)
 		LINK   = $(FC)
 	endif
 
@@ -48,9 +49,9 @@ ifdef FLAGS
 		FFLAGS  = -Nalloc_assign -Kfast -SCALAPACK -SSL2
 		CC      = mpifccpx -Nclang 
 		CFLAGS  = -Kfast
-		MOD_DIR = -M ./include
+		MOD_DIR = -M $(INC_DIR)
 		LINK    = mpiFCCpx --linkfortran -SSL2
-		INCLUDE_1 = -I ./include
+		INCLUDE_1 = -I $(INC_DIR)
 	endif
 
 	ifeq ($(findstring METIS_INT64, $(DFLAGS)), METIS_INT64)
@@ -119,6 +120,7 @@ $(addprefix $(WRAP_DIR)/, $(SRC_ALL_C)) \
 ./src/gedatsu.f90
 LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
 LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
+C_HEADER    = $(subst graph/, $(INC_DIR)/, $(SRC_ALL_C:.c=.h))
 
 ##> **********
 ##> target (2) test for fotran
@@ -271,7 +273,7 @@ clean:
 	$(DRIVE7) \
 	$(DRIVE8) \
 	$(DRIVE9) \
-	./include/*.h \
+	$(C_HEADER) \
 	./include/*.mod \
 	./bin/*
 
