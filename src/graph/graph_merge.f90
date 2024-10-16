@@ -1,9 +1,9 @@
 !> グラフ結合モジュール
 !# gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
-!# gedatsu_merge_connectivity_subgraphs(merged_nodal_graph, merged_nodal_monoCOM, n_conn_graphs, conn_graphs, merged_conn_graph)
-!# gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, list_struct_R, merged_array_R)
-!# gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, list_struct_I, merged_array_I)
-!# gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, list_struct_C, merged_array_C)
+!# gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, n_conn_graphs, conn_graphs, merged_conn_graph)
+!# gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_array_R)
+!# gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_array_I)
+!# gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_array_C)
 !# gedatsu_list_initialize_R(list_struct_R, n)
 !# gedatsu_list_initialize_I(list_struct_R, n)
 !# gedatsu_list_initialize_C(list_struct_R, n)
@@ -20,6 +20,7 @@
 module mod_gedatsu_graph_merge
   use mod_monolis_utils
   use mod_gedatsu_graph
+  use mod_gedatsu_graph_handler
   implicit none
 
   !> merge_nodal_subgraphsフラグ（部分領域毎に並べる）
@@ -54,7 +55,7 @@ contains
     !> グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
     !> 通信テーブルの配列（配列長 n_graphs）
-    type(monolis_COM), intent(in) :: monoCOMs
+    type(monolis_COM), intent(in) :: monoCOMs(:)
     !> 統合されたグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_graph
     !> 統合された通信テーブル
@@ -62,48 +63,51 @@ contains
     !> 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
     integer(kint), intent(in) :: order_type
 
-    integer(kint) :: i, j, k, iS, iE, val, idx
-    integer(kint) :: n_vertex, n_internal_vertex, n_overlap_vertex, n_vertex_uniq
-    integer(kint), allocatable :: vertex_id(:), internal_vertex_id(:), overlap_vertex_id(:), iS_vertex_id(:)
+    integer(kint) :: i, j, k, iS, iE, val, idx, tmp
+    integer(kint) :: n_vertex, n_internal_vertex, n_overlap_vertex, n_vertex_uniq, n_edge
+    integer(kint), allocatable :: vertex_id(:), internal_vertex_id(:), overlap_vertex_id(:), vertex_id_notsorted(:), edge(:,:)
     logical, allocatable :: is_internal(:), is_already_count_overlap(:)
-    type(monolis_list_I), allocatable :: adj_list(:)  !> list of lists 計算点同士の隣接関係
 
-    !> 全ての graphs の vertex_id をつなげる
     n_vertex = 0
     n_internal_vertex = 0
     do i = 1, n_graphs
       n_vertex = n_vertex + graphs(i)%n_vertex
       n_internal_vertex = n_internal_vertex + graphs(i)%n_internal_vertex
     enddo
+
     call monolis_alloc_I_1d(vertex_id, n_vertex)
 
+    !> 全ての graphs の vertex_id をつなげる
     iS = 1
     do i = 1, n_graphs
-      iE = iS + graphs(i)%n_vertex
-      vertex_id(iS:iE) = graphs(i)%vertex_id(1:iE)
-      iS = iS + iE
+      iE = iS + graphs(i)%n_vertex - 1
+      vertex_id(iS:iE) = graphs(i)%vertex_id(1:graphs(i)%n_vertex)
+      iS = iS + graphs(i)%n_vertex
     enddo
 
     !> つなげた vertex_id を昇順ソート＋重複削除
     call monolis_qsort_I_1d(vertex_id, 1, n_vertex)
-    call monolis_get_uniq_array_I(vertex_id, n_vertex, n_vertex_uniq)
+    call monolis_get_uniq_array_I(vertex_id, n_vertex, tmp)
+    n_vertex = tmp  !> 重複を削除した全計算点数
+    call monolis_realloc_I_1d(vertex_id, n_vertex)
 
     !> 内部領域か袖領域かの判定
-    call monolis_alloc_L_1d(is_internal, n_vertex_uniq) ! 内部領域なら.true.
+    call monolis_alloc_L_1d(is_internal, n_vertex) ! 内部領域なら.true.
     do i = 1, n_graphs
       do j = 1, graphs(i)%n_internal_vertex
         val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_vertex_uniq, val, idx)
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)
         is_internal(idx) = .true.
       enddo
     enddo
+
     !> 内部領域と袖領域に分割
-    n_overlap_vertex = n_vertex_uniq - n_internal_vertex
+    n_overlap_vertex = n_vertex - n_internal_vertex
     call monolis_alloc_I_1d(internal_vertex_id, n_internal_vertex)
     call monolis_alloc_I_1d(overlap_vertex_id, n_overlap_vertex)
     j = 1
     k = 1
-    do i = 1, n_vertex_uniq
+    do i = 1, n_vertex
       if(is_internal(i))then
         internal_vertex_id(j) = vertex_id(i)
         j = j + 1
@@ -114,19 +118,23 @@ contains
     enddo
 
     !> ここから結合後のグラフ merged_graph の作成
-    call monolis_graph_initialize(merged_graph)
+    call gedatsu_graph_initialize(merged_graph)
 
-    merged_graph%n_vertex = n_vertex_uniq
+    !> n_vertex と n_internal_vertex の設定
+    call gedatsu_graph_set_n_vertex(merged_graph, n_vertex)
     merged_graph%n_internal_vertex = n_internal_vertex
 
-    call monolis_alloc_I_1d(merged_graph%vertex_id, n_vertex_uniq)
-    if(order_type == ORDER_DOMAIN_ID)then
+    !> vertex_id の作成
+    if(order_type == ORDER_NODAL_ID)then
+      merged_graph%vertex_id(1:n_internal_vertex) = internal_vertex_id(1:n_internal_vertex)
+      merged_graph%vertex_id(n_internal_vertex+1:n_vertex) = overlap_vertex_id(1:n_overlap_vertex)
+    elseif(order_type == ORDER_DOMAIN_ID)then
       !> 内部領域
       iS = 1
       do i = 1, n_graphs
-        iE = graphs(i)%n_internal_vertex
-        merged_graph%vertex_id(iS:iS+iE) = graphs(i)%vertex_id(1:iE)
-        iS = iS + iE
+        iE = iS + graphs(i)%n_internal_vertex - 1
+        merged_graph%vertex_id(iS:iE) = graphs(i)%vertex_id(1:graphs(i)%n_internal_vertex)
+        iS = iS + graphs(i)%n_internal_vertex
       enddo
       !> 袖領域
       call monolis_alloc_L_1d(is_already_count_overlap, n_overlap_vertex) ! 袖領域に含まれるとカウントしたら.true.にする
@@ -142,97 +150,56 @@ contains
           endif
         enddo
       enddo
-    elseif(order_type == ORDER_NODAL_ID)then
-      merged_graph%vertex_id(1:n_internal_vertex) = internal_vertex_id(1:n_internal_vertex)
-      merged_graph%vertex_id(n_internal_vertex+1:n_vertex) = overlap_vertex_id(1:n_overlap_vertex)
     else
       stop "*** error *** Invalid order_type. order_type must be ORDER_DOMAIN_ID or ORDER_NODAL_ID."
     endif
 
-    !> merged_graph%vertex_id の並び方が order_type フラグによって変わるため、これを vertex_id にコピーして使う
-    call monolis_dealloc_I_1d(vertex_id)
-    call monolis_alloc_I_1d(vertex_id, n_vertex_uniq)
-    vertex_id(:) = merged_graph%vertex_id(:)
+    !> 「ソート後の結合後ローカル番号」＝vertex_idと「ソートしていない本来の結合後ローカル番号」＝merged_graph%vertex_idの対応関係を保持しておく
+    call monolis_alloc_I_1d(vertex_id_notsorted, n_vertex)
+    do i = 1, n_vertex  !> i が「ソートしていない本来の結合後ローカル番号」
+      val = merged_graph%vertex_id(i)
+      call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)
+      vertex_id_notsorted(idx) = i
+    enddo
 
-    call monolis_alloc_I_1d(merged_graph%vertex_domain_id, n_vertex_uniq)
-    merged_graph%vertex_domain_id(:) = monolis_mpi_get_global_my_rank()
-
-    !> 隣接計算点数のカウント
-    allocate(adj_list(n_vertex_uniq))
-    call gedatsu_list_initialize_I(adj_list, n_vertex_uniq)
+    !> CSR 形式グラフの作成
     do i = 1, n_graphs
-      !> 内部領域
-      do j = 1, graphs(i)%n_internal_vertex
-        val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_internal_vertex, val, idx)
-        if(idx == -1 )stop "*** can't find val in vertex_id."
-        adj_list(idx)%n = graphs(i)%index(j+1) - graphs(i)%index(j) - 1  !> 隣接計算点数
+      call monolis_dealloc_I_2d(edge)
+      call gedatsu_graph_get_n_edge(graphs(i), n_edge)
+      call monolis_alloc_I_2d(edge, 2, n_edge)
+      call gedatsu_graph_get_edge_in_internal_region(graphs(i), monolis_mpi_get_global_my_rank(), edge) !> domain_id はランク番号
+
+      !> edge を「ソートしていない本来の結合後ローカル番号」に変換
+      do j = 1, n_edge
+        do k = 1, 2
+          idx = edge(k,j) !> 結合前グラフにおけるローカル番号
+          val = graphs(i)%vertex_id(idx)  !> グローバル番号
+          call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
+          edge(k,j) = vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
+        enddo
       enddo
-      !> 袖領域
-      do j = graphs(i)%n_internal_vertex+1, graphs(i)%n_vertex
-        val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_internal_vertex, val, idx)
-        !> 結合後グラフでは内部領域だったらすでにカウントされているのでスキップ
-        !> 結合後グラフでも袖領域だったら隣接計算点数は各領域における隣接計算点数の和になる
-        if(idx == -1)then
-          call monolis_bsearch_I(vertex_id, n_internal_vertex+1, n_vertex_uniq, val, idx)
-          adj_list(idx)%n = adj_list(idx)%n + graphs(i)%index(j+1) - graphs(i)%index(j) - 1  !> 隣接計算点数
-        endif
-      enddo
+
+      !> merged_graph にエッジを追加
+      call gedatsu_graph_add_edge(merged_graph, n_edge, edge)
     enddo
 
-    !> 隣接計算点番号リストを作成
-    do i = 1, n_vertex_uniq
-      call monolis_alloc_I_1d(adj_list(i)%array, adj_list(i)%n)
-    enddo
-    call monolis_alloc_I_1d(iS_vertex_id, n_vertex_uniq)
-    iS_vertex_id(:) = 1
-    do i = 1, n_graphs
-      !> 内部領域
-      do j = 1, graphs(i)%n_internal_vertex
-        val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_vertex_uniq, val, idx)
-        adj_list(idx)%array(1:adj_list(idx)%n) = graphs(i)%item(graphs(i)%index(j)+1:graphs(i)%index(j+1))  !> 隣接計算点番号
-      enddo
-      !> 袖領域
-      do j = graphs(i)%n_internal_vertex+1, graphs(i)%n_vertex
-        val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_internal_vertex, val, idx)
-        !> 結合後グラフでは内部領域だったらすでにカウントされているのでスキップ
-        !> 結合後グラフでも袖領域だったら隣接計算点数は各領域における隣接計算点数の和になる
-        if(idx == -1)then
-          call monolis_bsearch_I(vertex_id, n_internal_vertex+1, n_vertex_uniq, val, idx)
-          iE = iS_vertex_id(idx) + graphs(i)%index(j+1) - graphs(i)%index(j) - 1
-          adj_list(idx)%array(iS_vertex_id(idx):iE) = graphs(i)%item(graphs(i)%index(j)+1:graphs(i)%index(j+1))  !> 隣接計算点番号
-          iS_vertex_id(idx) = iS_vertex_id(idx) + iE
-        endif
-      enddo
-    enddo
-
-    !> CSR 形式グラフ構造体の作成
-    j = 0
-    do i = 1, n_vertex_uniq
-      j = j + adj_list(i)%n
-    enddo
-    call monolis_alloc_I_1d(merged_graph%index, n_vertex_uniq+1)
-    call monolis_alloc_I_1d(merged_graph%item, j)
-    merged_graph%index(1) = 0
-    iS = 1
-    do i = 1, n_vertex_uniq
-      merged_graph%index(i+1) = merged_graph%index(i) + 1 + adj_list(i)%n
-      iE = iS + adj_list(i)%n
-      merged_graph%item(iS:iE) = adj_list(i)%array(1:adj_list(i)%n)
-      iS = iS + iE
-    enddo
+    !> 重複削除
+    call gedatsu_graph_delete_dupulicate_edge(merged_graph)
 
     !> 通信テーブルの結合
-    call monolis_com_get_comm_table_parallel(merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id, &
-    & merged_monoCOM)
+    call monolis_com_initialize_by_global_id(merged_monoCOM, monolis_mpi_get_global_comm(), &
+    & merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id)
+    ! call monolis_com_get_comm_table_parallel(merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id, &
+    ! & merged_monoCOM)
   end subroutine gedatsu_merge_nodal_subgraphs
 
-  subroutine gedatsu_merge_connectivity_subgraphs(merged_nodal_graph, merged_nodal_monoCOM, &
-    & n_conn_graphs, conn_graphs, merged_conn_graph)
+  subroutine gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, &
+  & n_conn_graphs, conn_graphs, merged_conn_graph)
     implicit none
+    !> 統合したい節点グラフ構造の個数
+    integer(kint), intent(in) :: n_nodal_graphs
+    !> グラフ構造の配列
+    type(gedatsu_graph), intent(in) :: nodal_graphs(:)
     !> 統合された計算点グラフ構造
     type(gedatsu_graph), intent(in) :: merged_nodal_graph
     !> 統合された計算点グラフ構造の通信テーブル
@@ -244,34 +211,15 @@ contains
     !> 統合されたコネクティビティグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_conn_graph
 
-    integer(kint) :: i, j, k, iS, iE, val, idx
-    integer(kint) :: n_nodal_vertex, n_conn_vertex, n_conn_internal_vertex, n_conn_overlap_vertex, n_conn_vertex_uniq
-    integer(kint), allocatable :: nodal_vertex_id(:), conn_vertex_id(:), conn_internal_vertex_id(:), conn_overlap_vertex_id(:)
-    integer(kint), allocatable :: nodal_vertex_local_id(:)  !> ソート前のローカル計算点番号
+    integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n_edge
+    integer(kint) :: n_conn_vertex, n_conn_internal_vertex, n_conn_overlap_vertex, n_nodal_vertex
+    integer(kint), allocatable :: conn_vertex_id(:), conn_internal_vertex_id(:), conn_overlap_vertex_id(:), &
+    & conn_vertex_id_notsorted(:)
+    integer(kint), allocatable :: nodal_vertex_id(:), nodal_vertex_id_notsorted(:), edge(:,:)
     logical, allocatable :: is_conn_internal(:)
-    type(monolis_list_I), allocatable :: adj_list(:)  !> list of lists 計算点同士の隣接関係
 
-    !> #####
-    !> 要素のグローバル番号はわかるが、要素を構成する節点のグローバル番号はわからないから翻訳が必要
-    !> グローバル番号の検索は nodal_vertex で行うが、結合後のローカル番号の検索は mergedmerged_nodal_graph%n_vertex で行う必要がある
-    !> merged_nodal_graph%n_vertex の検索は二分探索が使えない
-    !> → ソート前のローカルIDーグローバルID対応 → ソート後のローカルIDーグローバルID対応への変換が必要（余分な配列が必要）
-    !> 【これは計算点グラフに関する話。コネクティビティグラフは単純に結合できる気がする】
-    !> #####
+    if(n_nodal_graphs /= n_conn_graphs) stop "*** n_nodal_graphs /= n_conn_graphs"
 
-    !> グローバル計算点番号を探索するのに使う配列
-    allocate(nodal_vertex_id, source = merged_nodal_graph%vertex_id)
-    n_nodal_vertex = merged_nodal_graph%n_vertex
-    call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
-    !> ソート後のローカル計算点番号を求める
-    call monolis_alloc_I_1d(nodal_vertex_local_id, n_nodal_vertex)
-    do i = 1, n_nodal_vertex
-      val = merged_nodal_graph%vertex_id(i)
-      call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
-      nodal_vertex_local_id(i) = idx
-    enddo
-
-    !> 全ての conn_graphs の vertex_id をつなげる
     n_conn_vertex = 0
     n_conn_internal_vertex = 0
     do i = 1, n_conn_graphs
@@ -280,33 +228,36 @@ contains
     enddo
     call monolis_alloc_I_1d(conn_vertex_id, n_conn_vertex)
 
+    !> 全ての conn_graphs の vertex_id をつなげる
     iS = 1
     do i = 1, n_conn_graphs
-      iE = iS + conn_graphs(i)%n_vertex
-      conn_vertex_id(iS:iE) = conn_graphs(i)%vertex_id(1:iE)
-      iS = iS + iE
+      iE = iS + conn_graphs(i)%n_vertex - 1
+      conn_vertex_id(iS:iE) = conn_graphs(i)%vertex_id(1:conn_graphs(i)%n_vertex)
+      iS = iS + conn_graphs(i)%n_vertex
     enddo
 
     !> つなげた conn_vertex_id を昇順ソート＋重複削除
     call monolis_qsort_I_1d(conn_vertex_id, 1, n_conn_vertex)
-    call monolis_get_uniq_array_I(conn_vertex_id, n_conn_vertex, n_conn_vertex_uniq)
+    call monolis_get_uniq_array_I(conn_vertex_id, n_conn_vertex, tmp)
+    n_conn_vertex = tmp
+    call monolis_realloc_I_1d(conn_vertex_id, n_conn_vertex)
 
     !> 内部領域か袖領域かの判定
-    call monolis_alloc_L_1d(is_conn_internal, n_conn_vertex_uniq) ! 内部領域なら.true.
+    call monolis_alloc_L_1d(is_conn_internal, n_conn_vertex) ! 内部領域なら.true.
     do i = 1, n_conn_graphs
       do j = 1, conn_graphs(i)%n_internal_vertex
         val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex_uniq, val, idx)
+        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx)
         is_conn_internal(idx) = .true.
       enddo
     enddo
     !> 内部領域と袖領域に分割
-    n_conn_overlap_vertex = n_conn_vertex_uniq - n_conn_internal_vertex
+    n_conn_overlap_vertex = n_conn_vertex - n_conn_internal_vertex
     call monolis_alloc_I_1d(conn_internal_vertex_id, n_conn_internal_vertex)
     call monolis_alloc_I_1d(conn_overlap_vertex_id, n_conn_overlap_vertex)
     j = 1
     k = 1
-    do i = 1, n_conn_vertex_uniq
+    do i = 1, n_conn_vertex
       if(is_conn_internal(i))then
         conn_internal_vertex_id(j) = conn_vertex_id(i)
         j = j + 1
@@ -319,88 +270,63 @@ contains
     !> ここから結合後のグラフ merged_conn_graph の作成
     call gedatsu_graph_initialize(merged_conn_graph)
 
-    merged_conn_graph%n_vertex = n_conn_vertex_uniq
+    call gedatsu_graph_set_n_vertex(merged_conn_graph, n_conn_vertex)
     merged_conn_graph%n_internal_vertex = n_conn_internal_vertex
 
-    call monolis_alloc_I_1d(merged_conn_graph%vertex_id, n_conn_vertex_uniq)
     merged_conn_graph%vertex_id(1:n_conn_internal_vertex) = conn_internal_vertex_id(1:n_conn_internal_vertex)
     merged_conn_graph%vertex_id(n_conn_internal_vertex+1:n_conn_vertex) = conn_overlap_vertex_id(1:n_conn_overlap_vertex)
 
-    call monolis_alloc_I_1d(merged_conn_graph%vertex_domain_id, merged_conn_graph%n_vertex)
-    merged_conn_graph%vertex_domain_id(:) = monolis_mpi_get_global_my_rank()
+    !> 「ソート後の結合後ローカル番号」と「ソートしていない本来の結合後ローカル番号」の対応関係を保持しておく必要がある
+    !> 要素
+    call monolis_alloc_I_1d(conn_vertex_id_notsorted, n_conn_vertex)
+    do i = 1, n_conn_vertex
+      val = merged_conn_graph%vertex_id(i)
+      call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx)
+      conn_vertex_id_notsorted(i) = idx
+    enddo
+    !> 計算点
+    allocate(nodal_vertex_id, source = merged_nodal_graph%vertex_id)
+    call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)
+    call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
+    call monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex)
+    do i = 1, n_nodal_vertex
+      val = merged_nodal_graph%vertex_id(i)
+      call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
+      nodal_vertex_id_notsorted(i) = idx
+    enddo
 
-    !> conn_vertex_id の並び方を merged_conn_graph%vertex_id にそろえる
-    call monolis_dealloc_I_1d(conn_vertex_id)
-    call monolis_alloc_I_1d(conn_vertex_id, n_conn_vertex_uniq)
-    conn_vertex_id(:) = merged_conn_graph%vertex_id(:)
-
-    call monolis_alloc_I_1d(merged_conn_graph%vertex_domain_id, n_conn_vertex_uniq)
-    merged_conn_graph%vertex_domain_id(:) = monolis_mpi_get_global_my_rank()
-
-    !> 隣接計算点数のカウント
-    allocate(adj_list(n_conn_vertex_uniq))
-    call gedatsu_list_initialize_I(adj_list, n_conn_vertex_uniq)
+    !> CSR 形式グラフの作成
     do i = 1, n_conn_graphs
-      !> 内部領域
-      do j = 1, conn_graphs(i)%n_internal_vertex
-        val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_internal_vertex, val, idx)
-        if(idx == -1 )stop "*** can't find val in vertex_id."
-        adj_list(idx)%n = conn_graphs(i)%index(j+1) - conn_graphs(i)%index(j) - 1  !> 隣接計算点数
+      call monolis_dealloc_I_2d(edge)
+      call gedatsu_graph_get_n_edge(conn_graphs(i), n_edge)
+      call monolis_alloc_I_2d(edge, 2, n_edge)
+      call gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graphs(i), conn_graphs(i), &
+      & monolis_mpi_get_global_my_rank(), edge)
+
+      !> edge を「ソートしていない本来の結合後ローカル番号」に変換
+      do j = 1, n_edge
+        !> 要素
+        idx = edge(1,j) !> 結合前グラフにおけるローカル番号
+        val = conn_graphs(i)%vertex_id(idx)  !> グローバル番号
+        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
+        edge(1,j) = conn_vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
+        !> 計算点
+        idx = edge(2,j)
+        val = nodal_graphs(i)%vertex_id(idx)
+        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
+        edge(2,j) = nodal_vertex_id_notsorted(idx)
       enddo
-      !> 袖領域
-      do j = conn_graphs(i)%n_internal_vertex+1, conn_graphs(i)%n_vertex
-        val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_internal_vertex, val, idx)
-        !> 結合後グラフでは内部領域だったらすでにカウントされているのでスキップ
-        if(idx == -1)then
-          call monolis_bsearch_I(conn_vertex_id, n_conn_internal_vertex+1, n_conn_vertex_uniq, val, idx)
-          adj_list(idx)%n = conn_graphs(i)%index(j+1) - conn_graphs(i)%index(j) - 1  !> 隣接計算点数
-        endif
-      enddo
+
+      ! !> merged_graph にエッジを追加
+      call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
     enddo
 
-    !> 隣接計算点番号リストを作成
-    do i = 1, n_conn_vertex_uniq
-      call monolis_alloc_I_1d(adj_list(i)%array, adj_list(i)%n)
-    enddo
-    do i = 1, n_conn_graphs
-      !> 内部領域
-      do j = 1, conn_graphs(i)%n_internal_vertex
-        val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex_uniq, val, idx)
-        adj_list(idx)%array(1:adj_list(idx)%n) = conn_graphs(i)%item(conn_graphs(i)%index(j)+1:conn_graphs(i)%index(j+1))  !> 隣接計算点番号
-      enddo
-      !> 袖領域
-      do j = conn_graphs(i)%n_internal_vertex+1, conn_graphs(i)%n_vertex
-        val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_internal_vertex, val, idx)
-        !> 結合後グラフでは内部領域だったらすでにカウントされているのでスキップ
-        if(idx == -1)then
-          call monolis_bsearch_I(conn_vertex_id, n_conn_internal_vertex+1, n_conn_vertex_uniq, val, idx)
-          adj_list(idx)%array(1:adj_list(idx)%n) = conn_graphs(i)%item(conn_graphs(i)%index(j)+1:conn_graphs(i)%index(j+1))  !> 隣接計算点番号
-        endif
-      enddo
-    enddo
+    !> 重複削除
+    call gedatsu_graph_delete_dupulicate_edge(merged_conn_graph)
 
-    !> CSR 形式グラフ構造体の作成
-    j = 0
-    do i = 1, n_conn_vertex_uniq
-      j = j + adj_list(i)%n
-    enddo
-    call monolis_alloc_I_1d(merged_conn_graph%index, n_conn_vertex_uniq+1)
-    call monolis_alloc_I_1d(merged_conn_graph%item, j)
-    merged_conn_graph%index(1) = 0
-    iS = 1
-    do i = 1, n_conn_vertex_uniq
-      merged_conn_graph%index(i+1) = merged_conn_graph%index(i) + 1 + adj_list(i)%n
-      iE = iS + adj_list(i)%n
-      merged_conn_graph%item(iS:iE) = adj_list(i)%array(1:adj_list(i)%n)
-      iS = iS + iE
-    enddo
   end subroutine gedatsu_merge_connectivity_subgraphs
 
-  subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, list_struct_R, merged_array_R)
+  subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_array_R)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -408,42 +334,86 @@ contains
     type(gedatsu_graph), intent(in) :: graphs(:)
     !> 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
+    !> 計算点が持つ物理量の個数
+    type(monolis_list_I), intent(in) :: n_dof_list(:)
     !>  リスト構造体
     type(monolis_list_R), intent(in) :: list_struct_R(:)
     !> 統合された実数配列
-    real(kdouble), allocatable, intent(inout) :: merged_array_R(:) !> 結合後グラフのローカル計算点番号で記述
+    real(kdouble), allocatable, intent(inout) :: merged_array_R(:)
 
-    integer(kint) :: i, j, k, val, idx, local_idx, n_vertex !> local_idx：ソート前のローカル計算点番号を代入するのに使う
-    integer(kint), allocatable :: vertex_id(:), vertex_local_id(:)  !> vertex_local_id：ソート前のローカル計算点番号
+    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
+    integer(kint), allocatable :: perm(:), vertex_id(:), merged_n_dof_list(:), index(:)
+    type(monolis_list_I), allocatable :: merged_index(:)
 
+    if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
     if(n_graphs /= size(list_struct_R)) stop "*** n_graphs and size(list_struct_R) don't match."
 
-    !> グローバル計算点番号を探索するのに使う配列
-    allocate(vertex_id, source = merged_graph%vertex_id)
     n_vertex = merged_graph%n_vertex
-    call monolis_qsort_I_1d(vertex_id, 1, n_vertex)
-    !> ソート後のローカル計算点番号を求める
-    call monolis_alloc_I_1d(vertex_local_id, n_vertex)
-    do i = 1, n_vertex
-      val = merged_graph%vertex_id(i)
-      call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)
-      vertex_local_id(i) = idx
+
+    call monolis_dealloc_R_1d(merged_array_R)
+    call monolis_alloc_R_1d(merged_array_R, n_vertex)
+
+    !ただlist_struct_Rをつなげるだけだと、重複がありえるのでだめ。
+    !複数の部分グラフにまたがる計算点については、どの部分グラフにおける物理量も同じ
+    !　→　各計算点の次元さえわかれば、
+    !結合前ローカル番号　→　結合後ローカル番号に読み替えて、「上書き」すればよい
+
+    !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(perm, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+
+    ! !> 結合後グラフの情報を取得
+    call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
+    do i = 1, n_graphs
+      if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
+      enddo
     enddo
 
-    !> 結合後グラフのローカル計算点番号に変換
-    n_vertex = merged_graph%n_vertex
-    call monolis_alloc_R_1d(merged_array_R, n_vertex)
+    !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
+    !> 結合後グラフ
+    val = n_vertex + 1
+    call monolis_alloc_I_1d(index, val)
+    j = 0
+    do i = 1, n_vertex
+      j = j + merged_n_dof_list(i)
+      index(i+1) = j
+    enddo
+    !> 結合前グラフ
+    allocate(merged_index(n_graphs))
+    call gedatsu_list_initialize_I(merged_index, n_graphs)
     do i = 1, n_graphs
-      do j = 1, graphs(i)%n_vertex  !> j : 結合前グラフにおけるローカル計算点番号
-        val = graphs(i)%vertex_id(j)  !> val：グローバル計算点番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx) !> idx : "ソートした" 結合後グラフにおけるローカル計算点番号
-        local_idx = vertex_local_id(idx)  !> local_id : "ソート前の" 結合後グラフにおけるローカル計算点番号
-        merged_array_R(local_idx) = list_struct_R(i)%array(j)
+      merged_index(i)%n = graphs(i)%n_vertex + 1
+      call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
+      k = 0
+      do j = 1, graphs(i)%n_vertex
+        k = k + n_dof_list(i)%array(j)
+        merged_index(i)%array(j+1) = k
+      enddo
+    enddo
+
+    !> index配列を用いて物理量分布の結合
+    do i = 1, n_graphs
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        iS = index(val) + 1
+        iE = index(val+1)
+        jS = merged_index(i)%array(j) + 1
+        jE = merged_index(i)%array(j+1)
+        merged_array_R(iS:iE) = list_struct_R(i)%array(jS:jE)
       enddo
     enddo
   end subroutine gedatsu_merge_distval_R
 
-  subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, list_struct_I, merged_array_I)
+  subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_array_I)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -451,13 +421,15 @@ contains
     type(gedatsu_graph), intent(in) :: graphs(:)
     !> 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
+    !> 計算点が持つ物理量の個数
+    type(monolis_list_I), intent(in) :: n_dof_list(:)
     !> リスト構造体
     type(monolis_list_I), intent(in) :: list_struct_I(:)
     !>  統合された整数配列
     integer(kint), allocatable, intent(inout) :: merged_array_I(:)
   end subroutine gedatsu_merge_distval_I
 
-  subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, list_struct_C, merged_array_C)
+  subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_array_C)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -465,6 +437,8 @@ contains
     type(gedatsu_graph), intent(in) :: graphs(:)
     !> 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
+    !> 計算点が持つ物理量の個数
+    type(monolis_list_I), intent(in) :: n_dof_list(:)
     !> リスト構造体
     type(monolis_list_C), intent(in) :: list_struct_C(:)
     !> 統合された複素数配列
@@ -560,7 +534,7 @@ contains
     !> 登録する配列
     real(kdouble), allocatable, intent(in) :: array(:)
 
-    if(allocated(list_struct_R(id)%array)) call monolis_dealloc_R_1d(list_struct_R(id)%array)
+    call monolis_dealloc_R_1d(list_struct_R(id)%array)
     call monolis_alloc_R_1d(list_struct_R(id)%array, n)
     list_struct_R(id)%array = array(:)
   end subroutine gedatsu_list_set_R
@@ -576,7 +550,7 @@ contains
     !> 登録する配列
     integer(kint), allocatable, intent(in) :: array(:)
 
-    if(allocated(list_struct_I(id)%array)) call monolis_dealloc_I_1d(list_struct_I(id)%array)
+    call monolis_dealloc_I_1d(list_struct_I(id)%array)
     call monolis_alloc_I_1d(list_struct_I(id)%array, n)
     list_struct_I(id)%array = array(:)
   end subroutine gedatsu_list_set_I
@@ -592,7 +566,7 @@ contains
     !> 登録する配列
     complex(kdouble), allocatable, intent(in) :: array(:)
 
-    if(allocated(list_struct_C(id)%array)) call monolis_dealloc_C_1d(list_struct_C(id)%array)
+    call monolis_dealloc_C_1d(list_struct_C(id)%array)
     call monolis_alloc_C_1d(list_struct_C(id)%array, n)
     list_struct_C(id)%array = array(:)
   end subroutine gedatsu_list_set_C
@@ -607,10 +581,8 @@ contains
     real(kdouble), allocatable, intent(inout) :: array(:)
     integer(kint) :: n
 
-    if(allocated(array)) call monolis_dealloc_R_1d(array)
-    n = size(list_struct_R(id)%array)
-    call monolis_alloc_R_1d(array, n)
-    array(:) = list_struct_R(id)%array
+    call monolis_dealloc_R_1d(array)
+    allocate(array, source=list_struct_R(id)%array)
   end subroutine gedatsu_list_get_R
 
   subroutine gedatsu_list_get_I(list_struct_I, id, array)
@@ -623,10 +595,8 @@ contains
     integer(kint), allocatable, intent(inout) :: array(:)
     integer(kint) :: n
 
-    if(allocated(array)) call monolis_dealloc_I_1d(array)
-    n = size(list_struct_I(id)%array)
-    call monolis_alloc_I_1d(array, n)
-    array(:) = list_struct_I(id)%array
+    call monolis_dealloc_I_1d(array)
+    allocate(array, source=list_struct_I(id)%array)
   end subroutine gedatsu_list_get_I
 
   subroutine gedatsu_list_get_C(list_struct_C, id, array)
@@ -639,10 +609,8 @@ contains
     complex(kdouble), allocatable, intent(inout) :: array(:)
     integer(kint) :: n
 
-    if(allocated(array)) call monolis_dealloc_C_1d(array)
-    n = size(list_struct_C(id)%array)
-    call monolis_alloc_C_1d(array, n)
-    array(:) = list_struct_C(id)%array
+    call monolis_dealloc_C_1d(array)
+    allocate(array, source=list_struct_C(id)%array)
   end subroutine gedatsu_list_get_C
 
 end module mod_gedatsu_graph_merge

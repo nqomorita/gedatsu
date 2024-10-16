@@ -17,6 +17,7 @@ program gedatsu_test
 
   call gedatsu_graph_convert_test()
   call gedatsu_graph_handler_test()
+  ! call gedatsu_graph_merge_test()
   call gedatsu_graph_part_test()
 
   call gedatsu_graph_repart_test()
