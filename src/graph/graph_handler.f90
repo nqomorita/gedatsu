@@ -772,6 +772,8 @@ contains
 
     n_edge_cur = graph%index(graph%n_vertex + 1)
 
+    !> 重複のない個数を数える
+
     n_edge_all = n_edge_cur + n_edge
 
     call monolis_alloc_I_2d(edge_all, 2, n_edge_all)
@@ -788,8 +790,10 @@ contains
     call monolis_dealloc_I_1d(graph%item)
     call monolis_alloc_I_1d(graph%item, n_edge_all)
 
+    !n_edge = 0
     do i = 1, n_edge
-      edge_all(1,n_edge_cur + i) = edge(1,i)
+      ! if(重複内要素)then n_edge += 1
+      edge_all(1,n_edge_cur + i) = edge(1,i)  !左辺だけ i→n_edge
       edge_all(2,n_edge_cur + i) = edge(2,i)
     enddo
 

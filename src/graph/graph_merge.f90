@@ -189,8 +189,6 @@ contains
     !> 通信テーブルの結合
     call monolis_com_initialize_by_global_id(merged_monoCOM, monolis_mpi_get_global_comm(), &
     & merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id)
-    ! call monolis_com_get_comm_table_parallel(merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id, &
-    ! & merged_monoCOM)
   end subroutine gedatsu_merge_nodal_subgraphs
 
   subroutine gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, &
@@ -295,34 +293,50 @@ contains
       nodal_vertex_id_notsorted(i) = idx
     enddo
 
+    !> 新しい実装方法
+    ! 3つの配列（重複許す）
+    ! グローバル要素番号→並べ替え用のpermも作る
+    ! n_conn_graphs(i)のi→permで並べ替え
+    ! ローカル要素番号→permで並べ替え
+
     !> CSR 形式グラフの作成
-    do i = 1, n_conn_graphs
-      call monolis_dealloc_I_2d(edge)
-      call gedatsu_graph_get_n_edge(conn_graphs(i), n_edge)
-      call monolis_alloc_I_2d(edge, 2, n_edge)
-      call gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graphs(i), conn_graphs(i), &
-      & monolis_mpi_get_global_my_rank(), edge)
+    ! do i = 1, merged_conn_graph%n_vertex（「抽出して足す」を繰り返す）
+    !   !グローバル要素番号取得
+    !   グローバル要素番号に対して二分探索→iとローカル番号がわかるので、要素を抽出できる
+    !   add_conn_graph
+    ! enddo
 
-      !> edge を「ソートしていない本来の結合後ローカル番号」に変換
-      do j = 1, n_edge
-        !> 要素
-        idx = edge(1,j) !> 結合前グラフにおけるローカル番号
-        val = conn_graphs(i)%vertex_id(idx)  !> グローバル番号
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
-        edge(1,j) = conn_vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
-        !> 計算点
-        idx = edge(2,j)
-        val = nodal_graphs(i)%vertex_id(idx)
-        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
-        edge(2,j) = nodal_vertex_id_notsorted(idx)
-      enddo
+    !> 以下は使わない（完成するまで、一応残しておく）
+    ! do i = 1, n_conn_graphs
+    !   call monolis_dealloc_I_2d(edge)
+    !   call gedatsu_graph_get_n_edge(conn_graphs(i), n_edge)
+    !   call monolis_alloc_I_2d(edge, 2, n_edge)
+    !   call gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graphs(i), conn_graphs(i), &
+    !   & monolis_mpi_get_global_my_rank(), edge)
 
-      ! !> merged_graph にエッジを追加
-      call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
-    enddo
+    !   !> edge を「ソートしていない本来の結合後ローカル番号」に変換
+    !   do j = 1, n_edge
+    !     !> 要素
+    !     idx = edge(1,j) !> 結合前グラフにおけるローカル番号
+    !     val = conn_graphs(i)%vertex_id(idx)  !> グローバル番号
+
+    !     call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
+    !     edge(1,j) = conn_vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
+    !     !> 計算点
+    !     idx = edge(2,j)
+    !     val = nodal_graphs(i)%vertex_id(idx)
+    !     call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
+    !     edge(2,j) = nodal_vertex_id_notsorted(idx)
+    !   enddo
+
+    !   !> merged_graph にエッジを追加
+    !   !どの要素を足すかbool配列
+
+    !   call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
+    ! enddo
 
     !> 重複削除
-    call gedatsu_graph_delete_dupulicate_edge(merged_conn_graph)
+    ! call gedatsu_graph_delete_dupulicate_edge(merged_conn_graph)
 
   end subroutine gedatsu_merge_connectivity_subgraphs
 
