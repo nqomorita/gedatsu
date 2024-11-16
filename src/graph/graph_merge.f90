@@ -1,9 +1,9 @@
 !> グラフ結合モジュール
 !# gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
 !# gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, n_conn_graphs, conn_graphs, merged_conn_graph)
-!# gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_array_R)
-!# gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_array_I)
-!# gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_array_C)
+!# gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
+!# gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
+!# gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
 !# gedatsu_list_initialize_R(list_struct_R, n)
 !# gedatsu_list_initialize_I(list_struct_R, n)
 !# gedatsu_list_initialize_C(list_struct_R, n)
@@ -213,7 +213,8 @@ contains
     integer(kint) :: n_conn_vertex, n_conn_internal_vertex, n_conn_overlap_vertex, n_nodal_vertex
     integer(kint), allocatable :: conn_vertex_id(:), conn_internal_vertex_id(:), conn_overlap_vertex_id(:), &
     & conn_vertex_id_notsorted(:)
-    integer(kint), allocatable :: nodal_vertex_id(:), nodal_vertex_id_notsorted(:), edge(:,:)
+    integer(kint), allocatable :: nodal_vertex_id(:), nodal_vertex_id_notsorted(:), edge(:,:), &
+    & perm(:), global_id_in_merged_graph(:), which_conn_graph(:), local_id_in_conn_graph(:)
     logical, allocatable :: is_conn_internal(:)
 
     if(n_nodal_graphs /= n_conn_graphs) stop "*** n_nodal_graphs /= n_conn_graphs"
@@ -294,17 +295,53 @@ contains
     enddo
 
     !> 新しい実装方法
-    ! 3つの配列（重複許す）
-    ! グローバル要素番号→並べ替え用のpermも作る
-    ! n_conn_graphs(i)のi→permで並べ替え
-    ! ローカル要素番号→permで並べ替え
+    !> 3つの配列（重複許す）
+    !> グローバル要素番号→並べ替え用のpermも作る
+    !> n_conn_graphs(i)のi→permで並べ替え
+    !> ローカル要素番号→permで並べ替え
+
+    !> グローバル要素番号：global_id_in_merged_graph
+    !> n_conn_graphs(i)のi：which_conn_graph
+    !> ローカル要素番号：local_id_in_conn_graph
+
+    call monolis_alloc_I_1d(global_id_in_merged_graph, n_conn_vertex)
+    global_id_in_merged_graph(:) = merged_conn_graph%vertex_id(:)
+    call monolis_alloc_I_1d(perm, n_conn_vertex)
+    call monolis_alloc_I_1d(which_conn_graph, n_conn_vertex)
+    call monolis_alloc_I_1d(local_id_in_conn_graph, n_conn_vertex)
+
+    call monolis_get_sequence_array_I(perm, n_conn_vertex, 1, 1)
+    call monolis_qsort_I_2d(global_id_in_merged_graph, perm, 1, n_conn_vertex)
+    call monolis_qsort_I_2d(perm, which_conn_graph, 1, n_conn_vertex)
+    call monolis_qsort_I_2d(perm, local_id_in_conn_graph, 1, n_conn_vertex)
 
     !> CSR 形式グラフの作成
-    ! do i = 1, merged_conn_graph%n_vertex（「抽出して足す」を繰り返す）
-    !   !グローバル要素番号取得
-    !   グローバル要素番号に対して二分探索→iとローカル番号がわかるので、要素を抽出できる
-    !   add_conn_graph
-    ! enddo
+    do i = 1, merged_conn_graph%n_vertex  !>「抽出して足す」を繰り返す
+      !グローバル要素番号取得
+      val = merged_conn_graph%vertex_id(i)
+      ! グローバル要素番号に対して二分探索→iとローカル番号がわかるので、要素を抽出できる
+      call monolis_bsearch_I(global_id_in_merged_graph, 1, n_conn_vertex, val, idx) !> // TODO 重複削除していないが、ソートはされているので二分探索使っても問題ない？
+
+      iS = conn_graphs(which_conn_graph(idx))%index(local_id_in_conn_graph(idx)) + 1
+      iE = conn_graphs(which_conn_graph(idx))%index(local_id_in_conn_graph(idx) + 1)
+
+      !> edgeに追加
+      n_edge = iE - iS + 1
+      call monolis_alloc_I_2d(edge, 2, n_edge)
+      edge(1,:) = i
+      edge(2,1:n_edge) = conn_graphs(which_conn_graph(idx))%item(iS:iE)
+
+    !> edge の計算点番号を「ソートしていない本来の結合後ローカル番号」に変換
+      do j = 1, n_edge
+        idx = edge(2,j)
+        val = nodal_graphs(i)%vertex_id(idx)
+        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
+        edge(2,j) = nodal_vertex_id_notsorted(idx)
+      enddo
+
+      !> add_conn_graph
+      call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
+    enddo
 
     !> 以下は使わない（完成するまで、一応残しておく）
     ! do i = 1, n_conn_graphs
@@ -319,7 +356,6 @@ contains
     !     !> 要素
     !     idx = edge(1,j) !> 結合前グラフにおけるローカル番号
     !     val = conn_graphs(i)%vertex_id(idx)  !> グローバル番号
-
     !     call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
     !     edge(1,j) = conn_vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
     !     !> 計算点
@@ -337,10 +373,9 @@ contains
 
     !> 重複削除
     ! call gedatsu_graph_delete_dupulicate_edge(merged_conn_graph)
-
   end subroutine gedatsu_merge_connectivity_subgraphs
 
-  subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_array_R)
+  subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -352,11 +387,13 @@ contains
     type(monolis_list_I), intent(in) :: n_dof_list(:)
     !>  リスト構造体
     type(monolis_list_R), intent(in) :: list_struct_R(:)
+    !> 結合後の計算点が持つ物理量の個数
+    integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
     !> 統合された実数配列
     real(kdouble), allocatable, intent(inout) :: merged_array_R(:)
 
     integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
-    integer(kint), allocatable :: perm(:), vertex_id(:), merged_n_dof_list(:), index(:)
+    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
     if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
