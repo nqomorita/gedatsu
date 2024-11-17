@@ -464,7 +464,7 @@ contains
     enddo
   end subroutine gedatsu_merge_distval_R
 
-  subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_array_I)
+  subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -476,11 +476,79 @@ contains
     type(monolis_list_I), intent(in) :: n_dof_list(:)
     !> リスト構造体
     type(monolis_list_I), intent(in) :: list_struct_I(:)
+    !> 結合後の計算点が持つ物理量の個数
+    integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
     !>  統合された整数配列
     integer(kint), allocatable, intent(inout) :: merged_array_I(:)
+
+    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
+    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
+    type(monolis_list_I), allocatable :: merged_index(:)
+
+    if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
+    if(n_graphs /= size(list_struct_I)) stop "*** n_graphs and size(list_struct_I) don't match."
+
+    n_vertex = merged_graph%n_vertex
+
+    call monolis_dealloc_I_1d(merged_array_I)
+    call monolis_alloc_I_1d(merged_array_I, n_vertex)
+
+    !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(perm, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+
+    ! !> 結合後グラフの情報を取得
+    call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
+    do i = 1, n_graphs
+      if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
+      enddo
+    enddo
+
+    !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
+    !> 結合後グラフ
+    val = n_vertex + 1
+    call monolis_alloc_I_1d(index, val)
+    j = 0
+    do i = 1, n_vertex
+      j = j + merged_n_dof_list(i)
+      index(i+1) = j
+    enddo
+    !> 結合前グラフ
+    allocate(merged_index(n_graphs))
+    call gedatsu_list_initialize_I(merged_index, n_graphs)
+    do i = 1, n_graphs
+      merged_index(i)%n = graphs(i)%n_vertex + 1
+      call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
+      k = 0
+      do j = 1, graphs(i)%n_vertex
+        k = k + n_dof_list(i)%array(j)
+        merged_index(i)%array(j+1) = k
+      enddo
+    enddo
+
+    !> index配列を用いて物理量分布の結合
+    do i = 1, n_graphs
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        iS = index(val) + 1
+        iE = index(val+1)
+        jS = merged_index(i)%array(j) + 1
+        jE = merged_index(i)%array(j+1)
+        merged_array_I(iS:iE) = list_struct_I(i)%array(jS:jE)
+      enddo
+    enddo
   end subroutine gedatsu_merge_distval_I
 
-  subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_array_C)
+  subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
     implicit none
     !> 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
@@ -492,8 +560,76 @@ contains
     type(monolis_list_I), intent(in) :: n_dof_list(:)
     !> リスト構造体
     type(monolis_list_C), intent(in) :: list_struct_C(:)
+    !> 結合後の計算点が持つ物理量の個数
+    integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
     !> 統合された複素数配列
-    real(kdouble), allocatable, intent(inout) :: merged_array_C(:)
+    complex(kdouble), allocatable, intent(inout) :: merged_array_C(:)
+
+    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
+    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
+    type(monolis_list_I), allocatable :: merged_index(:)
+
+    if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
+    if(n_graphs /= size(list_struct_C)) stop "*** n_graphs and size(list_struct_C) don't match."
+
+    n_vertex = merged_graph%n_vertex
+
+    call monolis_dealloc_C_1d(merged_array_C)
+    call monolis_alloc_C_1d(merged_array_C, n_vertex)
+
+    !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(perm, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+
+    ! !> 結合後グラフの情報を取得
+    call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
+    do i = 1, n_graphs
+      if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
+      enddo
+    enddo
+
+    !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
+    !> 結合後グラフ
+    val = n_vertex + 1
+    call monolis_alloc_I_1d(index, val)
+    j = 0
+    do i = 1, n_vertex
+      j = j + merged_n_dof_list(i)
+      index(i+1) = j
+    enddo
+    !> 結合前グラフ
+    allocate(merged_index(n_graphs))
+    call gedatsu_list_initialize_I(merged_index, n_graphs)
+    do i = 1, n_graphs
+      merged_index(i)%n = graphs(i)%n_vertex + 1
+      call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
+      k = 0
+      do j = 1, graphs(i)%n_vertex
+        k = k + n_dof_list(i)%array(j)
+        merged_index(i)%array(j+1) = k
+      enddo
+    enddo
+
+    !> index配列を用いて物理量分布の結合
+    do i = 1, n_graphs
+      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+        val = graphs(i)%vertex_id(j)  !> グローバル番号
+        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        val = perm(idx)  !> 結合後ソート前ローカル番号
+        iS = index(val) + 1
+        iE = index(val+1)
+        jS = merged_index(i)%array(j) + 1
+        jE = merged_index(i)%array(j+1)
+        merged_array_C(iS:iE) = list_struct_C(i)%array(jS:jE)
+      enddo
+    enddo
   end subroutine gedatsu_merge_distval_C
 
   subroutine gedatsu_list_initialize_R(list_struct_R, n)
@@ -583,11 +719,19 @@ contains
     !> 配列番号 id に登録する配列サイズ
     integer(kint), intent(in) :: n
     !> 登録する配列
-    real(kdouble), allocatable, intent(in) :: array(:)
+    real(kdouble), intent(in) :: array(:)
+
+    if(n /= size(array))then
+      call monolis_std_error_string("gedatsu_liset_set_R")
+      call monolis_std_error_string("n is not equal as size(array)")
+      call monolis_std_error_stop()
+    endif
+
+    list_struct_R(id)%n = n
 
     call monolis_dealloc_R_1d(list_struct_R(id)%array)
     call monolis_alloc_R_1d(list_struct_R(id)%array, n)
-    list_struct_R(id)%array = array(:)
+    list_struct_R(id)%array(:) = array(:)
   end subroutine gedatsu_list_set_R
 
   subroutine gedatsu_list_set_I(list_struct_I, id, n, array)
@@ -599,11 +743,19 @@ contains
     !> 配列番号 id に登録する配列サイズ
     integer(kint), intent(in) :: n
     !> 登録する配列
-    integer(kint), allocatable, intent(in) :: array(:)
+    integer(kint), intent(in) :: array(:)
+
+    if(n /= size(array))then
+      call monolis_std_error_string("gedatsu_liset_set_I")
+      call monolis_std_error_string("n is not equal as size(array)")
+      call monolis_std_error_stop()
+    endif
+
+    list_struct_I(id)%n = n
 
     call monolis_dealloc_I_1d(list_struct_I(id)%array)
     call monolis_alloc_I_1d(list_struct_I(id)%array, n)
-    list_struct_I(id)%array = array(:)
+    list_struct_I(id)%array(:) = array(:)
   end subroutine gedatsu_list_set_I
 
   subroutine gedatsu_list_set_C(list_struct_C, id, n, array)
@@ -615,11 +767,19 @@ contains
     !> 配列番号 id に登録する配列サイズ
     integer(kint), intent(in) :: n
     !> 登録する配列
-    complex(kdouble), allocatable, intent(in) :: array(:)
+    complex(kdouble), intent(in) :: array(:)
+
+    if(n /= size(array))then
+      call monolis_std_error_string("gedatsu_liset_set_C")
+      call monolis_std_error_string("n is not equal as size(array)")
+      call monolis_std_error_stop()
+    endif
+
+    list_struct_C(id)%n = n
 
     call monolis_dealloc_C_1d(list_struct_C(id)%array)
     call monolis_alloc_C_1d(list_struct_C(id)%array, n)
-    list_struct_C(id)%array = array(:)
+    list_struct_C(id)%array(:) = array(:)
   end subroutine gedatsu_list_set_C
 
   subroutine gedatsu_list_get_R(list_struct_R, id, array)
@@ -630,10 +790,10 @@ contains
     integer(kint), intent(in) :: id
     !> 参照する配列
     real(kdouble), allocatable, intent(inout) :: array(:)
-    integer(kint) :: n
 
     call monolis_dealloc_R_1d(array)
-    allocate(array, source=list_struct_R(id)%array)
+    call monolis_alloc_R_1d(array, list_struct_R(id)%n)
+    array(:) = list_struct_R(id)%array(:)
   end subroutine gedatsu_list_get_R
 
   subroutine gedatsu_list_get_I(list_struct_I, id, array)
@@ -644,10 +804,10 @@ contains
     integer(kint), intent(in) :: id
     !> 参照する配列
     integer(kint), allocatable, intent(inout) :: array(:)
-    integer(kint) :: n
 
     call monolis_dealloc_I_1d(array)
-    allocate(array, source=list_struct_I(id)%array)
+    call monolis_alloc_I_1d(array, list_struct_I(id)%n)
+    array(:) = list_struct_I(id)%array(:)
   end subroutine gedatsu_list_get_I
 
   subroutine gedatsu_list_get_C(list_struct_C, id, array)
@@ -658,10 +818,10 @@ contains
     integer(kint), intent(in) :: id
     !> 参照する配列
     complex(kdouble), allocatable, intent(inout) :: array(:)
-    integer(kint) :: n
 
     call monolis_dealloc_C_1d(array)
-    allocate(array, source=list_struct_C(id)%array)
+    call monolis_alloc_C_1d(array, list_struct_C(id)%n)
+    array(:) = list_struct_C(id)%array(:)
   end subroutine gedatsu_list_get_C
 
 end module mod_gedatsu_graph_merge
