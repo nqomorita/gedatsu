@@ -216,6 +216,7 @@ contains
     integer(kint), allocatable :: nodal_vertex_id(:), nodal_vertex_id_notsorted(:), edge(:,:), &
     & perm(:), global_id_in_merged_graph(:), which_conn_graph(:), local_id_in_conn_graph(:)
     logical, allocatable :: is_conn_internal(:)
+    type(monolis_list_I), allocatable :: conn_graphs_vertex_id(:), conn_graphs_vertex_id_perm(:)
 
     if(n_nodal_graphs /= n_conn_graphs) stop "*** n_nodal_graphs /= n_conn_graphs"
 
@@ -291,7 +292,7 @@ contains
     do i = 1, n_nodal_vertex
       val = merged_nodal_graph%vertex_id(i)
       call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
-      nodal_vertex_id_notsorted(i) = idx
+      nodal_vertex_id_notsorted(idx) = i
     enddo
 
     !> 新しい実装方法
@@ -304,11 +305,36 @@ contains
     !> n_conn_graphs(i)のi：which_conn_graph
     !> ローカル要素番号：local_id_in_conn_graph
 
+    !> 結合前グラフの、ソート前後のグローバル番号を用意
+    allocate(conn_graphs_vertex_id(n_conn_graphs))
+    allocate(conn_graphs_vertex_id_perm(n_conn_graphs))
+    call gedatsu_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs)
+    call gedatsu_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs)
+    do i = 1, n_conn_graphs
+      call gedatsu_list_set_I(conn_graphs_vertex_id, i, conn_graphs(i)%n_vertex, conn_graphs(i)%vertex_id)
+      conn_graphs_vertex_id_perm(i)%n = conn_graphs(i)%n_vertex
+      call monolis_alloc_I_1d(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex)
+      call monolis_get_sequence_array_I(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex, 1, 1)
+      call monolis_qsort_I_2d(conn_graphs_vertex_id(i)%array, conn_graphs_vertex_id_perm(i)%array, 1, conn_graphs(i)%n_vertex)
+    enddo
+
     call monolis_alloc_I_1d(global_id_in_merged_graph, n_conn_vertex)
-    global_id_in_merged_graph(:) = merged_conn_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_conn_vertex)
     call monolis_alloc_I_1d(which_conn_graph, n_conn_vertex)
     call monolis_alloc_I_1d(local_id_in_conn_graph, n_conn_vertex)
+
+    global_id_in_merged_graph(:) = merged_conn_graph%vertex_id(:)
+    do i = 1, n_conn_vertex
+      val = merged_conn_graph%vertex_id(i)  !> グローバル番号
+      do j = 1, n_conn_graphs
+        call monolis_bsearch_I(conn_graphs_vertex_id(j)%array, 1, conn_graphs_vertex_id(j)%n, val, idx)  !> ソート後ローカル番号
+        if(idx == -1) continue
+        tmp = conn_graphs_vertex_id_perm(j)%array(idx)  !> ソート前ローカル番号
+        which_conn_graph(i) = j
+        local_id_in_conn_graph(i) = tmp
+        if(idx /= -1) exit
+      enddo
+    enddo
 
     call monolis_get_sequence_array_I(perm, n_conn_vertex, 1, 1)
     call monolis_qsort_I_2d(global_id_in_merged_graph, perm, 1, n_conn_vertex)
@@ -327,19 +353,19 @@ contains
 
       !> edgeに追加
       n_edge = iE - iS + 1
+      call monolis_dealloc_I_2d(edge)
       call monolis_alloc_I_2d(edge, 2, n_edge)
       edge(1,:) = i
       edge(2,1:n_edge) = conn_graphs(which_conn_graph(idx))%item(iS:iE)
 
-    !> edge の計算点番号を「ソートしていない本来の結合後ローカル番号」に変換
+      !> edge の計算点番号を「ソートしていない本来の結合後ローカル番号」に変換
       do j = 1, n_edge
-        idx = edge(2,j)
-        val = nodal_graphs(i)%vertex_id(idx)
-        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
-        edge(2,j) = nodal_vertex_id_notsorted(idx)
+        tmp = edge(2,j)     !> 結合前ローカル番号
+        val = nodal_graphs(which_conn_graph(idx))%vertex_id(tmp)    !> グローバル番号
+        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, tmp)  !> 結合後ソート後ローカル番号
+        edge(2,j) = nodal_vertex_id_notsorted(tmp)  !> 結合後ソート前ローカル番号
       enddo
 
-      !> add_conn_graph
       call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
     enddo
 

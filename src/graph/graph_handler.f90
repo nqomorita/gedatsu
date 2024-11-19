@@ -660,7 +660,7 @@ contains
     !   print *, (temp(j,i), j=1,size(temp,1))
     ! enddo
 
-    call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
+    ! call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)  !> これをコメントアウトしないと、edge(1,:)が同じでもedge(2,:)がソートされてしまう
 
     ! print *, "temp"
     ! do i = 1, size(temp,2)
