@@ -295,6 +295,8 @@ module mod_gedatsu_graph_merge_test
     check_index(6) = 17
     check_index(7) = 20
     check_index(8) = 22
+    call monolis_test_check_eq_I("gedatsu_graph_merge_test nodal_graph ORDER_NODAL_ID index", &
+    & merged_graph%index, check_index)
     call monolis_alloc_I_1d(check_item, 22)
     check_item(1) = 2
     check_item(2) = 3
