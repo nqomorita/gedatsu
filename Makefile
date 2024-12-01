@@ -100,11 +100,20 @@ SRC_DLB = \
   dlb_handler.f90
 
 ##> C wrapper section
+SRC_DEF_C = \
+	gedatsu_def_graph_c.c
+
 SRC_GRAPH_C = \
-  gedatsu_graph_convert_c.c
+  gedatsu_graph_convert_c.c \
+  gedatsu_graph_merge_c.c
+
+SRC_GRAPH_CF = \
+	merge_wrapper.f90
 
 SRC_ALL_C = \
-$(addprefix graph/, $(SRC_GRAPH_C))
+$(addprefix define/, $(SRC_DEF_C)) \
+$(addprefix graph/, $(SRC_GRAPH_C)) \
+$(addprefix graph/, $(SRC_GRAPH_CF))
 
 ##> all targes
 SRC_ALL = \
@@ -120,7 +129,7 @@ $(addprefix $(WRAP_DIR)/, $(SRC_ALL_C)) \
 ./src/gedatsu.f90
 LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
 LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
-C_HEADER    = $(subst graph/, $(INC_DIR)/, $(SRC_ALL_C:.c=.h))
+C_HEADER    = $(subst define/, $(INC_DIR)/, $(SRC_DEF_C:.c=.h)) $(subst graph/, $(INC_DIR)/, $(SRC_GRAPH_C:.c=.h))
 
 ##> **********
 ##> target (2) test for fotran
@@ -137,10 +146,15 @@ TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 TEST_C_TARGET = $(TST_WRAP_DIR)/gedatsu_c_test
 
 ##> lib objs
+SRC_DEF_C_TEST = \
+gedatsu_def_graph_c_test.c
+
 SRC_GRAPH_C_TEST = \
-gedatsu_graph_convert_c_test.c
+gedatsu_graph_convert_c_test.c \
+gedatsu_graph_merge_c_test.c
 
 SRC_ALL_C_TEST = \
+$(addprefix define/, $(SRC_DEF_C_TEST)) \
 $(addprefix graph/, $(SRC_GRAPH_C_TEST))
 
 TST_SRC_C_ALL = $(SRC_ALL_C_TEST) gedatsu_c_test.c
@@ -244,7 +258,9 @@ $(DRIVE9): $(DRV_OBJS9)
 	$(LINK) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)
 
 cp_header:
+	$(CP) ./wrapper/define/gedatsu_def_graph_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
+	$(CP) ./wrapper/graph/gedatsu_graph_merge_c.h ./include/
 	$(CP) ./wrapper/gedatsu.h ./include/
 
 clean:
