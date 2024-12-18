@@ -273,31 +273,25 @@ contains
 
   end subroutine gedatsu_merged_connectivity_subgraphs_c
 
-  subroutine gedatsu_merge_distval_R_c( &
-    & n_graphs, &
-    & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
-    & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, &
-    & merged_index, merged_item, &
-    & &
-    & mreged_n_dof_list, merged_array_R) &
-    & bind(c, name = "gedatsu_merge_distval_R_c_main")
-    implicit none
-    integer(c_int), intent(in), value :: n_graphs
-
-
-
-    type(gedatsu_graph) :: graphs(n_graphs), merged_graph
-    type(monolis_list_I) :: n_dof_list
-    type(monolis_list_R) :: list_struct_R
-    integer(kint),allocatable :: merged_n_dof_list
-    real(kdouble),allocatable :: merged_array_R
-
-
-    call gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
-
-  end subroutine gedatsu_merge_distval_R_c
-
-
+!  subroutine gedatsu_merge_distval_R_c( &
+!    & n_graphs, &
+!    & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
+!    & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, &
+!    & merged_index, merged_item, &
+!    & &
+!    & mreged_n_dof_list, merged_array_R) &
+!    & bind(c, name = "gedatsu_merge_distval_R_c_main")
+!    implicit none
+!    integer(c_int), intent(in), value :: n_graphs
+!
+!    type(gedatsu_graph) :: graphs(n_graphs), merged_graph
+!    type(monolis_list_I) :: n_dof_list
+!    type(monolis_list_R) :: list_struct_R
+!    integer(kint),allocatable :: merged_n_dof_list
+!    real(kdouble),allocatable :: merged_array_R
+!
+!    call gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
+!  end subroutine gedatsu_merge_distval_R_c
 
   ! subroutine gedatsu_list_initialize_R_c() &
   !   & bind(c, name = "gedatsu_list_initialize_R_c_main")
