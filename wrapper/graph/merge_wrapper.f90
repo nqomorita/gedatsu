@@ -6,13 +6,12 @@ module mod_gedatsu_graph_merge_wrapper
 
 contains
 
-  !> vertex_id等は、n_graphs個のグラフそれぞれがもつ配列
-  !> → 各グラフのvertex_idの先頭ポインタを並べた配列 (サイズ n_graphs) を引数にとる
-  subroutine gedatsu_merge_nodal_subgraphs_c(n_graphs, n_vertex, n_internal_vertex, vertex_id_ptr, vertex_domain_id_ptr, &
-    & index_ptr, item_ptr, index_size, item_size, &
+  subroutine gedatsu_merge_nodal_subgraphs_c( &
+    & n_graphs, &
+    & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
     & my_rank, comm, comm_size, &
-    & recv_n_neib, recv_neib_pe_ptr, recv_index_ptr, recv_item_ptr, recv_neib_pe_size, recv_index_size, recv_item_size, &
-    & send_n_neib, send_neib_pe_ptr, send_index_ptr, send_item_ptr, send_neib_pe_size, send_index_size, send_item_size, &
+    & recv_n_neib, recv_neib_pe, recv_index, recv_item, &
+    & send_n_neib, send_neib_pe, send_index, send_item, &
     & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, &
     & merged_index, merged_item, merged_my_rank, merged_comm, merged_comm_size, &
     & merged_recv_n_neib, merged_recv_neib_pe, merged_recv_index, merged_recv_item, &
@@ -25,13 +24,12 @@ contains
     integer(c_int), intent(in), target :: my_rank(n_graphs), comm(n_graphs), comm_size(n_graphs)
     integer(c_int), intent(in), target :: recv_n_neib(n_graphs), send_n_neib(n_graphs)
 
-    type(c_ptr), intent(in), target :: vertex_id_ptr(:,:), vertex_domain_id_ptr(:,:)
-    type(c_ptr), intent(in), target :: index_ptr(:,:), item_ptr(:,:)
-    type(c_ptr), intent(in), target :: recv_neib_pe_ptr(:,:), recv_index_ptr(:,:), recv_item_ptr(:,:)
-    type(c_ptr), intent(in), target :: send_neib_pe_ptr(:,:), send_index_ptr(:,:), send_item_ptr(:,:)
-    integer(c_int), intent(in), target :: index_size(n_graphs), item_size(n_graphs)
-    integer(c_int), intent(in), target :: recv_neib_pe_size(n_graphs), recv_index_size(n_graphs), recv_item_size(n_graphs)
-    integer(c_int), intent(in), target :: send_neib_pe_size(n_graphs), send_index_size(n_graphs), send_item_size(n_graphs)
+    !> graphsのvertex_idとかをまとめたCポインタ(int**)は、c_ptrでうけとる。（じゃないと、ポインタを要素にもつ配列って扱えなくない？）。
+
+    type(c_ptr), intent(in), target :: vertex_id(:), vertex_domain_id(:)
+    type(c_ptr), intent(in), target :: index(:), item(:)
+    type(c_ptr), intent(in), target :: recv_neib_pe(:), recv_index(:), recv_item(:)
+    type(c_ptr), intent(in), target :: send_neib_pe(:), send_index(:), send_item(:)
 
     integer(c_int), intent(inout), target :: merged_n_vertex, merged_n_internal_vertex
     integer(c_int), intent(inout), target :: merged_my_rank, merged_comm, merged_comm_size, merged_recv_n_neib, merged_send_n_neib
@@ -45,8 +43,8 @@ contains
     type(monolis_COM), allocatable :: monoCOMs(:)
     type(gedatsu_graph) :: merged_graph
     type(monolis_COM) :: merged_monoCOM
-    integer(c_int) :: i
-    integer(c_int), pointer :: ptr(:) !> vertex_idやitemなどの、各要素を参照するポインタ
+    integer(kint) :: i, nindex, nitem
+    integer(kint), pointer :: ptr(:)
 
     allocate(graphs(n_graphs))
     allocate(monoCOMs(n_graphs))
@@ -57,22 +55,18 @@ contains
       call gedatsu_graph_set_n_vertex(graphs(i), n_vertex(i))
       graphs(i)%n_internal_vertex = n_internal_vertex(i)
 
-      call c_f_pointer(vertex_id_ptr(i,1), ptr, [n_vertex(i)])
+      call c_f_pointer(vertex_id(i), ptr, [n_vertex(i)])
       graphs(i)%vertex_id = ptr
 
-      call c_f_pointer(vertex_domain_id_ptr(i,1), ptr, [n_vertex(i)])
+      call c_f_pointer(vertex_domain_id(i), ptr, [n_vertex(i)])
       graphs(i)%vertex_domain_id = ptr
 
-      call c_f_pointer(index_ptr(i,1), ptr, [index_size(i)])
-      graphs(i)%index = ptr
-
-      call monolis_alloc_I_1d(graphs(i)%item, item_size(i))
-      call c_f_pointer(item_ptr(i,1), ptr, [item_size(i)])
+      nindex = n_vertex(i) + 1
+      call c_f_pointer(index(i), ptr, [nindex])
+      nitem = ptr(nindex)
+      call monolis_alloc_I_1d(graphs(i)%item, nitem)
+      call c_f_pointer(item(i), ptr, [nitem])
       graphs(i)%item = ptr
-
-      !> インデックスを１スタートに修正
-      graphs(i)%vertex_id = graphs(i)%vertex_id + 1
-      graphs(i)%item = graphs(i)%item + 1
 
     enddo
 
@@ -84,28 +78,35 @@ contains
       monoCOMs(i)%comm_size = comm_size(i)
 
       monoCOMs(i)%recv_n_neib = recv_n_neib(i)
-      call c_f_pointer(recv_neib_pe_ptr(i,1), ptr, [recv_neib_pe_size(i)])
+      call c_f_pointer(recv_neib_pe(i), ptr, [recv_n_neib(i)])
       monoCOMs(i)%recv_neib_pe = ptr
-      call c_f_pointer(recv_index_ptr(i,1), ptr, [recv_index_size(i)])
+      nindex = recv_n_neib(i) + 1
+      call c_f_pointer(recv_index(i), ptr, [nindex])
       monoCOMs(i)%recv_index = ptr
-      call c_f_pointer(recv_item_ptr(i,1), ptr, [recv_item_size(i)])
+      nitem = ptr(nindex)
+      call c_f_pointer(recv_item(i), ptr, [nitem])
       monoCOMs(i)%recv_item = ptr
 
       monoCOMs(i)%send_n_neib = send_n_neib(i)
-      call c_f_pointer(send_neib_pe_ptr(i,1), ptr, [send_neib_pe_size(i)])
+      call c_f_pointer(send_neib_pe(i), ptr, [send_n_neib(i)])
       monoCOMs(i)%send_neib_pe = ptr
-      call c_f_pointer(send_index_ptr(i,1), ptr, [send_index_size(i)])
+      nindex = send_n_neib(i) + 1
+      call c_f_pointer(send_index(i), ptr, [nindex])
       monoCOMs(i)%send_index = ptr
-      call c_f_pointer(send_item_ptr(i,1), ptr, [send_item_size(i)])
+      nitem = ptr(nindex)
+      call c_f_pointer(send_item(i), ptr, [nitem])
       monoCOMs(i)%send_item = ptr
-
-      monoCOMs(i)%recv_item = monoCOMs(i)%recv_item + 1
-      monoCOMs(i)%send_item = monoCOMs(i)%send_item + 1
     enddo
+
+    !> インデックスを1スタートに修正
+    graphs(i)%vertex_id = graphs(i)%vertex_id + 1
+    graphs(i)%item = graphs(i)%item + 1
+    monoCOMs(i)%recv_item = monoCOMs(i)%recv_item + 1
+    monoCOMs(i)%send_item = monoCOMs(i)%send_item + 1
 
     call gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
 
-    !> // TODO インデックスを０スタートに修正
+    !> インデックスを０スタートに修正
     merged_graph%vertex_id = merged_graph%vertex_id - 1
     merged_graph%item = merged_graph%item - 1
     do i = 1, n_graphs
@@ -138,16 +139,169 @@ contains
 
   end subroutine gedatsu_merge_nodal_subgraphs_c
 
-  subroutine gedatsu_merged_connectivity_subgraphs_c
-    ! & bind(c, name = "gedatsu_merge_connectivity_subgraphs_c_main")
+  subroutine gedatsu_merged_connectivity_subgraphs_c( &
+    & n_nodal_graphs, &
+    & nodal_n_vertex, nodal_n_internal_vertex, nodal_vertex_id, nodal_vertex_domain_id, nodal_index, nodal_item, &
+    & merged_nodal_n_vertex, merged_nodal_n_internal_vertex, merged_nodal_vertex_id, merged_nodal_vertex_domain_id, &
+    & merged_nodal_index, merged_nodal_item, merged_nodal_my_rank, merged_nodal_comm, merged_nodal_comm_size, &
+    & merged_nodal_recv_n_neib, merged_nodal_recv_neib_pe, merged_nodal_recv_index, merged_nodal_recv_item, &
+    & merged_nodal_send_n_neib, merged_nodal_send_neib_pe, merged_nodal_send_index, merged_nodal_send_item, &
+    & n_conn_graphs, &
+    & conn_n_vertex, conn_n_internal_vertex, conn_vertex_id, conn_vertex_domain_id, conn_index, conn_item, &
+    & merged_conn_n_vertex, merged_conn_n_internal_vertex, merged_conn_vertex_id, merged_conn_vertex_domain_id, &
+    & merged_conn_index, merged_conn_item ) &
+    & bind(c, name = "gedatsu_merge_connectivity_subgraphs_c_main")
     implicit none
-    
+    integer(c_int), intent(in), value :: n_nodal_graphs
+    integer(c_int), intent(in), target :: nodal_n_vertex(n_nodal_graphs), nodal_n_internal_vertex(n_nodal_graphs)
+    type(c_ptr), intent(in), target :: nodal_vertex_id(:), nodal_vertex_domain_id(:)
+    type(c_ptr), intent(in), target :: nodal_index(:), nodal_item(:)
+    integer(c_int), intent(in), target :: merged_nodal_n_vertex, merged_nodal_n_internal_vertex
+    integer(c_int), intent(in), target :: merged_nodal_my_rank, merged_nodal_comm, merged_nodal_comm_size
+    integer(c_int), intent(in), target :: merged_nodal_recv_n_neib, merged_nodal_send_n_neib
+    integer(c_int), intent(in), target :: merged_nodal_vertex_id(:), merged_nodal_vertex_domain_id(:)
+    integer(c_int), intent(in), target :: merged_nodal_index(:), merged_nodal_item(:)
+    integer(c_int), intent(in), target :: merged_nodal_recv_neib_pe(:), merged_nodal_recv_index(:), merged_nodal_recv_item(:)
+    integer(c_int), intent(in), target :: merged_nodal_send_neib_pe(:), merged_nodal_send_index(:), merged_nodal_send_item(:)
+
+    integer(c_int), intent(in), value :: n_conn_graphs
+    integer(c_int), intent(in), target :: conn_n_vertex(n_conn_graphs), conn_n_internal_vertex(n_conn_graphs)
+    type(c_ptr), intent(in), target :: conn_vertex_id(:), conn_vertex_domain_id(:)
+    type(c_ptr), intent(in), target :: conn_index(:), conn_item(:)
+    integer(c_int), intent(inout), target :: merged_conn_n_vertex, merged_conn_n_internal_vertex
+    integer(c_int), intent(inout), target :: merged_conn_vertex_id(:), merged_conn_vertex_domain_id(:)
+    integer(c_int), intent(inout), target :: merged_conn_index(:), merged_conn_item(:)
+
+    type(gedatsu_graph), allocatable :: nodal_graphs(:), conn_graphs(:)
+    type(gedatsu_graph) :: merged_nodal_graph, merged_conn_graph
+    type(monolis_COM) :: merged_nodal_monoCOM
+    integer(kint) :: i, nindex, nitem
+    integer(kint), pointer :: ptr(:)
+
+    allocate(nodal_graphs(n_nodal_graphs))
+    allocate(conn_graphs(n_conn_graphs))
+
+    !> nodal_graphs
+    do i = 1, n_nodal_graphs
+      call gedatsu_graph_initialize(nodal_graphs(i))
+      call gedatsu_graph_set_n_vertex(nodal_graphs(i), nodal_n_vertex(i))
+      nodal_graphs(i)%n_internal_vertex = nodal_n_internal_vertex(i)
+
+      call c_f_pointer(nodal_vertex_id(i), ptr, [nodal_n_vertex(i)])
+      nodal_graphs(i)%vertex_id = ptr
+
+      call c_f_pointer(nodal_vertex_domain_id(i), ptr, [nodal_n_vertex(i)])
+      nodal_graphs(i)%vertex_domain_id = ptr
+
+      nindex = nodal_n_vertex(i) + 1
+      call c_f_pointer(nodal_index(i), ptr, [nindex])
+      nitem = ptr(nindex)
+      call monolis_alloc_I_1d(nodal_graphs(i)%item, nitem)
+      call c_f_pointer(nodal_item(i), ptr, [nitem])
+      nodal_graphs(i)%item = ptr
+    enddo
+
+    !> conn_graphs
+    do i = 1, n_conn_graphs
+      call gedatsu_graph_initialize(conn_graphs(i))
+      call gedatsu_graph_set_n_vertex(conn_graphs(i), conn_n_vertex(i))
+      conn_graphs(i)%n_internal_vertex = conn_n_internal_vertex(i)
+
+      call c_f_pointer(conn_vertex_id(i), ptr, [conn_n_vertex(i)])
+      conn_graphs(i)%vertex_id = ptr
+
+      call c_f_pointer(conn_vertex_domain_id(i), ptr, [conn_n_vertex(i)])
+      conn_graphs(i)%vertex_domain_id = ptr
+
+      nindex = conn_n_vertex(i) + 1
+      call c_f_pointer(conn_index(i), ptr, [nindex])
+      nitem = ptr(nindex)
+      call monolis_alloc_I_1d(conn_graphs(i)%item, nitem)
+      call c_f_pointer(conn_item(i), ptr, [nitem])
+      conn_graphs(i)%item = ptr
+    enddo
+
+    !> merged_nodal_graph
+    merged_nodal_graph%n_vertex = merged_nodal_n_vertex
+    merged_nodal_graph%n_internal_vertex = merged_nodal_n_internal_vertex
+    merged_nodal_graph%vertex_id = merged_nodal_vertex_id
+    merged_nodal_graph%vertex_domain_id = merged_nodal_vertex_domain_id
+    merged_nodal_graph%index = merged_nodal_index
+    merged_nodal_graph%item = merged_nodal_item
+
+    !> merged_nodal_monoCOM
+    merged_nodal_monoCOM%my_rank = merged_nodal_my_rank
+    merged_nodal_monoCOM%comm = merged_nodal_comm
+    merged_nodal_monoCOM%comm_size = merged_nodal_comm_size
+    merged_nodal_monoCOM%recv_n_neib = merged_nodal_recv_n_neib
+    merged_nodal_monoCOM%recv_neib_pe = merged_nodal_recv_neib_pe
+    merged_nodal_monoCOM%recv_index = merged_nodal_recv_index
+    merged_nodal_monoCOM%recv_item = merged_nodal_recv_item
+    merged_nodal_monoCOM%send_n_neib = merged_nodal_send_n_neib
+    merged_nodal_monoCOM%send_neib_pe = merged_nodal_send_neib_pe
+    merged_nodal_monoCOM%send_index = merged_nodal_send_index
+    merged_nodal_monoCOM%send_item = merged_nodal_send_item
+
+    !> インデックスを1スタートに修正
+    do i = 1, n_nodal_graphs
+      nodal_graphs(i)%vertex_id = nodal_graphs(i)%vertex_id + 1
+      nodal_graphs(i)%item = nodal_graphs(i)%item + 1
+    enddo
+    do i = 1, n_conn_graphs
+      conn_graphs(i)%vertex_id = conn_graphs(i)%vertex_id + 1
+      conn_graphs(i)%item = conn_graphs(i)%item + 1
+    enddo
+    merged_nodal_monoCOM%recv_item = merged_nodal_monoCOM%recv_item - 1
+    merged_nodal_monoCOM%send_item = merged_nodal_monoCOM%send_item - 1
+
+    call gedatsu_merge_connectivity_subgraphs( &
+    & n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, n_conn_graphs, conn_graphs, merged_conn_graph)
+
+    !> インデックスを0スタートに修正
+    merged_conn_graph%vertex_id = merged_conn_graph%vertex_id - 1
+    merged_conn_graph%item = merged_conn_graph%item - 1
+    merged_nodal_monoCOM%recv_item = merged_nodal_monoCOM%recv_item - 1
+    merged_nodal_monoCOM%send_item = merged_nodal_monoCOM%send_item - 1
+
+    !> merged_conn_graph
+    merged_conn_n_vertex = merged_conn_graph%n_vertex
+    merged_conn_n_internal_vertex = merged_conn_graph%n_internal_vertex
+    merged_conn_vertex_id = merged_conn_graph%vertex_id
+    merged_conn_vertex_domain_id = merged_conn_graph%vertex_domain_id
+    merged_conn_index = merged_conn_graph%index
+    merged_conn_item = merged_conn_graph%item
+
   end subroutine gedatsu_merged_connectivity_subgraphs_c
 
-  subroutine gedatsu_merge_distval_R_c
-    ! & bind(c, name = "gedatsu_merge_distval_R_c_main")
+  subroutine gedatsu_merge_distval_R_c( &
+    & n_graphs, &
+    & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
+    & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, &
+    & merged_index, merged_item, &
+    & &
+    & mreged_n_dof_list, merged_array_R) &
+    & bind(c, name = "gedatsu_merge_distval_R_c_main")
     implicit none
-    
+    integer(c_int), intent(in), value :: n_graphs
+
+
+
+    type(gedatsu_graph) :: graphs(n_graphs), merged_graph
+    type(monolis_list_I) :: n_dof_list
+    type(monolis_list_R) :: list_struct_R
+    integer(kint),allocatable :: merged_n_dof_list
+    real(kdouble),allocatable :: merged_array_R
+
+
+    call gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
+
   end subroutine gedatsu_merge_distval_R_c
+
+
+
+  ! subroutine gedatsu_list_initialize_R_c() &
+  !   & bind(c, name = "gedatsu_list_initialize_R_c_main")
+  !   implicit none
+  ! end subroutine gedatsu_list_initialize_R_c
 
 end module mod_gedatsu_graph_merge_wrapper
