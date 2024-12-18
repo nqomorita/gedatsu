@@ -329,7 +329,7 @@ contains
       val = merged_conn_graph%vertex_id(i)  !> グローバル番号
       do j = 1, n_conn_graphs
         call monolis_bsearch_I(conn_graphs_vertex_id(j)%array, 1, conn_graphs_vertex_id(j)%n, val, idx)  !> ソート後ローカル番号
-        if(idx == -1) continue
+        if(idx == -1) cycle
         tmp = conn_graphs_vertex_id_perm(j)%array(idx)  !> ソート前ローカル番号
         which_conn_graph(i) = j
         local_id_in_conn_graph(i) = tmp
