@@ -143,7 +143,7 @@ contains
         do j = graphs(i)%n_internal_vertex+1, graphs(i)%n_vertex
           val = graphs(i)%vertex_id(j)
           call monolis_bsearch_I(overlap_vertex_id, 1, n_overlap_vertex, val, idx)
-          if(idx /= -1) cycle
+          if(idx == -1) cycle
           if(.not. is_already_count_overlap(idx))then
             merged_graph%vertex_id(n_internal_vertex+k) = val
             k = k + 1
