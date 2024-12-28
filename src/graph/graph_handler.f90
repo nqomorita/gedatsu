@@ -838,8 +838,12 @@ contains
     integer(kint) :: i, iS, iE, len, len_uniq
     integer(kint), allocatable :: index_(:), item(:), item_tmp(:)
 
-    allocate(index_, source=graph%index)
-    allocate(item, source=graph%item)
+    call monolis_alloc_I_1d(index_, graph%n_vertex+1)
+    call monolis_alloc_I_1d(item, graph%index(graph%n_vertex+1))
+
+    index_(:) = graph%index(:)
+    item(:) = graph%item(:)
+
     call monolis_dealloc_I_1d(graph%item)
 
     do i = 1, graph%n_vertex

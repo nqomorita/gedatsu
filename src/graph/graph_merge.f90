@@ -286,7 +286,8 @@ contains
       conn_vertex_id_notsorted(i) = idx
     enddo
     !> 計算点
-    allocate(nodal_vertex_id, source = merged_nodal_graph%vertex_id)
+    call monolis_alloc_I_1d(nodal_vertex_id, merged_nodal_graph%n_vertex)
+    nodal_vertex_id(:) = merged_nodal_graph%vertex_id(:)
     call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)
     call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
     call monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex)
@@ -295,16 +296,6 @@ contains
       call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
       nodal_vertex_id_notsorted(idx) = i
     enddo
-
-    !> 新しい実装方法
-    !> 3つの配列（重複許す）
-    !> グローバル要素番号→並べ替え用のpermも作る
-    !> n_conn_graphs(i)のi→permで並べ替え
-    !> ローカル要素番号→permで並べ替え
-
-    !> グローバル要素番号：global_id_in_merged_graph
-    !> n_conn_graphs(i)のi：which_conn_graph
-    !> ローカル要素番号：local_id_in_conn_graph
 
     !> 結合前グラフの、ソート前後のグローバル番号を用意
     allocate(conn_graphs_vertex_id(n_conn_graphs))
@@ -369,37 +360,6 @@ contains
 
       call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
     enddo
-
-    !> 以下は使わない（完成するまで、一応残しておく）
-    ! do i = 1, n_conn_graphs
-    !   call monolis_dealloc_I_2d(edge)
-    !   call gedatsu_graph_get_n_edge(conn_graphs(i), n_edge)
-    !   call monolis_alloc_I_2d(edge, 2, n_edge)
-    !   call gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graphs(i), conn_graphs(i), &
-    !   & monolis_mpi_get_global_my_rank(), edge)
-
-    !   !> edge を「ソートしていない本来の結合後ローカル番号」に変換
-    !   do j = 1, n_edge
-    !     !> 要素
-    !     idx = edge(1,j) !> 結合前グラフにおけるローカル番号
-    !     val = conn_graphs(i)%vertex_id(idx)  !> グローバル番号
-    !     call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
-    !     edge(1,j) = conn_vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
-    !     !> 計算点
-    !     idx = edge(2,j)
-    !     val = nodal_graphs(i)%vertex_id(idx)
-    !     call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
-    !     edge(2,j) = nodal_vertex_id_notsorted(idx)
-    !   enddo
-
-    !   !> merged_graph にエッジを追加
-    !   !どの要素を足すかbool配列
-
-    !   call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
-    ! enddo
-
-    !> 重複削除
-    ! call gedatsu_graph_delete_dupulicate_edge(merged_conn_graph)
   end subroutine gedatsu_merge_connectivity_subgraphs
 
   subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
@@ -431,13 +391,9 @@ contains
     call monolis_dealloc_R_1d(merged_array_R)
     call monolis_alloc_R_1d(merged_array_R, n_vertex)
 
-    !ただlist_struct_Rをつなげるだけだと、重複がありえるのでだめ。
-    !複数の部分グラフにまたがる計算点については、どの部分グラフにおける物理量も同じ
-    !　→　各計算点の次元さえわかれば、
-    !結合前ローカル番号　→　結合後ローカル番号に読み替えて、「上書き」すればよい
-
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
-    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
+    vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
@@ -521,7 +477,8 @@ contains
     call monolis_alloc_I_1d(merged_array_I, n_vertex)
 
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
-    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
+    vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
@@ -605,7 +562,8 @@ contains
     call monolis_alloc_C_1d(merged_array_C, n_vertex)
 
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
-    allocate(vertex_id, source=merged_graph%vertex_id)
+    call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
+    vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
