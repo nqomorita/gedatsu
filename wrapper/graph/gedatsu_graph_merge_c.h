@@ -46,45 +46,6 @@ void gedatsu_merge_nodal_subgraphs(
   MONOLIS_COM* merged_monoCOM,
   int order_type);
 
-void gedatsu_merge_nodal_subgraphs_c_main(
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int** vertex_id,
-  int** vertex_domain_id,
-  int** index,
-  int** item,
-  int* my_rank,
-  int* comm,
-  int* comm_size,
-  int* recv_n_neib,
-  int** recv_neib_pe,
-  int** recv_index,
-  int** recv_item,
-  int* send_n_neib,
-  int** send_neib_pe,
-  int** send_index,
-  int** send_item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int merged_my_rank,
-  int merged_comm,
-  int merged_comm_size,
-  int merged_recv_n_neib,
-  int* merged_recv_neib_pe,
-  int* merged_recv_index,
-  int* merged_recv_item,
-  int merged_send_n_neib,
-  int* merged_send_neib_pe,
-  int* merged_send_index,
-  int* merged_send_item,
-  int order_type
-);
-
 /**
  * @brief コネクティビティグラフの結合
  * @param[in] n_nodal_graphs 統合したい計算点グラフ構造の個数
@@ -102,46 +63,6 @@ void gedatsu_merge_connectivity_subgraphs(
   int n_conn_graphs,
   GEDATSU_GRAPH* conn_graphs,
   GEDATSU_GRAPH* merged_conn_graph);
-
-void gedatsu_merge_connectivity_subgraphs_c_main(
-  int n_nodal_graphs,
-  int* nodal_n_vertex,
-  int* nodal_n_internal_vertex,
-  int** nodal_vertex_id,
-  int** nodal_vertex_domain_id,
-  int** nodal_index,
-  int** nodal_item,
-  int merged_nodal_n_vertex,
-  int merged_nodal_n_internal_vertex,
-  int* merged_nodal_vertex_id,
-  int* merged_nodal_vertex_domain_id,
-  int* merged_nodal_index,
-  int* merged_nodal_item,
-  int merged_nodal_my_rank,
-  int merged_nodal_comm,
-  int merged_nodal_comm_size,
-  int merged_nodal_recv_n_neib,
-  int* merged_nodal_recv_neib_pe,
-  int* merged_nodal_recv_index,
-  int* merged_nodal_recv_item,
-  int merged_nodal_send_n_neib,
-  int* merged_nodal_send_neib_pe,
-  int* merged_nodal_send_index,
-  int* merged_nodal_send_item,
-  int n_conn_graphs,
-  int* conn_n_vertex,
-  int* conn_n_internal_vertex,
-  int** conn_vertex_id,
-  int** conn_vertex_domain_id,
-  int** conn_index,
-  int** conn_item,
-  int merged_conn_n_vertex,
-  int merged_conn_n_internal_vertex,
-  int* merged_conn_vertex_id,
-  int* merged_conn_vertex_domain_id,
-  int* merged_conn_index,
-  int* merged_conn_item
-);
 
 /**
  * @brief 物理量の結合 (実数配列)
@@ -162,8 +83,6 @@ void gedatsu_merge_distval_R(
   int* merged_n_dof_list,
   int* merged_array_R
 );
-
-void gedatsu_merge_distval_R_c_main();
 
 /**
  * @brief 物理量の結合 (整数配列)
