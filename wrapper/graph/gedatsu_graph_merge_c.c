@@ -63,7 +63,7 @@ void gedatsu_list_initialize_R(
   MONOLIS_LIST_R* list_struct_R,
   int n)
 {
-  for (int i = 0; i < n+1; i++)
+  for (int i = 0; i < n; i++)
   {
     list_struct_R[i].n = 0;
     monolis_dealloc_R_1d(&list_struct_R[i].array);
@@ -74,7 +74,7 @@ void gedatsu_list_initialize_I(
   MONOLIS_LIST_I* list_struct_I,
   int n)
 {
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n; i++)
   {
     list_struct_I[i].n = 0;
     monolis_dealloc_I_1d(&list_struct_I[i].array);
@@ -85,7 +85,7 @@ void gedatsu_list_initialize_C(
   MONOLIS_LIST_C* list_struct_C,
   int n)
 {
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n; i++)
   {
     list_struct_C[i].n = 0;
     monolis_dealloc_C_1d(&list_struct_C[i].array);
@@ -96,7 +96,7 @@ void gedatsu_list_finalize_R(
   MONOLIS_LIST_R* list_struct_R,
   int n)
 {
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n; i++)
   {
     list_struct_R[i].n = 0;
     monolis_dealloc_R_1d(&list_struct_R[i].array);
@@ -107,7 +107,7 @@ void gedatsu_list_finalize_I(
   MONOLIS_LIST_I* list_struct_I,
   int n)
 {
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n; i++)
   {
     list_struct_I[i].n = 0;
     monolis_dealloc_I_1d(&list_struct_I[i].array);
@@ -118,7 +118,7 @@ void gedatsu_list_finalize_C(
   MONOLIS_LIST_C* list_struct_C,
   int n)
 {
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n; i++)
   {
     list_struct_C[i].n = 0;
     monolis_dealloc_C_1d(&list_struct_C[i].array);
