@@ -184,7 +184,7 @@ void gedatsu_list_get_R(
 }
 
 void gedatsu_list_get_I(
-    MONOLIS_LIST_I* list_struct_I,
+  MONOLIS_LIST_I* list_struct_I,
   int id,
   int* array)
 {
@@ -197,7 +197,7 @@ void gedatsu_list_get_I(
 }
 
 void gedatsu_list_get_C(
-MONOLIS_LIST_C* list_struct_C,
+  MONOLIS_LIST_C* list_struct_C,
   int id,
   double complex* array)
 {
