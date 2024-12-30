@@ -129,19 +129,29 @@ void gedatsu_list_initialize_R(
   int n
 );
 
-void gedatsu_list_initialize_R_c_main(
-  int* list_struct_R_n,
-  double** list_struct_R_array,
+void gedatsu_list_initialize_I(
+  MONOLIS_LIST_I* list_struct_I,
+  int n
+);
+
+void gedatsu_list_initialize_C(
+  MONOLIS_LIST_C* list_struct_C,
   int n
 );
 
 void gedatsu_list_finalize_R(
-  MONOLIS_LIST_R* list_struct_R
+  MONOLIS_LIST_R* list_struct_R,
+  int n
 );
 
-void gedatsu_list_finalize_R_c_main(
-  int* list_struct_R_n,
-  double** list_struct_R_array
+void gedatsu_list_finalize_I(
+  MONOLIS_LIST_I* list_struct_I,
+  int n
+);
+
+void gedatsu_list_finalize_C(
+  MONOLIS_LIST_C* list_struct_C,
+  int n
 );
 
 void gedatsu_list_set_R(
@@ -151,93 +161,11 @@ void gedatsu_list_set_R(
   double* array
 );
 
-void gedatsu_list_set_R_c_main(
-  int* list_struct_R_n,
-  double** list_struct_R_array,
-  int id,
-  int n,
-  double* array
-);
-
-void gedatsu_list_get_R(
-  MONOLIS_LIST_R* list_struct_R,
-  int id,
-  double* array
-);
-
-void gedatsu_list_get_R_c_main(
-  int* list_struct_R_n,
-  double** list_struct_R_array,
-  int id,
-  double* array
-);
-
-void gedatsu_list_initialize_I(
-  MONOLIS_LIST_I* list_struct_I,
-  int n
-);
-
-void gedatsu_list_initialize_I_c_main(
-  int* list_struct_I_n,
-  int** list_struct_I_array,
-  int n
-);
-
-void gedatsu_list_finalize_I(
-  MONOLIS_LIST_I* list_struct_I
-);
-
-void gedatsu_list_finalize_I_c_main(
-  int* list_struct_I_n,
-  int** list_struct_I_array
-);
-
 void gedatsu_list_set_I(
   MONOLIS_LIST_I* list_struct_I,
   int id,
   int n,
   int* array
-);
-
-void gedatsu_list_set_I_c_main(
-  int* list_struct_I_n,
-  int** list_struct_I_array,
-  int id,
-  int n,
-  int* array
-);
-
-void gedatsu_list_get_I(
-    MONOLIS_LIST_I* list_struct_I,
-  int id,
-  int* array
-);
-
-void gedatsu_list_get_I_c_main(
-  int* list_struct_I_n,
-  int** list_struct_I_array,
-  int id,
-  int* array
-);
-
-void gedatsu_list_initialize_C(
-  MONOLIS_LIST_C* list_struct_C,
-  int n
-);
-
-void gedatsu_list_initialize_C_c_main(
-  int* list_struct_C_n,
-  double complex** list_struct_C_array,
-  int n
-);
-
-void gedatsu_list_finalize_C(
-  MONOLIS_LIST_C* list_struct_C
-);
-
-void gedatsu_list_finalize_C_c_main(
-  int* list_struct_C_n,
-  double complex** list_struct_C_array
 );
 
 void gedatsu_list_set_C(
@@ -247,23 +175,20 @@ void gedatsu_list_set_C(
   double complex* array
 );
 
-void gedatsu_list_set_C_c_main(
-  int* list_struct_C_n,
-  int** list_struct_C_array,
+void gedatsu_list_get_R(
+  MONOLIS_LIST_R* list_struct_R,
   int id,
-  int n,
-  double complex* array
+  double* array
+);
+
+void gedatsu_list_get_I(
+    MONOLIS_LIST_I* list_struct_I,
+  int id,
+  int* array
 );
 
 void gedatsu_list_get_C(
 MONOLIS_LIST_C* list_struct_C,
-  int id,
-  double complex* array
-);
-
-void gedatsu_list_get_C_c_main(
-  int* list_struct_C_n,
-  int** list_struct_C_array,
   int id,
   double complex* array
 );

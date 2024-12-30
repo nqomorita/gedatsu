@@ -8,58 +8,172 @@
 
 void gedatsu_graph_merge_c_test()
 {
-  // gedatsu_list_initialize_R_test();
-  // gedatsu_list_initialize_I_test();
-  // gedatsu_list_initialize_C_test();
-  // gedatsu_list_finalize_R_test();
-  // gedatsu_list_finalize_I_test();
-  // gedatsu_list_finalize_C_test();
-  // gedatsu_list_set_R_test();
-  // gedatsu_list_set_I_test();
-  // gedatsu_list_set_C_test();
-  // gedatsu_list_get_R_test();
-  // gedatsu_list_get_I_test();
-  // gedatsu_list_get_C_test();
+  gedatsu_list_initialize_R_c_test();
+  gedatsu_list_initialize_I_c_test();
+  gedatsu_list_initialize_C_c_test();
+  gedatsu_list_finalize_R_c_test();
+  gedatsu_list_finalize_I_c_test();
+  gedatsu_list_finalize_C_c_test();
+  gedatsu_list_set_R_c_test();
+  gedatsu_list_set_I_c_test();
+  gedatsu_list_set_C_c_test();
+  gedatsu_list_get_R_c_test();
+  gedatsu_list_get_I_c_test();
+  gedatsu_list_get_C_c_test();
   // gedatsu_merge_nodal_subgraphs_c_test();
   // gedatsu_merge_connectivity_subgraphs_c_test();
   // gedatsu_merge_distval_R_c_test();
 }
 
-// void gedatsu_list_initialize_R_test()
-// {}
+void gedatsu_list_initialize_R_c_test()
+{
+  MONOLIS_LIST_R list_struct_R[1];
 
-// void gedatsu_list_initialize_I_test()
-// {}
+  monolis_std_log_string("gedatsu_list_initialize_R");
+  gedatsu_list_initialize_R(list_struct_R, 1);
+  monolis_test_check_eq_I1("gedatsu_list_initialize_R", list_struct_R[0].n, 0);
+}
 
-// void gedatsu_list_initialize_C_test()
-// {}
+void gedatsu_list_initialize_I_c_test()
+{
+  MONOLIS_LIST_I list_struct_I[1];
 
-// void gedatsu_list_finalize_R_test()
-// {}
+  monolis_std_log_string("gedatsu_list_initialize_I");
+  gedatsu_list_initialize_I(list_struct_I, 1);
+  monolis_test_check_eq_I1("gedatsu_list_initialize_I", list_struct_I[0].n, 0);
+}
 
-// void gedatsu_list_finalize_I_test()
-// {}
+void gedatsu_list_initialize_C_c_test()
+{
+  MONOLIS_LIST_C list_struct_C[1];
 
-// void gedatsu_list_finalize_C_test()
-// {}
+  monolis_std_log_string("gedatsu_list_initialize_C");
+  gedatsu_list_initialize_C(list_struct_C, 1);
+  monolis_test_check_eq_I1("gedatsu_list_initialize_C", list_struct_C[0].n, 0);
+}
 
-// void gedatsu_list_set_R_test()
-// {}
+void gedatsu_list_finalize_R_c_test()
+{
+  MONOLIS_LIST_R list_struct_R[1];
 
-// void gedatsu_list_set_I_test()
-// {}
+  monolis_std_log_string("gedatsu_list_finalize_R");
+  list_struct_R[1].n = 1;
+  gedatsu_list_finalize_R(list_struct_R, 1);
+  monolis_test_check_eq_I1("gedatsu_list_finalize_R", list_struct_R[0].n, 0);
+}
 
-// void gedatsu_list_set_C_test()
-// {}
+void gedatsu_list_finalize_I_c_test()
+{
+  MONOLIS_LIST_I list_struct_I[1];
 
-// void gedatsu_list_get_R_test()
-// {}
+  monolis_std_log_string("gedatsu_list_finalize_I");
+  list_struct_I[1].n = 1;
+  gedatsu_list_finalize_I(list_struct_I, 1);
+  monolis_test_check_eq_I1("gedatsu_list_finalize_I", list_struct_I[0].n, 0);
+}
 
-// void gedatsu_list_get_I_test()
-// {}
+void gedatsu_list_finalize_C_c_test()
+{
+  MONOLIS_LIST_C list_struct_C[1];
 
-// void gedatsu_list_get_C_test()
-// {}
+  monolis_std_log_string("gedatsu_list_finalize_C");
+  list_struct_C[1].n = 1;
+  gedatsu_list_finalize_C(list_struct_C, 1);
+  monolis_test_check_eq_I1("gedatsu_list_finalize_C", list_struct_C[0].n, 0);
+}
+
+void gedatsu_list_set_R_c_test()
+{
+  MONOLIS_LIST_R list_struct_R[1];
+  double array[1];
+
+  monolis_std_log_string("gedatsu_list_set_R");
+  gedatsu_list_initialize_R(list_struct_R, 1);
+  array[0] = 1.0;
+  gedatsu_list_set_R(list_struct_R, 1, 1, array);
+  monolis_test_check_eq_I1("gedatsu_list_set_R n", list_struct_R[0].n, 1);
+  monolis_test_check_eq_R1("gedatsu_list_set_R array", list_struct_R[0].array[0], 1.0);
+}
+
+void gedatsu_list_set_I_c_test()
+{
+  MONOLIS_LIST_I list_struct_I[1];
+  int array[1];
+
+  monolis_std_log_string("gedatsu_list_set_I");
+  gedatsu_list_initialize_I(list_struct_I, 1);
+  array[0] = 1;
+  gedatsu_list_set_I(list_struct_I, 1, 1, array);
+  monolis_test_check_eq_I1("gedatsu_list_set_I n", list_struct_I[0].n, 1);
+  monolis_test_check_eq_I1("gedatsu_list_set_I array", list_struct_I[0].array[0], 1);
+}
+
+void gedatsu_list_set_C_c_test()
+{
+  MONOLIS_LIST_C list_struct_C[1];
+  double complex array[1];
+
+  monolis_std_log_string("gedatsu_list_set_C");
+  gedatsu_list_initialize_C(list_struct_C, 1);
+  array[0] = 1.0 + 1.0*I;
+  gedatsu_list_set_C(list_struct_C, 1, 1, array);
+  monolis_test_check_eq_I1("gedatsu_list_set_C n", list_struct_C[0].n, 1);
+  monolis_test_check_eq_C1("gedatsu_list_set_C array", list_struct_C[0].array[0], 1.0);
+}
+
+void gedatsu_list_get_R_c_test()
+{
+  MONOLIS_LIST_R list_struct_R[1];
+  double array1[1];
+  double array2[1];
+
+  monolis_std_log_string("gedatsu_list_get_R");
+
+  array1[0] = 1.0;
+  array2[0] = 0.0;
+
+  gedatsu_list_initialize_R(list_struct_R, 1);
+  gedatsu_list_set_R(list_struct_R, 1, 1, array1);
+  gedatsu_list_get_R(list_struct_R, 1, array2);
+
+  monolis_test_check_eq_R1("gedatsu_list_get_R", list_struct_R[0].array[0], array2[0]);
+}
+
+void gedatsu_list_get_I_c_test()
+{
+  MONOLIS_LIST_I list_struct_I[1];
+  int array1[1];
+  int array2[1];
+
+  monolis_std_log_string("gedatsu_list_get_I");
+
+  array1[0] = 1.0;
+  array2[0] = 0.0;
+
+  gedatsu_list_initialize_I(list_struct_I, 1);
+  gedatsu_list_set_I(list_struct_I, 1, 1, array1);
+  gedatsu_list_get_I(list_struct_I, 1, array2);
+
+  monolis_test_check_eq_I1("gedatsu_list_get_I", list_struct_I[0].array[0], array2[0]);
+}
+
+void gedatsu_list_get_C_c_test()
+{
+  MONOLIS_LIST_C list_struct_C[1];
+  double complex array1[1];
+  double complex array2[1];
+
+  monolis_std_log_string("gedatsu_list_get_C");
+
+  array1[0] = 1.0 + 1.0*I;
+  array2[0] = 0.0 + 1.0*I;
+
+  gedatsu_list_initialize_C(list_struct_C, 1);
+  gedatsu_list_set_C(list_struct_C, 1, 1, array1);
+  gedatsu_list_get_C(list_struct_C, 1, array2);
+
+  monolis_test_check_eq_C1("gedatsu_list_get_C", list_struct_C[0].array[0], array2[0]);
+}
 
 // void gedatsu_merge_nodal_subgraphs_c_test()
 // {
@@ -313,7 +427,7 @@ void gedatsu_graph_merge_c_test()
   //   merged_graph.item[i], check_item[i]);
   // }
 
-  // // TODO mallocで確保した配列をfreeで解放
+  // // mallocで確保した配列をfreeで解放
   // free(graphs);
   // free(monoCOMs);
 // }
