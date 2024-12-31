@@ -152,16 +152,16 @@ void gedatsu_list_get_R_c_test()
 {
   MONOLIS_LIST_R list_struct_R[1];
   double array1[1];
-  double array2[1];
+  double *array2;
 
   monolis_std_log_string("gedatsu_list_get_R");
 
   list_struct_R[0].array = NULL;
   array1[0] = 1.0;
-  array2[0] = 0.0;
+  array2 = NULL;
   gedatsu_list_initialize_R(list_struct_R, 1);
   gedatsu_list_set_R(list_struct_R, 0, 1, array1);
-  gedatsu_list_get_R(list_struct_R, 1, array2);
+  gedatsu_list_get_R(list_struct_R, 0, &array2);
 
   monolis_test_check_eq_R1("gedatsu_list_get_R", list_struct_R[0].array[0], array2[0]);
 }
@@ -170,16 +170,16 @@ void gedatsu_list_get_I_c_test()
 {
   MONOLIS_LIST_I list_struct_I[1];
   int array1[1];
-  int array2[1];
+  int *array2;
 
   monolis_std_log_string("gedatsu_list_get_I");
 
   list_struct_I[0].array = NULL;
   array1[0] = 1.0;
-  array2[0] = 0.0;
+  array2 = NULL;
   gedatsu_list_initialize_I(list_struct_I, 1);
   gedatsu_list_set_I(list_struct_I, 0, 1, array1);
-  gedatsu_list_get_I(list_struct_I, 1, array2);
+  gedatsu_list_get_I(list_struct_I, 0, &array2);
 
   monolis_test_check_eq_I1("gedatsu_list_get_I", list_struct_I[0].array[0], array2[0]);
 }
@@ -188,16 +188,16 @@ void gedatsu_list_get_C_c_test()
 {
   MONOLIS_LIST_C list_struct_C[1];
   double complex array1[1];
-  double complex array2[1];
+  double complex *array2;
 
   monolis_std_log_string("gedatsu_list_get_C");
 
   list_struct_C[0].array = NULL;
   array1[0] = 1.0 + 1.0*I;
-  array2[0] = 0.0 + 1.0*I;
+  array2 = NULL;
   gedatsu_list_initialize_C(list_struct_C, 1);
   gedatsu_list_set_C(list_struct_C, 0, 1, array1);
-  gedatsu_list_get_C(list_struct_C, 1, array2);
+  gedatsu_list_get_C(list_struct_C, 0, &array2);
 
   monolis_test_check_eq_C1("gedatsu_list_get_C", list_struct_C[0].array[0], array2[0]);
 }

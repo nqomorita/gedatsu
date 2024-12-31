@@ -173,38 +173,38 @@ void gedatsu_list_set_C(
 void gedatsu_list_get_R(
   const MONOLIS_LIST_R* list_struct_R,
   const int id,
-  double* array)
+  double** array)
 {
-  monolis_dealloc_R_1d(&array);
-  array = monolis_alloc_R_1d(array, list_struct_R[id].n);
+  monolis_dealloc_R_1d(array);
+  *array = monolis_alloc_R_1d(*array, list_struct_R[id].n);
   for (int i = 0; i < list_struct_R[id].n; i++)
   {
-    array[i] = list_struct_R[id].array[i];
+    *array[i] = list_struct_R[id].array[i];
   }
 }
 
 void gedatsu_list_get_I(
   const MONOLIS_LIST_I* list_struct_I,
   const int id,
-  int* array)
+  int** array)
 {
-  monolis_dealloc_I_1d(&array);
-  array = monolis_alloc_I_1d(array, list_struct_I[id].n);
+  monolis_dealloc_I_1d(array);
+  *array = monolis_alloc_I_1d(*array, list_struct_I[id].n);
   for (int i = 0; i < list_struct_I[id].n; i++)
   {
-    array[i] = list_struct_I[id].array[i];
+    *array[i] = list_struct_I[id].array[i];
   }
 }
 
 void gedatsu_list_get_C(
   const MONOLIS_LIST_C* list_struct_C,
   const int id,
-  double complex* array)
+  double complex** array)
 {
-  monolis_dealloc_C_1d(&array);
-  array = monolis_alloc_C_1d(array, list_struct_C[id].n);
+  monolis_dealloc_C_1d(array);
+  *array = monolis_alloc_C_1d(*array, list_struct_C[id].n);
   for (int i = 0; i < list_struct_C[id].n; i++)
   {
-    array[i] = list_struct_C[id].array[i];
+    *array[i] = list_struct_C[id].array[i];
   }
 }

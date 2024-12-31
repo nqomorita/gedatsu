@@ -178,19 +178,19 @@ void gedatsu_list_set_C(
 void gedatsu_list_get_R(
   const MONOLIS_LIST_R* list_struct_R,
   const int id,
-  double* array
+  double** array
 );
 
 void gedatsu_list_get_I(
   const MONOLIS_LIST_I* list_struct_I,
   const int id,
-  int* array
+  int** array
 );
 
 void gedatsu_list_get_C(
   const MONOLIS_LIST_C* list_struct_C,
   const int id,
-  double complex* array
+  double complex** array
 );
 
 #ifdef __cplusplus
