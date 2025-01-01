@@ -80,9 +80,33 @@ void gedatsu_merge_distval_R(
   const GEDATSU_GRAPH* merged_graph,
   const MONOLIS_LIST_I* n_dof_list,
   const MONOLIS_LIST_R* list_struct_R,
-  int* merged_n_dof_list,
-  int* merged_array_R
+  int** merged_n_dof_list,
+  double** merged_array_R
 );
+
+void gedatsu_merge_distval_R_c(
+  int sum_n_vertex,
+  int sum_index,
+  int sum_item,
+  int n_graphs,
+  int* n_vertex,
+  int* n_internal_vertex,
+  int* vertex_id,
+  int* vertex_domain_id,
+  int* index,
+  int* item,
+  int merged_n_vertex,
+  int merged_n_internal_vertex,
+  int* merged_vertex_id,
+  int* merged_vertex_domain_id,
+  int* merged_index,
+  int* merged_item,
+  int* n_dof_list_n,
+  int* n_dof_list_array,
+  int* list_struct_R_n,
+  double* list_struct_R_array,
+  int* merged_n_dof_list,
+  double* merged_array_R);
 
 /**
  * @brief 物理量の結合 (整数配列)
