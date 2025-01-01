@@ -22,7 +22,7 @@ void gedatsu_graph_merge_c_test()
   gedatsu_list_get_C_c_test();
   // gedatsu_merge_nodal_subgraphs_c_test();
   // gedatsu_merge_connectivity_subgraphs_c_test();
-  // gedatsu_merge_distval_R_c_test();
+  gedatsu_merge_distval_R_c_test();
 }
 
 void gedatsu_list_initialize_R_c_test()
