@@ -37,6 +37,10 @@ contains
     integer(kint), allocatable :: Iarray(:)
     real(kdouble), allocatable :: Darray(:)
 
+    ! print *, "sum_n_vertex", sum_n_vertex
+    ! print *, "sum_index", sum_index
+    ! print *, "sum_item", sum_item
+
     !> graphs
     iS = 1
     do i = 1, n_graphs
@@ -57,7 +61,10 @@ contains
     iS = 1
     do i = 1, n_graphs
       call monolis_alloc_I_1d(graphs(i)%item, graphs(i)%index(n_vertex(i)+1))
-      iE = iS + graphs(i)%index(n_vertex(i)+1)
+      iE = iS + graphs(i)%index(n_vertex(i)+1) - 1
+      ! print *, "iS", iS
+      ! print *, "iE", iE
+      ! print *, "item(:)", graphs(i)%index(n_vertex(i)+1)
       graphs(i)%item(1:graphs(i)%index(n_vertex(i)+1)) = item(iS:iE)
       iS = iS + graphs(i)%index(n_vertex(i)+1)
     enddo
@@ -95,6 +102,12 @@ contains
       call gedatsu_list_set_R(list_struct_R, i, list_struct_R_n(i), Darray)
       iS = iS + list_struct_R_n(i)
     enddo
+
+    !> 確認
+    ! do i = 1, n_graphs
+    !   print *, "i", i
+    !   call gedatsu_graph_debug_write(graphs(i))
+    ! enddo
 
     !> Fortranの結合関数
     call gedatsu_merge_distval_R_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, &
