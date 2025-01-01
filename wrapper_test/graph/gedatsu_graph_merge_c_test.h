@@ -24,6 +24,8 @@ void gedatsu_list_get_C_c_test();
 // void gedatsu_merge_nodal_subgraphs_c_test();
 // void gedatsu_merge_connectivity_subgraphs_c_test();
 void gedatsu_merge_distval_R_c_test();
+void gedatsu_merge_distval_I_c_test();
+void gedatsu_merge_distval_C_c_test();
 
 #ifdef __cplusplus
 }
