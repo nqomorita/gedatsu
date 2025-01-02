@@ -321,6 +321,12 @@ void gedatsu_merge_nodal_subgraphs_c_test()
   graphs[2].item[16] = 0;
   graphs[2].item[17] = 4;
 
+  // 結合前の通信テーブル
+  for (int i = 0; i < n_graphs; i++)
+  {
+    monolis_com_initialize_by_self(&monoCOMs[i]);
+  }
+
   // 結合後グラフの模範解答 (ORDER_NODAL_IDで計算点グラフを結合)
   check_vertex_id = monolis_alloc_I_1d(check_vertex_id, 7);
   check_index = monolis_alloc_I_1d(check_index, 8);
@@ -375,49 +381,52 @@ void gedatsu_merge_nodal_subgraphs_c_test()
 
 
   // 結合後グラフの模範解答 (ORDER_DOMAIN_IDで計算点グラフを結合)
+  monolis_dealloc_I_1d(&check_vertex_id);
+  monolis_dealloc_I_1d(&check_index);
+  monolis_dealloc_I_1d(&check_item);
   check_vertex_id = monolis_alloc_I_1d(check_vertex_id, 7);
   check_index = monolis_alloc_I_1d(check_index, 8);
   check_item = monolis_alloc_I_1d(check_item, 22);
 
-  check_vertex_id[0] = 0;
-  check_vertex_id[1] = 0;
-  check_vertex_id[2] = 0;
-  check_vertex_id[3] = 0;
-  check_vertex_id[4] = 0;
-  check_vertex_id[5] = 0;
-  check_vertex_id[6] = 0;
+  check_vertex_id[0] = 1;
+  check_vertex_id[1] = 4;
+  check_vertex_id[2] = 2;
+  check_vertex_id[3] = 3;
+  check_vertex_id[4] = 5;
+  check_vertex_id[5] = 6;
+  check_vertex_id[6] = 7;
 
   check_index[0] = 0;
-  check_index[1] = 0;
-  check_index[2] = 0;
-  check_index[3] = 0;
-  check_index[4] = 0;
-  check_index[5] = 0;
-  check_index[6] = 0;
-  check_index[7] = 0;
+  check_index[1] = 2;
+  check_index[2] = 6;
+  check_index[3] = 10;
+  check_index[4] = 12;
+  check_index[5] = 17;
+  check_index[6] = 20;
+  check_index[7] = 22;
 
-  check_item[0] = 0;
-  check_item[1] = 0;
-  check_item[2] = 0;
-  check_item[3] = 0;
-  check_item[4] = 0;
-  check_item[5] = 0;
-  check_item[6] = 0;
-  check_item[7] = 0;
-  check_item[8] = 0;
-  check_item[9] = 0;
-  check_item[10] = 0;
-  check_item[11] = 0;
-  check_item[12] = 0;
-  check_item[13] = 0;
-  check_item[14] = 0;
-  check_item[15] = 0;
-  check_item[16] = 0;
-  check_item[17] = 0;
-  check_item[18] = 0;
-  check_item[19] = 0;
-  check_item[20] = 0;
-  check_item[21] = 0;
+  check_item[0] = 2;
+  check_item[1] = 3;
+  check_item[2] = 1;
+  check_item[3] = 3;
+  check_item[4] = 5;
+  check_item[5] = 6;
+  check_item[6] = 1;
+  check_item[7] = 2;
+  check_item[8] = 4;
+  check_item[9] = 5;
+  check_item[10] = 3;
+  check_item[11] = 5;
+  check_item[12] = 2;
+  check_item[13] = 3;
+  check_item[14] = 4;
+  check_item[15] = 6;
+  check_item[16] = 7;
+  check_item[17] = 2;
+  check_item[18] = 5;
+  check_item[19] = 7;
+  check_item[20] = 5;
+  check_item[21] = 6;
 
   // 結合
 
@@ -426,16 +435,16 @@ void gedatsu_merge_nodal_subgraphs_c_test()
 
 
   // free
-  // for (int i = 0; i < n_graphs; i++)
-  // {
-  //   gedatsu_graph_finalize(&graphs[i]);
-  //   monolis_com_finalize(&monoCOMs[i]);
-  // }
+  for (int i = 0; i < n_graphs; i++)
+  {
+    gedatsu_graph_finalize(&graphs[i]);
+    monolis_com_finalize(&monoCOMs[i]);
+  }
   // gedatsu_graph_finalize(&merged_graph);
   // monolis_com_finalize(&merged_monoCOM);
-  // monolis_dealloc_I_1d(&check_vertex_id);
-  // monolis_dealloc_I_1d(&check_index);
-  // monolis_dealloc_I_1d(&check_item);
+  monolis_dealloc_I_1d(&check_vertex_id);
+  monolis_dealloc_I_1d(&check_index);
+  monolis_dealloc_I_1d(&check_item);
 }
 
 void gedatsu_merge_connectivity_subgraphs_c_test()
@@ -632,83 +641,118 @@ void gedatsu_merge_connectivity_subgraphs_c_test()
   conn_graphs[1].item = monolis_alloc_I_1d(conn_graphs[1].item, 9);
   conn_graphs[2].item = monolis_alloc_I_1d(conn_graphs[2].item, 12);
 
-  conn_graphs[0].vertex_id[0] = 0;
-  conn_graphs[0].vertex_id[1] = 0;
-  conn_graphs[0].vertex_id[2] = 0;
-  conn_graphs[1].vertex_id[0] = 0;
-  conn_graphs[1].vertex_id[1] = 0;
-  conn_graphs[1].vertex_id[2] = 0;
-  conn_graphs[2].vertex_id[0] = 0;
-  conn_graphs[2].vertex_id[1] = 0;
-  conn_graphs[2].vertex_id[2] = 0;
-  conn_graphs[2].vertex_id[3] = 0;
+  conn_graphs[0].vertex_id[0] = 1;
+  conn_graphs[0].vertex_id[1] = 2;
+  conn_graphs[0].vertex_id[2] = 4;
+  conn_graphs[1].vertex_id[0] = 3;
+  conn_graphs[1].vertex_id[1] = 1;
+  conn_graphs[1].vertex_id[2] = 2;
+  conn_graphs[2].vertex_id[0] = 5;
+  conn_graphs[2].vertex_id[1] = 3;
+  conn_graphs[2].vertex_id[2] = 2;
+  conn_graphs[2].vertex_id[3] = 4;
 
   conn_graphs[0].index[0] = 0;
-  conn_graphs[0].index[1] = 0;
-  conn_graphs[0].index[2] = 0;
+  conn_graphs[0].index[1] = 3;
+  conn_graphs[0].index[2] = 6;
+  conn_graphs[0].index[3] = 9;
   conn_graphs[1].index[0] = 0;
-  conn_graphs[1].index[1] = 0;
-  conn_graphs[1].index[2] = 0;
+  conn_graphs[1].index[1] = 3;
+  conn_graphs[1].index[2] = 6;
+  conn_graphs[1].index[3] = 9;
   conn_graphs[2].index[0] = 0;
-  conn_graphs[2].index[1] = 0;
-  conn_graphs[2].index[2] = 0;
-  conn_graphs[2].index[3] = 0;
+  conn_graphs[2].index[1] = 3;
+  conn_graphs[2].index[2] = 6;
+  conn_graphs[2].index[3] = 9;
+  conn_graphs[2].index[4] = 12;
 
-  conn_graphs[0].item[0] = 0;
-  conn_graphs[0].item[1] = 0;
-  conn_graphs[0].item[2] = 0;
-  conn_graphs[0].item[3] = 0;
-  conn_graphs[0].item[4] = 0;
-  conn_graphs[0].item[5] = 0;
-  conn_graphs[0].item[6] = 0;
-  conn_graphs[0].item[7] = 0;
-  conn_graphs[0].item[8] = 0;
-  conn_graphs[1].item[0] = 0;
-  conn_graphs[1].item[1] = 0;
-  conn_graphs[1].item[2] = 0;
-  conn_graphs[1].item[3] = 0;
-  conn_graphs[1].item[4] = 0;
-  conn_graphs[1].item[5] = 0;
-  conn_graphs[1].item[6] = 0;
-  conn_graphs[1].item[7] = 0;
-  conn_graphs[1].item[8] = 0;
-  conn_graphs[2].item[0] = 0;
-  conn_graphs[2].item[1] = 0;
-  conn_graphs[2].item[2] = 0;
-  conn_graphs[2].item[3] = 0;
-  conn_graphs[2].item[4] = 0;
-  conn_graphs[2].item[5] = 0;
-  conn_graphs[2].item[6] = 0;
-  conn_graphs[2].item[7] = 0;
-  conn_graphs[2].item[8] = 0;
-  conn_graphs[2].item[9] = 0;
-  conn_graphs[2].item[10] = 0;
-  conn_graphs[2].item[11] = 0;
+  conn_graphs[0].item[0] = 1;
+  conn_graphs[0].item[1] = 2;
+  conn_graphs[0].item[2] = 4;
+  conn_graphs[0].item[3] = 2;
+  conn_graphs[0].item[4] = 5;
+  conn_graphs[0].item[5] = 4;
+  conn_graphs[0].item[6] = 4;
+  conn_graphs[0].item[7] = 5;
+  conn_graphs[0].item[8] = 6;
+  conn_graphs[1].item[0] = 2;
+  conn_graphs[1].item[1] = 3;
+  conn_graphs[1].item[2] = 5;
+  conn_graphs[1].item[3] = 1;
+  conn_graphs[1].item[4] = 2;
+  conn_graphs[1].item[5] = 4;
+  conn_graphs[1].item[6] = 2;
+  conn_graphs[1].item[7] = 5;
+  conn_graphs[1].item[8] = 4;
+  conn_graphs[2].item[0] = 5;
+  conn_graphs[2].item[1] = 6;
+  conn_graphs[2].item[2] = 7;
+  conn_graphs[2].item[3] = 2;
+  conn_graphs[2].item[4] = 3;
+  conn_graphs[2].item[5] = 5;
+  conn_graphs[2].item[6] = 2;
+  conn_graphs[2].item[7] = 5;
+  conn_graphs[2].item[8] = 4;
+  conn_graphs[2].item[9] = 4;
+  conn_graphs[2].item[10] = 5;
+  conn_graphs[2].item[11] = 6;
 
   // 結合後の通信テーブル // TODO あってる？
   monolis_com_initialize_by_self(&merged_nodal_monoCOM);
 
-  // 結合
+  // 結合後のコネクティビティグラフの模範解答 (ORDER_NODAL_IDで計算点グラフを結合)
+  check_vertex_id = monolis_alloc_I_1d(check_vertex_id, 5);
+  check_index = monolis_alloc_I_1d(check_index, 6);
+  check_item = monolis_alloc_I_1d(check_item, 15);
 
-  // 結合後のコネクティビティグラフの模範解答
+  check_vertex_id[0] = 1;
+  check_vertex_id[1] = 2;
+  check_vertex_id[2] = 3;
+  check_vertex_id[3] = 4;
+  check_vertex_id[4] = 5;
+
+  check_index[0] = 0;
+  check_index[1] = 3;
+  check_index[2] = 6;
+  check_index[3] = 9;
+  check_index[4] = 12;
+  check_index[5] = 15;
+
+  check_item[0] = 1;
+  check_item[1] = 2;
+  check_item[2] = 4;
+  check_item[3] = 2;
+  check_item[4] = 5;
+  check_item[5] = 4;
+  check_item[6] = 2;
+  check_item[7] = 3;
+  check_item[8] = 5;
+  check_item[9] = 4;
+  check_item[10] = 5;
+  check_item[11] = 6;
+  check_item[12] = 5;
+  check_item[13] = 6;
+  check_item[14] = 7;
+
+  // 結合
 
   // 確認
 
   //free
-  // for (int i = 0; i < n_nodal_graphs; i++)
-  // {
-  //   gedatsu_graph_finalize(&nodal_graphs[i]);
-  // }
-  //   for (int i = 0; i < n_conn_graphs; i++)
-  // {
-  //   gedatsu_graph_finalize(&conn_graphs[i]);
-  // }
-  // gedatsu_graph_finalize(&merged_nodal_graph);
+  for (int i = 0; i < n_nodal_graphs; i++)
+  {
+    gedatsu_graph_finalize(&nodal_graphs[i]);
+  }
+    for (int i = 0; i < n_conn_graphs; i++)
+  {
+    gedatsu_graph_finalize(&conn_graphs[i]);
+  }
+  gedatsu_graph_finalize(&merged_nodal_graph);
   // gedatsu_graph_finalize(&merged_conn_graph);
-  // monolis_com_finalize(&merged_nodal_monoCOM);
-  // monolis_dealloc_I_1d(&check_vertex_id);
-  // monolis_dealloc_I_1d(&check_index);
-  // monolis_dealloc_I_1d(&check_item);
+  monolis_com_finalize(&merged_nodal_monoCOM);
+  monolis_dealloc_I_1d(&check_vertex_id);
+  monolis_dealloc_I_1d(&check_index);
+  monolis_dealloc_I_1d(&check_item);
 }
 
 void gedatsu_merge_distval_R_c_test()
