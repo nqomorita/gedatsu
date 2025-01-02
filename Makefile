@@ -36,9 +36,9 @@ ifdef FLAGS
 	endif
 
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
-		FC      = mpiifort
+		FC      = mpiifx
 		FFLAGS  = -fPIC -O2 -align array64byte  -nofor-main
-		CC      = mpiicc
+		CC      = mpiicx
 		CFLAGS  = -fPIC -O2 -no-multibyte-chars
 		MOD_DIR = -module $(INC_DIR)
 		LINK   = $(FC)
