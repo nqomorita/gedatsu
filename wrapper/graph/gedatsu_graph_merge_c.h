@@ -29,6 +29,75 @@ typedef struct{
   double complex* array;
 }MONOLIS_LIST_C;
 
+void gedatsu_list_initialize_R(
+  MONOLIS_LIST_R* list_struct_R,
+  const int n
+);
+
+void gedatsu_list_initialize_I(
+  MONOLIS_LIST_I* list_struct_I,
+  const int n
+);
+
+void gedatsu_list_initialize_C(
+  MONOLIS_LIST_C* list_struct_C,
+  const int n
+);
+
+void gedatsu_list_finalize_R(
+  MONOLIS_LIST_R* list_struct_R,
+  const int n
+);
+
+void gedatsu_list_finalize_I(
+  MONOLIS_LIST_I* list_struct_I,
+  const int n
+);
+
+void gedatsu_list_finalize_C(
+  MONOLIS_LIST_C* list_struct_C,
+  const int n
+);
+
+void gedatsu_list_set_R(
+  MONOLIS_LIST_R* list_struct_R,
+  const int id,
+  const int n,
+  const double* array
+);
+
+void gedatsu_list_set_I(
+  MONOLIS_LIST_I* list_struct_I,
+  const int id,
+  const int n,
+  const int* array
+);
+
+void gedatsu_list_set_C(
+  MONOLIS_LIST_C* list_struct_C,
+  const int id,
+  const int n,
+  const double complex* array
+);
+
+void gedatsu_list_get_R(
+  const MONOLIS_LIST_R* list_struct_R,
+  const int id,
+  double** array
+);
+
+void gedatsu_list_get_I(
+  const MONOLIS_LIST_I* list_struct_I,
+  const int id,
+  int** array
+);
+
+void gedatsu_list_get_C(
+  const MONOLIS_LIST_C* list_struct_C,
+  const int id,
+  double complex** array
+);
+
 /**
  * @brief 計算点グラフの結合
  * @param[in] n_graphs 統合したいグラフ構造の個数
@@ -197,75 +266,6 @@ void gedatsu_merge_distval_C_c(
   double complex* list_struct_C_array,
   int* merged_n_dof_list,
   double complex* merged_array_C
-);
-
-void gedatsu_list_initialize_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int n
-);
-
-void gedatsu_list_initialize_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int n
-);
-
-void gedatsu_list_initialize_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int n
-);
-
-void gedatsu_list_finalize_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int n
-);
-
-void gedatsu_list_finalize_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int n
-);
-
-void gedatsu_list_finalize_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int n
-);
-
-void gedatsu_list_set_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int id,
-  const int n,
-  const double* array
-);
-
-void gedatsu_list_set_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int id,
-  const int n,
-  const int* array
-);
-
-void gedatsu_list_set_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int id,
-  const int n,
-  const double complex* array
-);
-
-void gedatsu_list_get_R(
-  const MONOLIS_LIST_R* list_struct_R,
-  const int id,
-  double** array
-);
-
-void gedatsu_list_get_I(
-  const MONOLIS_LIST_I* list_struct_I,
-  const int id,
-  int** array
-);
-
-void gedatsu_list_get_C(
-  const MONOLIS_LIST_C* list_struct_C,
-  const int id,
-  double complex** array
 );
 
 #ifdef __cplusplus

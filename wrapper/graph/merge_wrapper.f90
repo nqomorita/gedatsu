@@ -37,10 +37,6 @@ contains
     integer(kint), allocatable :: Iarray(:)
     real(kdouble), allocatable :: Darray(:)
 
-    ! print *, "sum_n_vertex", sum_n_vertex
-    ! print *, "sum_index", sum_index
-    ! print *, "sum_item", sum_item
-
     !> graphs
     iS = 1
     do i = 1, n_graphs
