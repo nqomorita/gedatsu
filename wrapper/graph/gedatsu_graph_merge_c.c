@@ -167,9 +167,13 @@ void gedatsu_merge_nodal_subgraphs(
 {
   int iS, iE, val, idx, tmp1, tmp2;
   int n_vertex, n_internal_vertex, n_overlap_vertex, n_vertex_uniq, n_edge;
-  int *vertex_id, *internal_vertex_id, *overlap_vertex_id, *vertex_id_notsorted;
-  int **edge;
-  bool *is_internal, *is_already_count_overlap;
+  int* vertex_id = NULL;
+  int* internal_vertex_id = NULL;
+  int* overlap_vertex_id = NULL;
+  int* vertex_id_notsorted = NULL;
+  int** edge = NULL;
+  bool* is_internal = NULL;
+  bool* is_already_count_overlap = NULL;
 
   n_vertex = 0;
   n_internal_vertex = 0;
@@ -209,7 +213,7 @@ void gedatsu_merge_nodal_subgraphs(
     {
       val = graphs[i].vertex_id[j];
       // monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx);  // TODO 関数が存在しない
-      // is_internal[idx] = .true.;
+      is_internal[idx] = true;
     }
   }
 
@@ -343,20 +347,20 @@ void gedatsu_merge_connectivity_subgraphs(
 {
   int iS, iE, val, idx, tmp1, tmp2, n_edge;
   int n_conn_vertex, n_conn_internal_vertex, n_conn_overlap_vertex, n_nodal_vertex;
-  int* conn_vertex_id;
-  int* conn_internal_vertex_id;
-  int* conn_overlap_vertex_id;
-  int* conn_vertex_id_notsorted;
-  int* nodal_vertex_id;
-  int* nodal_vertex_id_notsorted;
-  int* perm;
-  int* global_id_in_merged_graph;
-  int* which_conn_graph;
-  int* local_id_in_conn_graph;
-  int** edge;
-  bool* is_conn_internal;
-  MONOLIS_LIST_I* conn_graphs_vertex_id;
-  MONOLIS_LIST_I* conn_graphs_vertex_id_perm;
+  int* conn_vertex_id = NULL;
+  int* conn_internal_vertex_id = NULL;
+  int* conn_overlap_vertex_id = NULL;
+  int* conn_vertex_id_notsorted = NULL;
+  int* nodal_vertex_id = NULL;
+  int* nodal_vertex_id_notsorted = NULL;
+  int* perm = NULL;
+  int* global_id_in_merged_graph = NULL;
+  int* which_conn_graph = NULL;
+  int* local_id_in_conn_graph = NULL;
+  int** edge = NULL;
+  bool* is_conn_internal = NULL;
+  MONOLIS_LIST_I* conn_graphs_vertex_id = NULL;
+  MONOLIS_LIST_I* conn_graphs_vertex_id_perm = NULL;
 
   if (n_nodal_graphs != n_conn_graphs)
   {
@@ -559,16 +563,16 @@ void gedatsu_merge_distval_R(
   int** merged_n_dof_list,
   double** merged_array_R)
 {
-  int* n_vertex;
-  int* n_internal_vertex;
-  int* vertex_id;
-  int* vertex_domain_id;
-  int* index;
-  int* item;
-  int* n_dof_list_n;
-  int* list_struct_R_n;
-  int* n_dof_list_array;
-  double* list_struct_R_array;
+  int* n_vertex = NULL;
+  int* n_internal_vertex = NULL;
+  int* vertex_id = NULL;
+  int* vertex_domain_id = NULL;
+  int* index = NULL;
+  int* item = NULL;
+  int* n_dof_list_n = NULL;
+  int* list_struct_R_n = NULL;
+  int* n_dof_list_array = NULL;
+  double* list_struct_R_array = NULL;
 
   int sum_n_vertex, sum_index, sum_item;
   int iE_n_vertex, iE_index, iE_item;
@@ -661,16 +665,16 @@ void gedatsu_merge_distval_I(
   int** merged_n_dof_list,
   int** merged_array_I)
 {
-  int* n_vertex;
-  int* n_internal_vertex;
-  int* vertex_id;
-  int* vertex_domain_id;
-  int* index;
-  int* item;
-  int* n_dof_list_n;
-  int* list_struct_I_n;
-  int* n_dof_list_array;
-  int* list_struct_I_array;
+  int* n_vertex = NULL;
+  int* n_internal_vertex = NULL;
+  int* vertex_id = NULL;
+  int* vertex_domain_id = NULL;
+  int* index = NULL;
+  int* item = NULL;
+  int* n_dof_list_n = NULL;
+  int* list_struct_I_n = NULL;
+  int* n_dof_list_array = NULL;
+  int* list_struct_I_array = NULL;
 
   int sum_n_vertex, sum_index, sum_item;
   int iE_n_vertex, iE_index, iE_item;
@@ -763,16 +767,16 @@ void gedatsu_merge_distval_C(
   int** merged_n_dof_list,
   double complex** merged_array_C)
 {
-  int* n_vertex;
-  int* n_internal_vertex;
-  int* vertex_id;
-  int* vertex_domain_id;
-  int* index;
-  int* item;
-  int* n_dof_list_n;
-  int* list_struct_C_n;
-  int* n_dof_list_array;
-  double complex* list_struct_C_array;
+  int* n_vertex = NULL;
+  int* n_internal_vertex = NULL;
+  int* vertex_id = NULL;
+  int* vertex_domain_id = NULL;
+  int* index = NULL;
+  int* item = NULL;
+  int* n_dof_list_n = NULL;
+  int* list_struct_C_n = NULL;
+  int* n_dof_list_array = NULL;
+  double complex* list_struct_C_array = NULL;
 
   int sum_n_vertex, sum_index, sum_item;
   int iE_n_vertex, iE_index, iE_item;

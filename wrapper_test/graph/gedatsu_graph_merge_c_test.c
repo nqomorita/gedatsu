@@ -763,8 +763,8 @@ void gedatsu_merge_distval_R_c_test()
   GEDATSU_GRAPH merged_graph;
   MONOLIS_LIST_I n_dof_list[3];
   MONOLIS_LIST_R list_struct_R[3];
-  int* merged_n_dof_list;
-  double* merged_array_R;
+  int* merged_n_dof_list = NULL;
+  double* merged_array_R = NULL;
 
   monolis_std_log_string("gedatsu_merge_distval_R_c_test");
 
