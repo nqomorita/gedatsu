@@ -119,7 +119,8 @@ void gedatsu_merge_nodal_subgraphs(
  * @brief コネクティビティグラフの結合
  * @param[in] n_nodal_graphs 統合したい計算点グラフ構造の個数
  * @param[in] nodal_graphs 計算点グラフ構造の配列（配列長 n_nodal_graphs）
- * @param[inout] merged_nodal_monoCOM 統合された通信テーブル
+ * @param[in] merged_nodal_graph 結合された計算点グラフ
+ * @param[in] merged_nodal_monoCOM 統合された通信テーブル
  * @param[in] n_conn_graphs 統合したいコネクティビティグラフ構造の個数
  * @param[in] conn_graphs コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
  * @param[inout] merged_conn_graph 結合されたコネクティビティグラフ
