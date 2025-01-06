@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <complex.h>
 #include "gedatsu.h"
 #include "monolis_utils.h"
@@ -210,6 +211,7 @@ void gedatsu_merge_nodal_subgraphs_c_test()
   MONOLIS_COM merged_monoCOM;
 
   int* check_vertex_id = NULL;
+  int* check_vertex_domain_id = NULL;
   int* check_index = NULL;
   int* check_item = NULL;
 
@@ -376,9 +378,12 @@ void gedatsu_merge_nodal_subgraphs_c_test()
 
 
   // 確認
-
-
-
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c nodal_graph n_vertex", merged_graph.n_vertex, 5);
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c nodal_graph n_vertex", merged_graph.n_internal_vertex, 5);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph vertex_id", 5, merged_graph.vertex_id, 5, check_vertex_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph vertex_domain_id", 5, merged_graph.vertex_domain_id, 5, check_vertex_domain_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph index", 6, merged_graph.index, 6, check_index);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph item", 15, merged_graph.item, 15, check_item);
 
   // 結合後グラフの模範解答 (ORDER_DOMAIN_IDで計算点グラフを結合)
   monolis_dealloc_I_1d(&check_vertex_id);
@@ -432,7 +437,12 @@ void gedatsu_merge_nodal_subgraphs_c_test()
 
 
   // 確認
-
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c nodal_graph n_vertex", merged_graph.n_vertex, 5);
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c nodal_graph n_vertex", merged_graph.n_internal_vertex, 5);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph vertex_id", 5, merged_graph.vertex_id, 5, check_vertex_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph vertex_domain_id", 5, merged_graph.vertex_domain_id, 5, check_vertex_domain_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph index", 6, merged_graph.index, 6, check_index);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c nodal_graph item", 15, merged_graph.item, 15, check_item);
 
   // free
   for (int i = 0; i < n_graphs; i++)
@@ -458,6 +468,7 @@ void gedatsu_merge_connectivity_subgraphs_c_test()
   GEDATSU_GRAPH merged_conn_graph;
 
   int* check_vertex_id = NULL;
+  int* check_vertex_domain_id = NULL;
   int* check_index = NULL;
   int* check_item = NULL;
 
@@ -702,6 +713,7 @@ void gedatsu_merge_connectivity_subgraphs_c_test()
 
   // 結合後のコネクティビティグラフの模範解答 (ORDER_NODAL_IDで計算点グラフを結合)
   check_vertex_id = monolis_alloc_I_1d(check_vertex_id, 5);
+  check_vertex_domain_id = monolis_alloc_I_1d(check_vertex_domain_id, 5);
   check_index = monolis_alloc_I_1d(check_index, 6);
   check_item = monolis_alloc_I_1d(check_item, 15);
 
@@ -737,6 +749,12 @@ void gedatsu_merge_connectivity_subgraphs_c_test()
   // 結合
 
   // 確認
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c conn_graph n_vertex", merged_conn_graph.n_vertex, 5);
+  // monolis_test_check_eq_I1("gedatsu_graph_merge_test_c conn_graph n_vertex", merged_conn_graph.n_internal_vertex, 5);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c conn_graph vertex_id", 5, merged_conn_graph.vertex_id, 5, check_vertex_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c conn_graph vertex_domain_id", 5, merged_conn_graph.vertex_domain_id, 5, check_vertex_domain_id);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c conn_graph index", 6, merged_conn_graph.index, 6, check_index);
+  // monolis_test_check_eq_I("gedatsu_graph_merge_test_c conn_graph item", 15, merged_conn_graph.item, 15, check_item);
 
   //free
   for (int i = 0; i < n_nodal_graphs; i++)
@@ -765,6 +783,9 @@ void gedatsu_merge_distval_R_c_test()
   MONOLIS_LIST_R list_struct_R[3];
   int* merged_n_dof_list = NULL;
   double* merged_array_R = NULL;
+
+  int* check_merged_n_dof_list = NULL;
+  double* check_merged_array_R = NULL;
 
   monolis_std_log_string("gedatsu_merge_distval_R_c_test");
 
@@ -976,16 +997,27 @@ void gedatsu_merge_distval_R_c_test()
   list_struct_R[2].array[4] = 6.0;
   list_struct_R[2].array[5] = 7.0;
 
+  // 結合後の物理量分布の確認
+  check_merged_n_dof_list = monolis_alloc_I_1d(check_merged_n_dof_list, 7);
+  check_merged_array_R = monolis_alloc_R_1d(check_merged_array_R, 7);
+  for (int i = 0; i < 7; i++)
+  {
+    check_merged_n_dof_list[i] = 1;
+    check_merged_array_R[i] = (double)(i+1);
+  }
+
   // 結合
   gedatsu_merge_distval_R(n_graphs, graphs, &merged_graph, n_dof_list, list_struct_R,
   &merged_n_dof_list, &merged_array_R);
 
-  // 結合後の物理量分布の確認
-  for (int i = 0; i < 7; i++)
-  {
-    monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_R n_dof_list", merged_n_dof_list[i], 1);
-    monolis_test_check_eq_R1("gedatsu_graph_merge_test_c dist_val_R array", merged_array_R[i], (double)i+1);
-  }
+  // 確認
+  // for (int i = 0; i < 7; i++)
+  // {
+  //   monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_R n_dof_list", merged_n_dof_list[i], 1);
+  //   monolis_test_check_eq_R1("gedatsu_graph_merge_test_c dist_val_R array", merged_array_R[i], (double)i+1);
+  // }
+  monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_R n_dof_list", 7, merged_n_dof_list, 7, check_merged_n_dof_list);
+  monolis_test_check_eq_R("gedatsu_graph_merge_test_c dist_val_R array", 7, merged_array_R, 7, check_merged_array_R);
 
   // free
   gedatsu_list_finalize_I(n_dof_list, 1);
@@ -1015,6 +1047,9 @@ void gedatsu_merge_distval_I_c_test()
   MONOLIS_LIST_I list_struct_I[3];
   int* merged_n_dof_list = NULL;
   int* merged_array_I = NULL;
+
+  int* check_merged_n_dof_list = NULL;
+  int* check_merged_array_I = NULL;
 
   monolis_std_log_string("gedatsu_merge_distval_I_c_test");
 
@@ -1226,16 +1261,27 @@ void gedatsu_merge_distval_I_c_test()
   list_struct_I[2].array[4] = 6;
   list_struct_I[2].array[5] = 7;
 
+  // 結合後の物理量分布の模範解答
+  check_merged_n_dof_list = monolis_alloc_I_1d(check_merged_n_dof_list, 7);
+  check_merged_array_I = monolis_alloc_I_1d(check_merged_array_I, 7);
+  for (int i = 0; i < 7; i++)
+  {
+    check_merged_n_dof_list[i] = 1;
+    check_merged_array_I[i] = i + 1;
+  }
+
   // 結合
   gedatsu_merge_distval_I(n_graphs, graphs, &merged_graph, n_dof_list, list_struct_I,
   &merged_n_dof_list, &merged_array_I);
 
-  // 結合後の物理量分布の確認
-  for (int i = 0; i < 7; i++)
-  {
-    monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_I n_dof_list", merged_n_dof_list[i], 1);
-    monolis_test_check_eq_R1("gedatsu_graph_merge_test_c dist_val_I array", merged_array_I[i], i+1);
-  }
+  // 確認
+  // for (int i = 0; i < 7; i++)
+  // {
+  //   monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_I n_dof_list", merged_n_dof_list[i], 1);
+  //   monolis_test_check_eq_R1("gedatsu_graph_merge_test_c dist_val_I array", merged_array_I[i], i+1);
+  // }
+  monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_I n_dof_list", 7, merged_n_dof_list, 7, check_merged_n_dof_list);
+  monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_I array", 7, merged_array_I, 7, check_merged_array_I);
 
   // free
   gedatsu_list_finalize_I(n_dof_list, 1);
@@ -1265,6 +1311,9 @@ void gedatsu_merge_distval_C_c_test()
   MONOLIS_LIST_C list_struct_C[3];
   int* merged_n_dof_list = NULL;
   double complex* merged_array_C = NULL;
+
+  int* check_merged_n_dof_list = NULL;
+  double complex* check_merged_array_C = NULL;
 
   monolis_std_log_string("gedatsu_merge_distval_C_c_test");
 
@@ -1476,22 +1525,33 @@ void gedatsu_merge_distval_C_c_test()
   list_struct_C[2].array[4] = 6.0 + 1.0*I;
   list_struct_C[2].array[5] = 7.0 + 1.0*I;
 
+  // 結合後の物理量分布の模範解答
+  check_merged_n_dof_list = monolis_alloc_I_1d(check_merged_n_dof_list, 7);
+  check_merged_array_C = monolis_alloc_C_1d(check_merged_array_C, 7);
+  for (int i = 0; i < 7; i++)
+  {
+    check_merged_n_dof_list[i] = 1;
+    check_merged_array_C[i] = (double complex)(i+1) + 1.0*I;
+  }
+
   // 結合
   gedatsu_merge_distval_C(n_graphs, graphs, &merged_graph, n_dof_list, list_struct_C,
   &merged_n_dof_list, &merged_array_C);
 
-  // 結合後の物理量分布の確認
-  for (int i = 0; i < 7; i++)
-  {
-    monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_C n_dof_list", merged_n_dof_list[i], 1);
-  }
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[0], 1.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[1], 2.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[2], 3.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[3], 4.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[4], 5.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[5], 6.0 + 1.0*I);
-  monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[6], 7.0 + 1.0*I);
+  // 確認
+  // for (int i = 0; i < 7; i++)
+  // {
+  //   monolis_test_check_eq_I1("gedatsu_graph_merge_test_c dist_val_C n_dof_list", merged_n_dof_list[i], 1);
+  // }
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[0], 1.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[1], 2.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[2], 3.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[3], 4.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[4], 5.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[5], 6.0 + 1.0*I);
+  // monolis_test_check_eq_C1("gedatsu_graph_merge_test_c dist_val_C array", merged_array_C[6], 7.0 + 1.0*I);
+  monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_C n_dof_list", 7, merged_n_dof_list, 7, check_merged_n_dof_list);
+  monolis_test_check_eq_C("gedatsu_graph_merge_test_c dist_val_C array", 7, merged_array_C, 7, check_merged_array_C);
 
   // free
   gedatsu_list_finalize_I(n_dof_list, 1);
@@ -1509,4 +1569,118 @@ void gedatsu_merge_distval_C_c_test()
   monolis_dealloc_I_1d(&merged_graph.item);
   monolis_dealloc_I_1d(&merged_n_dof_list);
   monolis_dealloc_C_1d(&merged_array_C);
+}
+
+void monolis_test_check_eq_R(
+  const char* header,
+  const int size_a,
+  const double* a,
+  const int size_b,
+  const double* b)
+{
+  bool is_eq;
+
+  if (size_a != size_b)
+  {
+    monolis_test_assert_fail(header, "size mismatch");
+  }
+
+  for (int i = 0; i < size_a; i++)
+  {
+    if (abs(a[i]) < 1.0e-20)
+    {
+      if (abs(a[i] - b[i]) > 1.0e-8)
+      {
+        is_eq = false;
+      }else
+      {
+        is_eq = true;
+      }
+    }else if (abs(a[i] - b[i])/abs(a[i]) > 1.0e-8)
+    {
+      is_eq = false;
+    }else
+    {
+        is_eq = true;
+    }
+    if (!is_eq)
+    {
+      monolis_test_assert_fail(header, "value mismatch");
+    }
+  }
+
+  monolis_test_assert_pass(header);
+}
+
+void monolis_test_check_eq_I(
+  const char* header,
+  const int size_a,
+  const int* a,
+  const int size_b,
+  const int* b)
+{
+  bool is_eq;
+
+  if (size_a != size_b)
+  {
+    monolis_test_assert_fail(header, "size mismatch");
+  }
+
+  for (int i = 0; i < size_a; i++)
+  {
+    if (a[i] != b[i])
+    {
+      is_eq = false;
+    }else
+    {
+      is_eq = true;
+    }
+    if (!is_eq)
+    {
+      monolis_test_assert_fail(header, "value mismatch");
+    }
+  }
+
+  monolis_test_assert_pass(header);
+}
+
+void monolis_test_check_eq_C(
+  const char* header,
+  const int size_a,
+  const double complex* a,
+  const int size_b,
+  const double complex* b)
+{
+  bool is_eq;
+
+  if (size_a != size_b)
+  {
+    monolis_test_assert_fail(header, "size mismatch");
+  }
+
+  for (int i = 0; i < size_a; i++)
+  {
+    if (abs(creal(a[i])) < 1.0e-20 || abs(cimag(a[i]) < 1.0e-20))
+    {
+      if (abs(creal(a[i]) - creal(b[i])) + abs(cimag(a[i]) - cimag(b[i])) > 1.0e-8)
+      {
+        is_eq = false;
+      }else
+      {
+        is_eq = true;
+      }
+    }else if (abs(creal(a[i]) - creal(b[i]))/abs(creal(a[i])) + abs(cimag(a[i]) - cimag(b[i]))/abs(cimag(a[i])) > 1.0e-8)
+    {
+      is_eq = false;
+    }else
+    {
+        is_eq = true;
+    }
+    if (!is_eq)
+    {
+      monolis_test_assert_fail(header, "value mismatch");
+    }
+  }
+
+  monolis_test_assert_pass(header);
 }

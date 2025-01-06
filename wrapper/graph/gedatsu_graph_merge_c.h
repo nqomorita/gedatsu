@@ -1,4 +1,4 @@
-/* graph_convert_c.h */
+/* graph_merge_c.h */
 #include<complex.h>
 #include "monolis_utils.h"
 #include "gedatsu_def_graph_c.h"
