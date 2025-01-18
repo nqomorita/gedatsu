@@ -422,7 +422,7 @@ contains
       my_edge(2,i) = perm(in)
     enddo
 
-    call gedatsu_graph_set_edge(graph_tmp, n_my_edge, my_edge)
+    call gedatsu_graph_set_edge(graph_tmp, n_my_edge, my_edge, .true.)
   end subroutine gedatsu_dlb_get_temporary_nodal_graph
 
   !> @ingroup group_dlb
@@ -479,7 +479,7 @@ contains
       edge(2,i) = iperm(edge(2,i))
     enddo
 
-    call gedatsu_graph_set_edge(graph_new, n_edge, edge)
+    call gedatsu_graph_set_edge(graph_new, n_edge, edge, .true.)
 
     !> overlap region
     call gedatsu_graph_get_n_vertex_in_overlap_region(graph_tmp, my_rank, n_vertex)
@@ -518,7 +518,7 @@ contains
       edge(2,i) = iperm(edge(2,i))
     enddo
 
-    call gedatsu_graph_add_edge(graph_new, n_edge, edge)
+    call gedatsu_graph_add_edge(graph_new, n_edge, edge, .true.)
   end subroutine gedatsu_dlb_get_new_nodal_graph
 
   !> @ingroup group_dlb

@@ -188,7 +188,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -235,7 +235,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -283,7 +283,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -317,7 +317,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     n_edge = 0
 
@@ -355,7 +355,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     n_edge = 0
 
@@ -395,7 +395,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -441,7 +441,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -491,7 +491,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -530,7 +530,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 1", size(graph%item), 8)
     call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 2", graph%item(1), 2)
@@ -564,14 +564,14 @@ contains
     edge(1,5) = 4; edge(2,5) = 5
     edge(1,6) = 5; edge(2,6) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     n_add_edge = 2
 
     add(1,1) = 2; add(2,1) = 3
     add(1,2) = 3; add(2,2) = 2
 
-    call gedatsu_graph_add_edge(graph, n_add_edge, add)
+    call gedatsu_graph_add_edge(graph, n_add_edge, add, .true.)
 
     call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 1", size(graph%item), 8)
     call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 2", graph%item(1), 2)

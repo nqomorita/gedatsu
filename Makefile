@@ -98,10 +98,15 @@ SRC_DLB = \
   dlb_handler.f90
 
 ##> C wrapper section
+SRC_DEF_C = \
+  gedatsu_def_graph_c.c
+
 SRC_GRAPH_C = \
-  gedatsu_graph_convert_c.c
+  gedatsu_graph_convert_c.c \
+  gedatsu_graph_handler_c.c
 
 SRC_ALL_C = \
+$(addprefix define/, $(SRC_DEF_C)) \
 $(addprefix graph/, $(SRC_GRAPH_C))
 
 ##> all targes
@@ -135,7 +140,8 @@ TEST_C_TARGET = $(TST_WRAP_DIR)/gedatsu_c_test
 
 ##> lib objs
 SRC_GRAPH_C_TEST = \
-gedatsu_graph_convert_c_test.c
+gedatsu_graph_convert_c_test.c \
+gedatsu_graph_handler_c_test.c
 
 SRC_ALL_C_TEST = \
 $(addprefix graph/, $(SRC_GRAPH_C_TEST))
@@ -241,7 +247,9 @@ $(DRIVE9): $(DRV_OBJS9)
 	$(LINK) $(FFLAGS) -o $@ $(DRV_OBJS9) $(USE_LIB)
 
 cp_header:
+	$(CP) ./wrapper/define/gedatsu_def_graph_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
+	$(CP) ./wrapper/graph/gedatsu_graph_handler_c.h ./include/
 	$(CP) ./wrapper/gedatsu.h ./include/
 
 clean:

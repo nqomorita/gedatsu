@@ -146,7 +146,7 @@ contains
 
     call gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
 
-    call gedatsu_graph_set_edge(subgraph, n_edge, edge)
+    call gedatsu_graph_set_edge(subgraph, n_edge, edge, .true.)
   end subroutine gedatsu_get_parted_graph_main
 
   !> @ingroup dev_graph_part
@@ -180,7 +180,7 @@ contains
 
     call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 
-    call gedatsu_graph_add_edge(subgraph, n_edge, edge)
+    call gedatsu_graph_add_edge(subgraph, n_edge, edge, .true.)
   end subroutine gedatsu_add_overlapping_nodes
 
   !> @ingroup dev_graph_part

@@ -501,7 +501,7 @@ contains
   !> @ingroup graph_basic
   !> グラフのエッジを設定
   !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。ノード数は変化しない。
-  subroutine gedatsu_graph_set_edge(graph, n_edge, edge)
+  subroutine gedatsu_graph_set_edge(graph, n_edge, edge, is_sort)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -509,6 +509,8 @@ contains
     integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
     integer(kint), intent(in) :: edge(:,:)
+    !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
+    logical :: is_sort
     integer(kint) :: i, e1, e2, jS, jE, in
     integer(kint), allocatable :: temp(:,:)
 
@@ -552,17 +554,19 @@ contains
       graph%item(i) = e2
     enddo
 
-    do i = 1, graph%n_vertex
-      jS = graph%index(i) + 1
-      jE = graph%index(i + 1)
-      call monolis_qsort_I_1d(graph%item, jS, jE)
-    enddo
+    if(is_sort)then
+      do i = 1, graph%n_vertex
+        jS = graph%index(i) + 1
+        jE = graph%index(i + 1)
+        call monolis_qsort_I_1d(graph%item, jS, jE)
+      enddo
+    endif
   end subroutine gedatsu_graph_set_edge
 
   !> @ingroup graph_basic
   !> グラフのエッジを追加
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
-  subroutine gedatsu_graph_add_edge(graph, n_edge, edge)
+  subroutine gedatsu_graph_add_edge(graph, n_edge, edge, is_sort)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -570,6 +574,8 @@ contains
     integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
     integer(kint), intent(in) :: edge(:,:)
+    !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
+    logical :: is_sort
     integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
     integer(kint), allocatable :: edge_all(:,:)
 
@@ -602,7 +608,7 @@ contains
       edge_all(2,n_edge_cur + i) = edge(2,i)
     enddo
 
-    call gedatsu_graph_set_edge(graph, n_edge_all, edge_all)
+    call gedatsu_graph_set_edge(graph, n_edge_all, edge_all, is_sort)
   end subroutine gedatsu_graph_add_edge
 
   !> @ingroup graph_basic
