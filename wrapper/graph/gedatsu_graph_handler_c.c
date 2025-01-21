@@ -212,5 +212,44 @@ void gedatsu_graph_add_edge(
 void gedatsu_graph_delete_dupulicate_edge(
   GEDATSU_GRAPH* graph)
 {
+  int* index;
+  int* item;
+  int* temp;
 
+  index = monolis_alloc_I_1d(index, graph->n_vertex + 1);
+  item = monolis_alloc_I_1d(item, graph->index[graph->n_vertex]);
+
+  for (int i = 0; i < graph->n_vertex + 1; ++i) {
+    index[i] = graph->index[i];
+  }
+
+  for (int i = 0; i < graph->index[graph->n_vertex]; ++i) {
+    item[i] = graph->item[i];
+  }
+
+  monolis_dealloc_I_1d(&graph->item);
+
+  temp = NULL;
+  int n_total = 0;
+  for (int i = 0; i < graph->n_vertex; ++i) {
+    int jS = index[i];
+    int jE = index[i + 1];
+    int len = jE - jS;
+
+    monolis_dealloc_I_1d(&temp);
+    temp = monolis_alloc_I_1d(temp, len);
+
+    for (int j = jS; j < jE; ++j) {
+      temp[j - jS] = item[j];
+    }
+
+    int len_uniq = 0;
+    monolis_qsort_I_1d(temp, 1, len);
+    monolis_get_uniq_array_I(temp, len, &len_uniq);
+
+    graph->item = monolis_append_I_1d(graph->item, n_total, len_uniq, temp);
+    n_total = n_total + len_uniq;
+
+    graph->index[i + 1] = graph->index[i] + len_uniq;
+  }
 }
