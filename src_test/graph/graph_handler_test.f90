@@ -541,6 +541,13 @@ contains
     call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 7", graph%item(6), 3)
     call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 8", graph%item(7), 5)
     call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 9", graph%item(8), 4)
+
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(1), 0)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(2), 1)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(3), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(4), 5)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(5), 7)
+    call monolis_test_check_eq_I1("gedatsu_graph_set_edge case 10", graph%index(6), 8)
   end subroutine gedatsu_graph_set_edge_test
 
   subroutine gedatsu_graph_add_edge_test()
@@ -582,5 +589,12 @@ contains
     call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 7", graph%item(6), 3)
     call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 8", graph%item(7), 5)
     call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 9", graph%item(8), 4)
+
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(1), 0)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(2), 1)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(3), 3)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(4), 5)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(5), 7)
+    call monolis_test_check_eq_I1("gedatsu_graph_add_edge case 10", graph%index(6), 8)
   end subroutine gedatsu_graph_add_edge_test
 end module mod_gedatsu_graph_handler_test
