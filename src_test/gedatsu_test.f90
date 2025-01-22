@@ -4,6 +4,7 @@ program gedatsu_test
   use mod_gedatsu_def_graph_test
   use mod_gedatsu_graph_handler_test
   use mod_gedatsu_graph_convert_test
+  use mod_gedatsu_graph_merge_test
   use mod_gedatsu_graph_part_test
   use mod_gedatsu_graph_repart_test
   use mod_gedatsu_driver_test
@@ -17,6 +18,7 @@ program gedatsu_test
 
   call gedatsu_graph_convert_test()
   call gedatsu_graph_handler_test()
+  call gedatsu_graph_merge_test()
   call gedatsu_graph_part_test()
 
   call gedatsu_graph_repart_test()

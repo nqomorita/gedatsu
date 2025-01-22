@@ -15,6 +15,8 @@
 !# gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 !# gedatsu_graph_set_edge(graph, n_edge, edge)
 !# gedatsu_graph_add_edge(graph, n_edge, edge)
+!# gedatsu_graph_delete_dupulicate_edge(graph)
+!# gedatsu_graph_get_edge_in_internal_region_conn_graph(graph, n_edge, edge)
 module mod_gedatsu_graph_handler
   use mod_monolis_utils
   use mod_gedatsu_graph
@@ -401,6 +403,72 @@ contains
     enddo
   end subroutine gedatsu_graph_get_edge_in_internal_region
 
+  !> *** コネクティビティグラフ結合時はこの関数を使う ***
+  !> *** 理由：nodal_graph%vertex_id は計算点番号、conn_graph%vertex_id は要素番号が記述されているから。 ***
+  !> @ingroup graph_basic
+  !> 領域番号 domain_id に属するグラフのエッジを取得
+  !> @details エッジの組はローカル節点番号で表現される
+  subroutine gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graph, conn_graph, domain_id, edge)
+    implicit none
+    !> [in] graph 構造体（計算点グラフ）
+    type(gedatsu_graph), intent(in) :: nodal_graph
+    !> [in] graph 構造体（コネクティビティグラフ）
+    type(gedatsu_graph), intent(in) :: conn_graph
+    !> [in] 領域番号
+    integer(kint), intent(in) :: domain_id
+    !> [out] グラフのエッジ配列
+    integer(kint), intent(out) :: edge(:,:)
+
+    integer(kint) :: i, nid, idx, j, jS, jE
+    integer(kint) :: n_nodal_vertex, n_conn_vertex, n_edge, e1, e2, n1, n2
+    integer(kint), allocatable :: nodal_ids(:), conn_ids(:)
+    integer(kint), allocatable :: nodal_perm(:), conn_perm(:)
+
+    call gedatsu_graph_get_n_vertex_in_internal_region(nodal_graph, domain_id, n_nodal_vertex)
+    call gedatsu_graph_get_n_vertex_in_internal_region(conn_graph, domain_id, n_conn_vertex)
+
+    call monolis_alloc_I_1d(nodal_ids, n_nodal_vertex)
+    call monolis_alloc_I_1d(conn_ids, n_conn_vertex)
+
+    call gedatsu_graph_get_vertex_id_in_internal_region(nodal_graph, domain_id, nodal_ids)
+    call gedatsu_graph_get_vertex_id_in_internal_region(conn_graph, domain_id, conn_ids)
+
+    call monolis_alloc_I_1d(nodal_perm, n_nodal_vertex)
+    call monolis_alloc_I_1d(conn_perm, n_conn_vertex)
+
+    call monolis_get_sequence_array_I(nodal_perm, n_nodal_vertex, 1, 1)
+    call monolis_get_sequence_array_I(conn_perm, n_conn_vertex, 1, 1)
+
+    call monolis_qsort_I_2d(nodal_ids, nodal_perm, 1, n_nodal_vertex)
+    call monolis_qsort_I_2d(conn_ids, conn_perm, 1, n_conn_vertex)
+
+    n_edge = 0
+    do i = 1, conn_graph%n_vertex
+      if(conn_graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = conn_graph%index(i) + 1
+      jE = conn_graph%index(i + 1)
+      do j = jS, jE
+        nid = conn_graph%item(j)
+        if(nodal_graph%vertex_domain_id(nid) == domain_id)then
+
+          n1 = conn_graph%vertex_id(i)
+          call monolis_bsearch_I(conn_ids, 1, n_conn_vertex, n1, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 1"
+          e1 = conn_perm(idx)
+
+          n2 = nodal_graph%vertex_id(nid)
+          call monolis_bsearch_I(nodal_ids, 1, n_nodal_vertex, n2, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
+          e2 = nodal_perm(idx)
+
+          n_edge = n_edge + 1
+          edge(1,n_edge) = e1
+          edge(2,n_edge) = e2
+        endif
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_edge_in_internal_region_conn_graph
+
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
   !> @details エッジの組はローカル節点番号で表現される
@@ -559,6 +627,81 @@ contains
     enddo
   end subroutine gedatsu_graph_set_edge
 
+  !> *** コネクティビティグラフ結合時はこの関数を使う ***
+  !> *** 理由１：if(graph%n_vertex < maxval(edge(:,1:n_edge)))then があると引っかかるから。 ***
+  !> *** 理由２：エッジをソートしてしまうと、要素を構成する節点が反時計回りならないから。 ***
+  !> *** 理由３：item のブロック内でソートしてしまうと、要素を構成する節点が反時計回りならないから。 ***
+  !> @ingroup graph_basic
+  !> グラフのエッジを設定
+  !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。ノード数は変化しない。
+  subroutine gedatsu_graph_set_edge_conn(graph, n_edge, edge)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    !> [in] グラフのエッジ数
+    integer(kint), intent(in) :: n_edge
+    !> [in] グラフエッジ
+    integer(kint), intent(in) :: edge(:,:)
+    integer(kint) :: i, e1, e2, jS, jE, in, j
+    integer(kint), allocatable :: temp(:,:)
+
+    if(n_edge < 1)then
+      call monolis_std_error_string("gedatsu_graph_set_edge")
+      call monolis_std_error_string("n_edge is less than 1")
+      call monolis_std_error_stop()
+    endif
+
+    call monolis_alloc_I_2d(temp, 2, n_edge)
+
+    temp = edge
+
+    ! print *, "temp"
+    ! do i = 1, size(temp,2)
+    !   print *, (temp(j,i), j=1,size(temp,1))
+    ! enddo
+
+    ! call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)  !> これをコメントアウトしないと、edge(1,:)が同じでもedge(2,:)がソートされてしまう
+
+    ! print *, "temp"
+    ! do i = 1, size(temp,2)
+    !   print *, (temp(j,i), j=1,size(temp,1))
+    ! enddo
+
+    ! if(graph%n_vertex < maxval(edge(:,1:n_edge)))then
+    !   call monolis_std_error_string("gedatsu_graph_set_edge")
+    !   call monolis_std_error_string("edge node number is greater than the number of vertex")
+    !   call monolis_std_error_stop()
+    ! endif
+
+    graph%index = 0
+    do i = 1, n_edge
+      e1 = temp(1,i)
+      e2 = temp(2,i)
+      graph%index(e1 + 1) = graph%index(e1 + 1) + 1
+    enddo
+
+    do i = 1, graph%n_vertex
+      graph%index(i + 1) = graph%index(i + 1) + graph%index(i)
+    enddo
+
+    in = graph%index(graph%n_vertex + 1)
+
+    if(allocated(graph%item)) call monolis_dealloc_I_1d(graph%item)
+
+    call monolis_alloc_I_1d(graph%item, in)
+
+    do i = 1, n_edge
+      e2 = temp(2,i)
+      graph%item(i) = e2
+    enddo
+
+    ! do i = 1, graph%n_vertex
+    !   jS = graph%index(i) + 1
+    !   jE = graph%index(i + 1)
+    !   call monolis_qsort_I_1d(graph%item, jS, jE)
+    ! enddo
+  end subroutine gedatsu_graph_set_edge_conn
+
   !> @ingroup graph_basic
   !> グラフのエッジを追加
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
@@ -605,6 +748,58 @@ contains
     call gedatsu_graph_set_edge(graph, n_edge_all, edge_all)
   end subroutine gedatsu_graph_add_edge
 
+  !> *** コネクティビティグラフ結合時はこの関数を使う ***
+  !> *** gedatsu_graph_add_edge との違い：gedatsu_graph_set_edge ではなく、gedatsu_graph_add_edge_conn 呼ぶところのみ。 ***
+  !> @ingroup graph_basic
+  !> グラフのエッジを追加
+  !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
+  subroutine gedatsu_graph_add_edge_conn(graph, n_edge, edge)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    !> [in] グラフのエッジ数
+    integer(kint), intent(in) :: n_edge
+    !> [in] グラフエッジ
+    integer(kint), intent(in) :: edge(:,:)
+    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
+    integer(kint), allocatable :: edge_all(:,:)
+
+    if(n_edge < 1)then
+      call monolis_std_error_string("gedatsu_graph_add_edge")
+      call monolis_std_error_string("n_edge is less than 1")
+      call monolis_std_error_stop()
+    endif
+
+    n_edge_cur = graph%index(graph%n_vertex + 1)
+
+    !> 重複のない個数を数える
+
+    n_edge_all = n_edge_cur + n_edge
+
+    call monolis_alloc_I_2d(edge_all, 2, n_edge_all)
+
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        edge_all(1,j) = i
+        edge_all(2,j) = graph%item(j)
+      enddo
+    enddo
+
+    call monolis_dealloc_I_1d(graph%item)
+    call monolis_alloc_I_1d(graph%item, n_edge_all)
+
+    !n_edge = 0
+    do i = 1, n_edge
+      ! if(重複内要素)then n_edge += 1
+      edge_all(1,n_edge_cur + i) = edge(1,i)  !左辺だけ i→n_edge
+      edge_all(2,n_edge_cur + i) = edge(2,i)
+    enddo
+
+    call gedatsu_graph_set_edge_conn(graph, n_edge_all, edge_all)
+  end subroutine gedatsu_graph_add_edge_conn
+
   !> @ingroup graph_basic
   !> グラフのエッジを追加
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
@@ -633,4 +828,40 @@ contains
       endif
     enddo
   end subroutine gedatsu_graph_check_edge
+
+  !> @ingroup graph_basic
+  !> グラフの重複したエッジを削除
+  subroutine gedatsu_graph_delete_dupulicate_edge(graph)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    integer(kint) :: i, iS, iE, len, len_uniq
+    integer(kint), allocatable :: index_(:), item(:), item_tmp(:)
+
+    call monolis_alloc_I_1d(index_, graph%n_vertex+1)
+    call monolis_alloc_I_1d(item, graph%index(graph%n_vertex+1))
+
+    index_(:) = graph%index(:)
+    item(:) = graph%item(:)
+
+    call monolis_dealloc_I_1d(graph%item)
+
+    do i = 1, graph%n_vertex
+      iS = index_(i)+1
+      iE = index_(i+1)
+      len = iE - iS + 1
+
+      call monolis_dealloc_I_1d(item_tmp)
+      call monolis_alloc_I_1d(item_tmp, len)
+      item_tmp(1:len) = item(iS:iE)
+
+      call monolis_qsort_I_1d(item_tmp, 1, len)
+      call monolis_get_uniq_array_I(item_tmp, len, len_uniq)
+
+      call monolis_append_I_1d(graph%item, len_uniq, item_tmp)
+      graph%index(i+1) = graph%index(i) + len_uniq
+    enddo
+
+  end subroutine gedatsu_graph_delete_dupulicate_edge
+
 end module mod_gedatsu_graph_handler
