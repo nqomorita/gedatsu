@@ -181,7 +181,7 @@ contains
       enddo
 
       !> merged_graph にエッジを追加
-      call gedatsu_graph_add_edge(merged_graph, n_edge, edge)
+      call gedatsu_graph_add_edge(merged_graph, n_edge, edge, .true.)
     enddo
 
     !> 重複削除
@@ -358,7 +358,7 @@ contains
         edge(2,j) = nodal_vertex_id_notsorted(tmp)  !> 結合後ソート前ローカル番号
       enddo
 
-      call gedatsu_graph_add_edge_conn(merged_conn_graph, n_edge, edge)
+      call gedatsu_graph_add_edge(merged_conn_graph, n_edge, edge, .false.)
     enddo
   end subroutine gedatsu_merge_connectivity_subgraphs
 

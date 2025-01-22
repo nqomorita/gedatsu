@@ -10,8 +10,7 @@ void gedatsu_list_initialize_R(
   MONOLIS_LIST_R* list_struct_R,
   const int n)
 {
-  for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_R[i].n = 0;
     monolis_dealloc_R_1d(&list_struct_R[i].array);
   }
@@ -21,8 +20,7 @@ void gedatsu_list_initialize_I(
   MONOLIS_LIST_I* list_struct_I,
   const int n)
 {
-    for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_I[i].n = 0;
     monolis_dealloc_I_1d(&list_struct_I[i].array);
   }
@@ -32,8 +30,7 @@ void gedatsu_list_initialize_C(
   MONOLIS_LIST_C* list_struct_C,
   const int n)
 {
-    for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_C[i].n = 0;
     monolis_dealloc_C_1d(&list_struct_C[i].array);
   }
@@ -43,8 +40,7 @@ void gedatsu_list_finalize_R(
   MONOLIS_LIST_R* list_struct_R,
   const int n)
 {
-    for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_R[i].n = 0;
     monolis_dealloc_R_1d(&list_struct_R[i].array);
   }
@@ -54,8 +50,7 @@ void gedatsu_list_finalize_I(
   MONOLIS_LIST_I* list_struct_I,
   const int n)
 {
-    for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_I[i].n = 0;
     monolis_dealloc_I_1d(&list_struct_I[i].array);
   }
@@ -65,8 +60,7 @@ void gedatsu_list_finalize_C(
   MONOLIS_LIST_C* list_struct_C,
   const int n)
 {
-    for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_C[i].n = 0;
     monolis_dealloc_C_1d(&list_struct_C[i].array);
   }
@@ -81,8 +75,7 @@ void gedatsu_list_set_R(
   list_struct_R[id].n = n;
   monolis_dealloc_R_1d(&list_struct_R[id].array);
   list_struct_R[id].array = monolis_alloc_R_1d(list_struct_R[id].array, n);
-  for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_R[id].array[i] = array[i];
   }
 }
@@ -96,8 +89,7 @@ void gedatsu_list_set_I(
   list_struct_I[id].n = n;
   monolis_dealloc_I_1d(&list_struct_I[id].array);
   list_struct_I[id].array = monolis_alloc_I_1d(list_struct_I[id].array, n);
-  for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_I[id].array[i] = array[i];
   }
 }
@@ -111,8 +103,7 @@ void gedatsu_list_set_C(
   list_struct_C[id].n = n;
   monolis_dealloc_C_1d(&list_struct_C[id].array);
   list_struct_C[id].array = monolis_alloc_C_1d(list_struct_C[id].array, n);
-  for (int i = 0; i < n; i++)
-  {
+  for (int i = 0; i < n; i++) {
     list_struct_C[id].array[i] = array[i];
   }
 }
@@ -124,8 +115,7 @@ void gedatsu_list_get_R(
 {
   monolis_dealloc_R_1d(array);
   *array = monolis_alloc_R_1d(*array, list_struct_R[id].n);
-  for (int i = 0; i < list_struct_R[id].n; i++)
-  {
+  for (int i = 0; i < list_struct_R[id].n; i++) {
     *array[i] = list_struct_R[id].array[i];
   }
 }
@@ -137,8 +127,7 @@ void gedatsu_list_get_I(
 {
   monolis_dealloc_I_1d(array);
   *array = monolis_alloc_I_1d(*array, list_struct_I[id].n);
-  for (int i = 0; i < list_struct_I[id].n; i++)
-  {
+  for (int i = 0; i < list_struct_I[id].n; i++) {
     *array[i] = list_struct_I[id].array[i];
   }
 }
@@ -150,8 +139,7 @@ void gedatsu_list_get_C(
 {
   monolis_dealloc_C_1d(array);
   *array = monolis_alloc_C_1d(*array, list_struct_C[id].n);
-  for (int i = 0; i < list_struct_C[id].n; i++)
-  {
+  for (int i = 0; i < list_struct_C[id].n; i++) {
     *array[i] = list_struct_C[id].array[i];
   }
 }
@@ -177,22 +165,19 @@ void gedatsu_merge_nodal_subgraphs(
 
   n_vertex = 0;
   n_internal_vertex = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     n_vertex += graphs[i].n_vertex;
-    n_internal_vertex =+ graphs[i].n_internal_vertex;
+    n_internal_vertex += graphs[i].n_internal_vertex;
   }
 
   vertex_id = monolis_alloc_I_1d(vertex_id, n_vertex);
 
   // 全ての graphs の vertex_id をつなげる
   iS = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     iE = iS + graphs[i].n_vertex - 1;
     tmp1 = 0;
-    for (int j = iS; j < iE; j++)
-    {
+    for (int j = iS; j < iE; j++) {
       vertex_id[j] = graphs[i].vertex_id[tmp1];
       tmp1 += 1;
     }
@@ -200,17 +185,15 @@ void gedatsu_merge_nodal_subgraphs(
   }
 
   // つなげた vertex_id を昇順ソート＋重複削除
-  monolis_qsort_I_1d(vertex_id, 0, n_vertex-1);
+  monolis_qsort_I_1d(vertex_id, n_vertex, 0, n_vertex - 1);
   // monolis_get_uniq_array_I(vertex_id, n_vertex, tmp1);  // TODO 関数が存在しない
   n_vertex = tmp1;  // 重複を削除した全計算点数
   // monolis_realloc_I_1d(vertex_id, n_vertex);  // TODO 関数が存在しない
 
   // 内部領域か袖領域かの判定
   // monolis_alloc_L_1d(is_internal, n_vertex)  // 内部領域なら.true.  // TODO 関数が存在しない
-  for (int i = 0; i < n_graphs; i++)
-  {
-    for (int j = 0; j < graphs[i].n_internal_vertex; j++)
-    {
+  for (int i = 0; i < n_graphs; i++) {
+    for (int j = 0; j < graphs[i].n_internal_vertex; j++) {
       val = graphs[i].vertex_id[j];
       // monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx);  // TODO 関数が存在しない
       is_internal[idx] = true;
@@ -223,14 +206,11 @@ void gedatsu_merge_nodal_subgraphs(
   overlap_vertex_id = monolis_alloc_I_1d(overlap_vertex_id, n_overlap_vertex);
   tmp1 = 0;
   tmp2 = 0;
-  for (int i = 0; i < n_vertex; i++)
-  {
-    if (is_internal[i])
-    {
+  for (int i = 0; i < n_vertex; i++) {
+    if (is_internal[i]) {
       internal_vertex_id[tmp1] = vertex_id[i];
       tmp1 += 1;
-    }else
-    {
+    } else {
       overlap_vertex_id[tmp2] = vertex_id[i];
       tmp2 += 1;
     }
@@ -244,23 +224,18 @@ void gedatsu_merge_nodal_subgraphs(
   merged_graph->n_internal_vertex = n_internal_vertex;
 
   // vertex_id の作成
-  if (order_type == ORDER_NODAL_ID)
-  {
-    for (int i = 0; i < n_internal_vertex; i++)
-    {
+  if (order_type == ORDER_NODAL_ID) {
+    for (int i = 0; i < n_internal_vertex; i++) {
     merged_graph->vertex_id[i] = internal_vertex_id[i];
     merged_graph->vertex_id[n_internal_vertex+i] = overlap_vertex_id[i];
     }
-  }else if (order_type == ORDER_DOMAIN_ID)
-  {
+  } else if (order_type == ORDER_DOMAIN_ID) {
     // 内部領域
     iS = 1;
-    for (int i = 0; i < n_graphs; i++)
-    {
+    for (int i = 0; i < n_graphs; i++) {
       iE = iS + graphs[i].n_internal_vertex - 1;
       tmp1 = 0;
-      for (int i = iS; i < iE; i++)
-      {
+      for (int i = iS; i < iE; i++) {
         merged_graph->vertex_id[i] = graphs[i].vertex_id[tmp1];
         tmp1 += 1;
       }
@@ -270,42 +245,35 @@ void gedatsu_merge_nodal_subgraphs(
     // is_already_count_overlap = monolis_alloc_L_1d(is_already_count_overlap, n_overlap_vertex); // 袖領域に含まれるとカウントしたら.true.にする
     // TODO ↑ 関数が存在しない
     tmp1 = 0;
-    for (int i = 0; i < n_graphs; i++)
-    {
-      for (int j = graphs[i].n_internal_vertex; j < graphs[i].n_vertex; j++)
-      {
+    for (int i = 0; i < n_graphs; i++) {
+      for (int j = graphs[i].n_internal_vertex; j < graphs[i].n_vertex; j++) {
         val = graphs[i].vertex_id[j];
         // monolis_bsearch_I(overlap_vertex_id, 1, n_overlap_vertex, val, idx)  // TODO 関数が存在しない
-        if (idx == -1)
-        {
+        if (idx == -1) {
           continue;
         }
-        if (is_already_count_overlap[idx] == false)
-        {
+        if (is_already_count_overlap[idx] == false) {
           merged_graph->vertex_id[n_internal_vertex+tmp1] = val;
           tmp1 += 1;
           is_already_count_overlap[idx] = true;
         }
       }
     }
-  }else
-  {
+  } else {
     monolis_std_log_string("*** error *** Invalid order_type. order_type must be ORDER_DOMAIN_ID or ORDER_NODAL_ID.");
-    exit;
+    exit(1);
   }
 
   // 「ソート後の結合後ローカル番号」＝vertex_idと「ソートしていない本来の結合後ローカル番号」＝merged_graph%vertex_idの対応関係を保持しておく
   monolis_alloc_I_1d(vertex_id_notsorted, n_vertex);
-  for (int i = 0; i < n_vertex; i++)
-  {
+  for (int i = 0; i < n_vertex; i++) {
     val = merged_graph->vertex_id[i];
     // monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  // TODO 関数が存在しない
   vertex_id_notsorted[idx] = i;
   }
 
   // CSR 形式グラフの作成
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     monolis_dealloc_I_2d(&edge, 2, n_edge);
     // gedatsu_graph_get_n_edge(graphs(i), n_edge);  // TODO 関数が存在しない
     monolis_alloc_I_2d(edge, 2, n_edge);
@@ -313,10 +281,8 @@ void gedatsu_merge_nodal_subgraphs(
     // TODO ↑ 関数が存在しない
 
     // edge を「ソートしていない本来の結合後ローカル番号」に変換
-    for (int j = 0; j < n_edge; j++)
-    {
-      for (int k = 0; k < 2; k++)
-      {
+    for (int j = 0; j < n_edge; j++) {
+      for (int k = 0; k < 2; k++) {
         idx = edge[k][j];  // 結合前グラフにおけるローカル番号
         val = graphs[i].vertex_id[idx]; // グローバル番号
         // monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx);  // 「ソート後の結合後ローカル番号」 // TODO 関数が存在しない
@@ -362,16 +328,14 @@ void gedatsu_merge_connectivity_subgraphs(
   MONOLIS_LIST_I* conn_graphs_vertex_id = NULL;
   MONOLIS_LIST_I* conn_graphs_vertex_id_perm = NULL;
 
-  if (n_nodal_graphs != n_conn_graphs)
-  {
+  if (n_nodal_graphs != n_conn_graphs) {
     monolis_std_log_string("*** n_nodal_graphs != n_conn_graphs");
-    exit;
+    exit(1);
   }
 
   n_conn_vertex = 0;
   n_conn_internal_vertex = 0;
-  for (int i = 0; i < n_conn_graphs; i++)
-  {
+  for (int i = 0; i < n_conn_graphs; i++) {
     n_conn_vertex += conn_graphs[i].n_vertex;
     n_conn_internal_vertex += conn_graphs[i].n_internal_vertex;
   }
@@ -380,11 +344,9 @@ void gedatsu_merge_connectivity_subgraphs(
   // 全ての conn_graphs の vertex_id をつなげる
   iS = 0;
   tmp1 = 0;
-  for (int i = 0; i < n_conn_graphs; i++)
-  {
+  for (int i = 0; i < n_conn_graphs; i++) {
     iE = iS + conn_graphs[i].n_vertex - 1;
-    for (int j = iS; j < iE; j++)
-    {
+    for (int j = iS; j < iE; j++) {
       conn_vertex_id[j] = conn_graphs[i].vertex_id[tmp1];
       tmp1 += 1;
     }
@@ -392,17 +354,15 @@ void gedatsu_merge_connectivity_subgraphs(
   }
 
   // つなげた conn_vertex_id を昇順ソート＋重複削除
-  monolis_qsort_I_1d(conn_vertex_id, 0, n_conn_vertex-1);
+  monolis_qsort_I_1d(conn_vertex_id, n_conn_vertex, 0, n_conn_vertex - 1);
   // monolis_get_uniq_array_I(conn_vertex_id, n_conn_vertex, tmp1);  // TODO 関数ない
   n_conn_vertex = tmp1;
   // monolis_realloc_I_1d(conn_vertex_id, n_conn_vertex);  // TODO 関数ない
 
   // 内部領域か袖領域かの判定
   // monolis_alloc_L_1d(is_conn_internal, n_conn_vertex) // 内部領域なら.true.  // TODO 関数ない
-  for (int i = 0; i < n_conn_graphs; i++)
-  {
-    for (int j = 0; j < conn_graphs[i].n_internal_vertex; j++)
-    {
+  for (int i = 0; i < n_conn_graphs; i++) {
+    for (int j = 0; j < conn_graphs[i].n_internal_vertex; j++) {
       val = conn_graphs[i].vertex_id[j];
       // monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) // TODO 関数ない
       is_conn_internal[idx] = true;
@@ -414,14 +374,11 @@ void gedatsu_merge_connectivity_subgraphs(
   monolis_alloc_I_1d(conn_overlap_vertex_id, n_conn_overlap_vertex);
   tmp1 = 0;
   tmp2 = 0;
-  for (int i = 0; i < n_conn_vertex; i++)
-  {
-    if (is_conn_internal[i] == true)
-    {
+  for (int i = 0; i < n_conn_vertex; i++) {
+    if (is_conn_internal[i] == true) {
       conn_internal_vertex_id[tmp1] = conn_vertex_id[i];
       tmp1 += 1;
-    }else
-    {
+    } else {
       conn_internal_vertex_id[tmp2] = conn_vertex_id[i];
       tmp2 += 1;
     }
@@ -432,35 +389,30 @@ void gedatsu_merge_connectivity_subgraphs(
   // gedatsu_graph_set_n_vertex(merged_conn_graph, n_conn_vertex) // TODO 関数ない
   merged_conn_graph->n_internal_vertex = n_conn_internal_vertex;
 
-  for (int i = 0; i < n_conn_internal_vertex; i++)
-  {
+  for (int i = 0; i < n_conn_internal_vertex; i++) {
     merged_conn_graph->vertex_id[i] = conn_internal_vertex_id[i];
   }
-  for (int i = 0; i < n_conn_overlap_vertex; i++)
-  {
+  for (int i = 0; i < n_conn_overlap_vertex; i++) {
     merged_conn_graph->vertex_id[n_conn_internal_vertex+i] = conn_overlap_vertex_id[i];
   }
 
   // 「ソート後の結合後ローカル番号」と「ソートしていない本来の結合後ローカル番号」の対応関係を保持しておく必要がある
   // 要素
   monolis_alloc_I_1d(conn_vertex_id_notsorted, n_conn_vertex);
-  for (int i = 0; i < n_conn_vertex; i++)
-  {
+  for (int i = 0; i < n_conn_vertex; i++) {
     val = merged_conn_graph->vertex_id[i];
     // monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx) // TODO 関数ない
     conn_vertex_id_notsorted[i] = idx;
   }
   // 計算点
   monolis_alloc_I_1d(nodal_vertex_id, merged_nodal_graph->n_vertex);
-  for (int i = 0; i < merged_nodal_graph->n_vertex; i++)
-  {
+  for (int i = 0; i < merged_nodal_graph->n_vertex; i++) {
     nodal_vertex_id[i] = merged_nodal_graph->vertex_id[i];
   }
   // gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex); // TODO 関数ない
-  monolis_qsort_I_1d(nodal_vertex_id, 0, n_nodal_vertex-1);
+  monolis_qsort_I_1d(nodal_vertex_id, n_nodal_vertex, 0, n_nodal_vertex - 1);
   monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex);
-  for (int i = 0; i < n_nodal_vertex; i++)
-  {
+  for (int i = 0; i < n_nodal_vertex; i++) {
     val = merged_nodal_graph->vertex_id[i];
     // monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx); // TODO 関数ない
     nodal_vertex_id_notsorted[idx] = i;
@@ -471,8 +423,7 @@ void gedatsu_merge_connectivity_subgraphs(
   conn_graphs_vertex_id_perm = (MONOLIS_LIST_I *)calloc(n_conn_graphs, sizeof(MONOLIS_LIST_I));
   gedatsu_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs);
   gedatsu_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs);
-  for (int i = 0; i < n_conn_graphs; i++)
-  {
+  for (int i = 0; i < n_conn_graphs; i++) {
     gedatsu_list_set_I(conn_graphs_vertex_id, i, conn_graphs[i].n_vertex, conn_graphs[i].vertex_id);
     conn_graphs_vertex_id_perm[i].n = conn_graphs[i].n_vertex;
     monolis_alloc_I_1d(conn_graphs_vertex_id_perm[i].array, conn_graphs[i].n_vertex);
@@ -485,27 +436,22 @@ void gedatsu_merge_connectivity_subgraphs(
   monolis_alloc_I_1d(which_conn_graph, n_conn_vertex);
   monolis_alloc_I_1d(local_id_in_conn_graph, n_conn_vertex);
 
-  for (int i = 0; i < n_conn_vertex; i++)
-  {
+  for (int i = 0; i < n_conn_vertex; i++) {
     global_id_in_merged_graph[i] = merged_conn_graph->vertex_id[i];
   }
-  for (int i = 0; i < n_conn_vertex; i++)
-  {
+  for (int i = 0; i < n_conn_vertex; i++) {
     val = merged_conn_graph->vertex_id[i];  // グローバル番号
-    for (int j = 0; j < n_conn_graphs; j++)
-    {
+    for (int j = 0; j < n_conn_graphs; j++) {
       // monolis_bsearch_I(conn_graphs_vertex_id(j)%array, 1, conn_graphs_vertex_id(j)%n, val, idx)  // ソート後ローカル番号
       // TODO ↑ 関数ない
-      if (idx == -1)
-      {
+      if (idx == -1) {
         continue;
       }
       tmp1 = conn_graphs_vertex_id_perm[j].array[idx]; // ソート前ローカル番号
       which_conn_graph[i] = j;
       local_id_in_conn_graph[i] = tmp1;
-      if (idx /= -1)
-      {
-        exit:
+      if (idx /= -1) {
+        exit(1);
       }
     }
   }
@@ -531,20 +477,17 @@ void gedatsu_merge_connectivity_subgraphs(
     n_edge = iE - iS + 1;
     monolis_dealloc_I_2d(&edge, 2, n_edge);
     monolis_alloc_I_2d(edge, 2, n_edge);
-    for (int j = 0; j < n_edge; j++)
-    {
+    for (int j = 0; j < n_edge; j++) {
       edge[0][j] = i;
     }
     tmp1 = 0;
-    for (int j = iS; j < iE; j++)
-    {
+    for (int j = iS; j < iE; j++) {
       edge[0][tmp1] = conn_graphs[which_conn_graph[idx]].index[j];
       tmp1 += 1;
     }
 
     // edge の計算点番号を「ソートしていない本来の結合後ローカル番号」に変換
-    for (int j = 0; j < n_edge; j++)
-    {
+    for (int j = 0; j < n_edge; j++) {
       tmp1 = edge[1][j]; // 結合前ローカル番号
       val = nodal_graphs[which_conn_graph[idx]].vertex_id[tmp1];  //グローバル番号
       // monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, tmp2)  !> 結合後ソート後ローカル番号 // TODO 関数ない
@@ -588,8 +531,7 @@ void gedatsu_merge_distval_R(
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
@@ -609,25 +551,21 @@ void gedatsu_merge_distval_R(
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
     n_dof_list_n[i] = n_dof_list[i].n;
     list_struct_R_n[i] = list_struct_R[i].n;
-    for (int j = 0; j < n_vertex[i]; j++)
-    {
+    for (int j = 0; j < n_vertex[i]; j++) {
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
       list_struct_R_array[iE_n_vertex+j] = list_struct_R[i].array[j];
     }
-    for (int j = 0; j < n_vertex[i]+1; j++)
-    {
+    for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
     }
-    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++)
-    {
+    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++) {
       item[iE_item+j] = graphs[i].item[j];
     }
     iE_n_vertex += n_vertex[i];
@@ -690,8 +628,7 @@ void gedatsu_merge_distval_I(
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
@@ -711,25 +648,21 @@ void gedatsu_merge_distval_I(
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
     n_dof_list_n[i] = n_dof_list[i].n;
     list_struct_I_n[i] = list_struct_I[i].n;
-    for (int j = 0; j < n_vertex[i]; j++)
-    {
+    for (int j = 0; j < n_vertex[i]; j++) {
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
       list_struct_I_array[iE_n_vertex+j] = list_struct_I[i].array[j];
     }
-    for (int j = 0; j < n_vertex[i]+1; j++)
-    {
+    for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
     }
-    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++)
-    {
+    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++) {
       item[iE_item+j] = graphs[i].item[j];
     }
     iE_n_vertex += n_vertex[i];
@@ -792,8 +725,7 @@ void gedatsu_merge_distval_C(
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
@@ -813,25 +745,21 @@ void gedatsu_merge_distval_C(
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
-  for (int i = 0; i < n_graphs; i++)
-  {
+  for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
     n_dof_list_n[i] = n_dof_list[i].n;
     list_struct_C_n[i] = list_struct_C[i].n;
-    for (int j = 0; j < n_vertex[i]; j++)
-    {
+    for (int j = 0; j < n_vertex[i]; j++) {
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
       list_struct_C_array[iE_n_vertex+j] = list_struct_C[i].array[j];
     }
-    for (int j = 0; j < n_vertex[i]+1; j++)
-    {
+    for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
     }
-    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++)
-    {
+    for (int j = 0; j < graphs[i].index[n_vertex[i]]; j++) {
       item[iE_item+j] = graphs[i].item[j];
     }
     iE_n_vertex += n_vertex[i];

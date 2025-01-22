@@ -101,14 +101,15 @@ SRC_DLB = \
 
 ##> C wrapper section
 SRC_DEF_C = \
-	gedatsu_def_graph_c.c
+  gedatsu_def_graph_c.c
 
 SRC_GRAPH_C = \
   gedatsu_graph_convert_c.c \
+  gedatsu_graph_handler_c.c \
   gedatsu_graph_merge_c.c
 
 SRC_GRAPH_CF = \
-	merge_wrapper.f90
+  merge_wrapper.f90
 
 SRC_ALL_C = \
 $(addprefix define/, $(SRC_DEF_C)) \
@@ -151,6 +152,7 @@ gedatsu_def_graph_c_test.c
 
 SRC_GRAPH_C_TEST = \
 gedatsu_graph_convert_c_test.c \
+gedatsu_graph_handler_c_test.c \
 gedatsu_graph_merge_c_test.c
 
 SRC_ALL_C_TEST = \
@@ -261,6 +263,7 @@ cp_header:
 	$(CP) ./wrapper/define/gedatsu_def_graph_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_merge_c.h ./include/
+	$(CP) ./wrapper/graph/gedatsu_graph_handler_c.h ./include/
 	$(CP) ./wrapper/gedatsu.h ./include/
 
 clean:

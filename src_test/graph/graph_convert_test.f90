@@ -120,7 +120,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5;
     edge(1,8) = 5; edge(2,8) = 4;
 
-    call gedatsu_graph_set_edge(node, n_edge, edge)
+    call gedatsu_graph_set_edge(node, n_edge, edge, .true.)
 
     !> conn graph case 1
     n_vertex = 4
@@ -136,7 +136,7 @@ contains
     edge(1,5) = 3; edge(2,5) = 3;
     edge(1,6) = 3; edge(2,6) = 4;
 
-    call gedatsu_graph_set_edge(conn, n_edge, edge)
+    call gedatsu_graph_set_edge(conn, n_edge, edge, .true.)
 
     call gedatsu_check_connectivity_graph(node, conn, is_valid)
 
@@ -158,7 +158,7 @@ contains
     edge(1,5) = 3; edge(2,5) = 1;
     edge(1,6) = 3; edge(2,6) = 3;
 
-    call gedatsu_graph_set_edge(conn, n_edge, edge)
+    call gedatsu_graph_set_edge(conn, n_edge, edge, .true.)
 
     call gedatsu_check_connectivity_graph(node, conn, is_valid)
 

@@ -52,7 +52,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     n_domain = 2
 
@@ -109,7 +109,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     n_domain = 2
 
@@ -199,7 +199,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 
@@ -277,7 +277,7 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge)
+    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
 
     domain_id = 0
 

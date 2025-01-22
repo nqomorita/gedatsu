@@ -221,7 +221,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 4; edge(2,12) = 5
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(graphs(1), 14, edge)
+    call gedatsu_graph_set_edge(graphs(1), 14, edge, .true.)
 
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 1; edge(2,2) = 3
@@ -237,7 +237,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 5; edge(2,12) = 1
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(graphs(2), 14, edge)
+    call gedatsu_graph_set_edge(graphs(2), 14, edge, .true.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 18)
@@ -259,7 +259,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,16) = 5; edge(2,16) = 6
     edge(1,17) = 6; edge(2,17) = 1
     edge(1,18) = 6; edge(2,18) = 5
-    call gedatsu_graph_set_edge(graphs(3), 18, edge)
+    call gedatsu_graph_set_edge(graphs(3), 18, edge, .true.)
 
     call monolis_com_initialize_by_self(monoCOMs(1))
     call monolis_com_initialize_by_self(monoCOMs(2))
@@ -431,7 +431,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 4; edge(2,12) = 5
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge, .true.)
 
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 1; edge(2,2) = 3
@@ -447,7 +447,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 5; edge(2,12) = 1
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge, .true.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 18)
@@ -469,7 +469,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,16) = 5; edge(2,16) = 6
     edge(1,17) = 6; edge(2,17) = 1
     edge(1,18) = 6; edge(2,18) = 5
-    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge, .true.)
 
     call monolis_com_initialize_by_self(monoCOMs(1))
     call monolis_com_initialize_by_self(monoCOMs(2))
@@ -512,7 +512,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,7) = 3; edge(2,7) = 2
     edge(1,8) = 3; edge(2,8) = 4
     edge(1,9) = 3; edge(2,9) = 5
-    call gedatsu_graph_set_edge_conn(conn_graphs(1), 9, edge)
+    call gedatsu_graph_set_edge(conn_graphs(1), 9, edge, .false.)
 
     edge(1,1) = 1; edge(2,1) = 1
     edge(1,2) = 1; edge(2,2) = 2
@@ -523,7 +523,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,7) = 3; edge(2,7) = 1
     edge(1,8) = 3; edge(2,8) = 5
     edge(1,9) = 3; edge(2,9) = 4
-    call gedatsu_graph_set_edge_conn(conn_graphs(2), 9, edge)
+    call gedatsu_graph_set_edge(conn_graphs(2), 9, edge, .false.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 12)
@@ -539,7 +539,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,10) = 4; edge(2,10) = 1
     edge(1,11) = 4; edge(2,11) = 5
     edge(1,12) = 4; edge(2,12) = 4
-    call gedatsu_graph_set_edge_conn(conn_graphs(3), 12, edge)
+    call gedatsu_graph_set_edge(conn_graphs(3), 12, edge, .false.)
 
     call gedatsu_merge_connectivity_subgraphs(3, nodal_graphs, merged_nodal_graph, merged_monoCOM, &
     & 3, conn_graphs, merged_conn_graph)
@@ -643,7 +643,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 4; edge(2,12) = 5
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge, .true.)
 
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 1; edge(2,2) = 3
@@ -659,7 +659,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 5; edge(2,12) = 1
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge, .true.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 18)
@@ -681,7 +681,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,16) = 5; edge(2,16) = 6
     edge(1,17) = 6; edge(2,17) = 1
     edge(1,18) = 6; edge(2,18) = 5
-    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge, .true.)
 
     call monolis_com_initialize_by_self(monoCOMs(1))
     call monolis_com_initialize_by_self(monoCOMs(2))
@@ -801,7 +801,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 4; edge(2,12) = 5
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge, .true.)
 
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 1; edge(2,2) = 3
@@ -817,7 +817,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 5; edge(2,12) = 1
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge, .true.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 18)
@@ -839,7 +839,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,16) = 5; edge(2,16) = 6
     edge(1,17) = 6; edge(2,17) = 1
     edge(1,18) = 6; edge(2,18) = 5
-    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge, .true.)
 
     call monolis_com_initialize_by_self(monoCOMs(1))
     call monolis_com_initialize_by_self(monoCOMs(2))
@@ -960,7 +960,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 4; edge(2,12) = 5
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(1), 14, edge, .true.)
 
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 1; edge(2,2) = 3
@@ -976,7 +976,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,12) = 5; edge(2,12) = 1
     edge(1,13) = 5; edge(2,13) = 2
     edge(1,14) = 5; edge(2,14) = 4
-    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(2), 14, edge, .true.)
 
     call monolis_dealloc_I_2d(edge)
     call monolis_alloc_I_2d(edge, 2, 18)
@@ -998,7 +998,7 @@ module mod_gedatsu_graph_merge_test
     edge(1,16) = 5; edge(2,16) = 6
     edge(1,17) = 6; edge(2,17) = 1
     edge(1,18) = 6; edge(2,18) = 5
-    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge)
+    call gedatsu_graph_set_edge(nodal_graphs(3), 18, edge, .true.)
 
     call monolis_com_initialize_by_self(monoCOMs(1))
     call monolis_com_initialize_by_self(monoCOMs(2))

@@ -569,7 +569,7 @@ contains
   !> @ingroup graph_basic
   !> グラフのエッジを設定
   !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。ノード数は変化しない。
-  subroutine gedatsu_graph_set_edge(graph, n_edge, edge)
+  subroutine gedatsu_graph_set_edge(graph, n_edge, edge, is_sort)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -577,6 +577,8 @@ contains
     integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
     integer(kint), intent(in) :: edge(:,:)
+    !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
+    logical :: is_sort
     integer(kint) :: i, e1, e2, jS, jE, in
     integer(kint), allocatable :: temp(:,:)
 
@@ -600,8 +602,8 @@ contains
 
     graph%index = 0
     do i = 1, n_edge
-      e1 = temp(1,i)
-      e2 = temp(2,i)
+      e1 = edge(1,i)
+      e2 = edge(2,i)
       graph%index(e1 + 1) = graph%index(e1 + 1) + 1
     enddo
 
@@ -616,96 +618,23 @@ contains
     call monolis_alloc_I_1d(graph%item, in)
 
     do i = 1, n_edge
-      e2 = temp(2,i)
+      e2 = edge(2,i)
       graph%item(i) = e2
     enddo
 
-    do i = 1, graph%n_vertex
-      jS = graph%index(i) + 1
-      jE = graph%index(i + 1)
-      call monolis_qsort_I_1d(graph%item, jS, jE)
-    enddo
-  end subroutine gedatsu_graph_set_edge
-
-  !> *** コネクティビティグラフ結合時はこの関数を使う ***
-  !> *** 理由１：if(graph%n_vertex < maxval(edge(:,1:n_edge)))then があると引っかかるから。 ***
-  !> *** 理由２：エッジをソートしてしまうと、要素を構成する節点が反時計回りならないから。 ***
-  !> *** 理由３：item のブロック内でソートしてしまうと、要素を構成する節点が反時計回りならないから。 ***
-  !> @ingroup graph_basic
-  !> グラフのエッジを設定
-  !> @details 既に定義されているエッジ情報は削除される。エッジの重複判定はなされない。ノード数は変化しない。
-  subroutine gedatsu_graph_set_edge_conn(graph, n_edge, edge)
-    implicit none
-    !> [in,out] graph 構造体
-    type(gedatsu_graph), intent(inout) :: graph
-    !> [in] グラフのエッジ数
-    integer(kint), intent(in) :: n_edge
-    !> [in] グラフエッジ
-    integer(kint), intent(in) :: edge(:,:)
-    integer(kint) :: i, e1, e2, jS, jE, in, j
-    integer(kint), allocatable :: temp(:,:)
-
-    if(n_edge < 1)then
-      call monolis_std_error_string("gedatsu_graph_set_edge")
-      call monolis_std_error_string("n_edge is less than 1")
-      call monolis_std_error_stop()
+    if(is_sort)then
+      do i = 1, graph%n_vertex
+        jS = graph%index(i) + 1
+        jE = graph%index(i + 1)
+        call monolis_qsort_I_1d(graph%item, jS, jE)
+      enddo
     endif
-
-    call monolis_alloc_I_2d(temp, 2, n_edge)
-
-    temp = edge
-
-    ! print *, "temp"
-    ! do i = 1, size(temp,2)
-    !   print *, (temp(j,i), j=1,size(temp,1))
-    ! enddo
-
-    ! call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)  !> これをコメントアウトしないと、edge(1,:)が同じでもedge(2,:)がソートされてしまう
-
-    ! print *, "temp"
-    ! do i = 1, size(temp,2)
-    !   print *, (temp(j,i), j=1,size(temp,1))
-    ! enddo
-
-    ! if(graph%n_vertex < maxval(edge(:,1:n_edge)))then
-    !   call monolis_std_error_string("gedatsu_graph_set_edge")
-    !   call monolis_std_error_string("edge node number is greater than the number of vertex")
-    !   call monolis_std_error_stop()
-    ! endif
-
-    graph%index = 0
-    do i = 1, n_edge
-      e1 = temp(1,i)
-      e2 = temp(2,i)
-      graph%index(e1 + 1) = graph%index(e1 + 1) + 1
-    enddo
-
-    do i = 1, graph%n_vertex
-      graph%index(i + 1) = graph%index(i + 1) + graph%index(i)
-    enddo
-
-    in = graph%index(graph%n_vertex + 1)
-
-    if(allocated(graph%item)) call monolis_dealloc_I_1d(graph%item)
-
-    call monolis_alloc_I_1d(graph%item, in)
-
-    do i = 1, n_edge
-      e2 = temp(2,i)
-      graph%item(i) = e2
-    enddo
-
-    ! do i = 1, graph%n_vertex
-    !   jS = graph%index(i) + 1
-    !   jE = graph%index(i + 1)
-    !   call monolis_qsort_I_1d(graph%item, jS, jE)
-    ! enddo
-  end subroutine gedatsu_graph_set_edge_conn
+  end subroutine gedatsu_graph_set_edge
 
   !> @ingroup graph_basic
   !> グラフのエッジを追加
   !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
-  subroutine gedatsu_graph_add_edge(graph, n_edge, edge)
+  subroutine gedatsu_graph_add_edge(graph, n_edge, edge, is_sort)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -713,6 +642,8 @@ contains
     integer(kint), intent(in) :: n_edge
     !> [in] グラフエッジ
     integer(kint), intent(in) :: edge(:,:)
+    !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
+    logical :: is_sort
     integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
     integer(kint), allocatable :: edge_all(:,:)
 
@@ -736,69 +667,14 @@ contains
         edge_all(2,j) = graph%item(j)
       enddo
     enddo
-
-    call monolis_dealloc_I_1d(graph%item)
-    call monolis_alloc_I_1d(graph%item, n_edge_all)
 
     do i = 1, n_edge
       edge_all(1,n_edge_cur + i) = edge(1,i)
       edge_all(2,n_edge_cur + i) = edge(2,i)
     enddo
 
-    call gedatsu_graph_set_edge(graph, n_edge_all, edge_all)
+    call gedatsu_graph_set_edge(graph, n_edge_all, edge_all, is_sort)
   end subroutine gedatsu_graph_add_edge
-
-  !> *** コネクティビティグラフ結合時はこの関数を使う ***
-  !> *** gedatsu_graph_add_edge との違い：gedatsu_graph_set_edge ではなく、gedatsu_graph_add_edge_conn 呼ぶところのみ。 ***
-  !> @ingroup graph_basic
-  !> グラフのエッジを追加
-  !> @details 既に定義されているエッジ情報は維持する。エッジの重複判定はなされない。
-  subroutine gedatsu_graph_add_edge_conn(graph, n_edge, edge)
-    implicit none
-    !> [in,out] graph 構造体
-    type(gedatsu_graph), intent(inout) :: graph
-    !> [in] グラフのエッジ数
-    integer(kint), intent(in) :: n_edge
-    !> [in] グラフエッジ
-    integer(kint), intent(in) :: edge(:,:)
-    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
-    integer(kint), allocatable :: edge_all(:,:)
-
-    if(n_edge < 1)then
-      call monolis_std_error_string("gedatsu_graph_add_edge")
-      call monolis_std_error_string("n_edge is less than 1")
-      call monolis_std_error_stop()
-    endif
-
-    n_edge_cur = graph%index(graph%n_vertex + 1)
-
-    !> 重複のない個数を数える
-
-    n_edge_all = n_edge_cur + n_edge
-
-    call monolis_alloc_I_2d(edge_all, 2, n_edge_all)
-
-    do i = 1, graph%n_vertex
-      jS = graph%index(i) + 1
-      jE = graph%index(i + 1)
-      do j = jS, jE
-        edge_all(1,j) = i
-        edge_all(2,j) = graph%item(j)
-      enddo
-    enddo
-
-    call monolis_dealloc_I_1d(graph%item)
-    call monolis_alloc_I_1d(graph%item, n_edge_all)
-
-    !n_edge = 0
-    do i = 1, n_edge
-      ! if(重複内要素)then n_edge += 1
-      edge_all(1,n_edge_cur + i) = edge(1,i)  !左辺だけ i→n_edge
-      edge_all(2,n_edge_cur + i) = edge(2,i)
-    enddo
-
-    call gedatsu_graph_set_edge_conn(graph, n_edge_all, edge_all)
-  end subroutine gedatsu_graph_add_edge_conn
 
   !> @ingroup graph_basic
   !> グラフのエッジを追加

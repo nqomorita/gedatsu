@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <complex.h>
+#include <math.h>
 #include "gedatsu.h"
 #include "monolis_utils.h"
 #include "gedatsu_graph_merge_c_test.h"
@@ -71,7 +72,7 @@ void gedatsu_list_finalize_R_c_test()
   monolis_std_log_string("gedatsu_list_finalize_R");
 
   list_struct_R[0].array = NULL;
-  list_struct_R[1].n = 1;
+  list_struct_R[0].n = 1;
   gedatsu_list_finalize_R(list_struct_R, 1);
 
   monolis_test_check_eq_I1("gedatsu_list_finalize_R", list_struct_R[0].n, 0);
@@ -84,7 +85,7 @@ void gedatsu_list_finalize_I_c_test()
   monolis_std_log_string("gedatsu_list_finalize_I");
 
   list_struct_I[0].array = NULL;
-  list_struct_I[1].n = 1;
+  list_struct_I[0].n = 1;
   gedatsu_list_finalize_I(list_struct_I, 1);
 
   monolis_test_check_eq_I1("gedatsu_list_finalize_I", list_struct_I[0].n, 0);
@@ -97,7 +98,7 @@ void gedatsu_list_finalize_C_c_test()
   monolis_std_log_string("gedatsu_list_finalize_C");
 
   list_struct_C[0].array = NULL;
-  list_struct_C[1].n = 1;
+  list_struct_C[0].n = 1;
   gedatsu_list_finalize_C(list_struct_C, 1);
 
   monolis_test_check_eq_I1("gedatsu_list_finalize_C", list_struct_C[0].n, 0);
@@ -1587,16 +1588,16 @@ void monolis_test_check_eq_R(
 
   for (int i = 0; i < size_a; i++)
   {
-    if (abs(a[i]) < 1.0e-20)
+    if (fabs(a[i]) < 1.0e-20)
     {
-      if (abs(a[i] - b[i]) > 1.0e-8)
+      if (fabs(a[i] - b[i]) > 1.0e-8)
       {
         is_eq = false;
       }else
       {
         is_eq = true;
       }
-    }else if (abs(a[i] - b[i])/abs(a[i]) > 1.0e-8)
+    }else if (fabs(a[i] - b[i])/fabs(a[i]) > 1.0e-8)
     {
       is_eq = false;
     }else
@@ -1660,16 +1661,16 @@ void monolis_test_check_eq_C(
 
   for (int i = 0; i < size_a; i++)
   {
-    if (abs(creal(a[i])) < 1.0e-20 || abs(cimag(a[i]) < 1.0e-20))
+    if (fabs(creal(a[i])) < 1.0e-20 || fabs(cimag(a[i])) < 1.0e-20)
     {
-      if (abs(creal(a[i]) - creal(b[i])) + abs(cimag(a[i]) - cimag(b[i])) > 1.0e-8)
+      if (fabs(creal(a[i]) - creal(b[i])) + fabs(cimag(a[i]) - cimag(b[i])) > 1.0e-8)
       {
         is_eq = false;
       }else
       {
         is_eq = true;
       }
-    }else if (abs(creal(a[i]) - creal(b[i]))/abs(creal(a[i])) + abs(cimag(a[i]) - cimag(b[i]))/abs(cimag(a[i])) > 1.0e-8)
+    }else if (fabs(creal(a[i]) - creal(b[i]))/fabs(creal(a[i])) + fabs(cimag(a[i]) - cimag(b[i]))/fabs(cimag(a[i])) > 1.0e-8)
     {
       is_eq = false;
     }else
