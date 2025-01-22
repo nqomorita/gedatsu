@@ -6,144 +6,6 @@
 #include "gedatsu_def_graph_c.h"
 #include "gedatsu_graph_merge_c.h"
 
-void gedatsu_list_initialize_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_R[i].n = 0;
-    monolis_dealloc_R_1d(&list_struct_R[i].array);
-  }
-}
-
-void gedatsu_list_initialize_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_I[i].n = 0;
-    monolis_dealloc_I_1d(&list_struct_I[i].array);
-  }
-}
-
-void gedatsu_list_initialize_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_C[i].n = 0;
-    monolis_dealloc_C_1d(&list_struct_C[i].array);
-  }
-}
-
-void gedatsu_list_finalize_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_R[i].n = 0;
-    monolis_dealloc_R_1d(&list_struct_R[i].array);
-  }
-}
-
-void gedatsu_list_finalize_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_I[i].n = 0;
-    monolis_dealloc_I_1d(&list_struct_I[i].array);
-  }
-}
-
-void gedatsu_list_finalize_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int n)
-{
-  for (int i = 0; i < n; i++) {
-    list_struct_C[i].n = 0;
-    monolis_dealloc_C_1d(&list_struct_C[i].array);
-  }
-}
-
-void gedatsu_list_set_R(
-  MONOLIS_LIST_R* list_struct_R,
-  const int id,
-  const int n,
-  const double* array)
-{
-  list_struct_R[id].n = n;
-  monolis_dealloc_R_1d(&list_struct_R[id].array);
-  list_struct_R[id].array = monolis_alloc_R_1d(list_struct_R[id].array, n);
-  for (int i = 0; i < n; i++) {
-    list_struct_R[id].array[i] = array[i];
-  }
-}
-
-void gedatsu_list_set_I(
-  MONOLIS_LIST_I* list_struct_I,
-  const int id,
-  const int n,
-  const int* array)
-{
-  list_struct_I[id].n = n;
-  monolis_dealloc_I_1d(&list_struct_I[id].array);
-  list_struct_I[id].array = monolis_alloc_I_1d(list_struct_I[id].array, n);
-  for (int i = 0; i < n; i++) {
-    list_struct_I[id].array[i] = array[i];
-  }
-}
-
-void gedatsu_list_set_C(
-  MONOLIS_LIST_C* list_struct_C,
-  const int id,
-  const int n,
-  const double complex* array)
-{
-  list_struct_C[id].n = n;
-  monolis_dealloc_C_1d(&list_struct_C[id].array);
-  list_struct_C[id].array = monolis_alloc_C_1d(list_struct_C[id].array, n);
-  for (int i = 0; i < n; i++) {
-    list_struct_C[id].array[i] = array[i];
-  }
-}
-
-void gedatsu_list_get_R(
-  const MONOLIS_LIST_R* list_struct_R,
-  const int id,
-  double** array)
-{
-  monolis_dealloc_R_1d(array);
-  *array = monolis_alloc_R_1d(*array, list_struct_R[id].n);
-  for (int i = 0; i < list_struct_R[id].n; i++) {
-    *array[i] = list_struct_R[id].array[i];
-  }
-}
-
-void gedatsu_list_get_I(
-  const MONOLIS_LIST_I* list_struct_I,
-  const int id,
-  int** array)
-{
-  monolis_dealloc_I_1d(array);
-  *array = monolis_alloc_I_1d(*array, list_struct_I[id].n);
-  for (int i = 0; i < list_struct_I[id].n; i++) {
-    *array[i] = list_struct_I[id].array[i];
-  }
-}
-
-void gedatsu_list_get_C(
-  const MONOLIS_LIST_C* list_struct_C,
-  const int id,
-  double complex** array)
-{
-  monolis_dealloc_C_1d(array);
-  *array = monolis_alloc_C_1d(*array, list_struct_C[id].n);
-  for (int i = 0; i < list_struct_C[id].n; i++) {
-    *array[i] = list_struct_C[id].array[i];
-  }
-}
-
 /** 計算点グラフの結合 */
 void gedatsu_merge_nodal_subgraphs(
   const int n_graphs,
@@ -421,10 +283,10 @@ void gedatsu_merge_connectivity_subgraphs(
   // 結合前グラフの、ソート前後のグローバル番号を用意
   conn_graphs_vertex_id = (MONOLIS_LIST_I *)calloc(n_conn_graphs, sizeof(MONOLIS_LIST_I));
   conn_graphs_vertex_id_perm = (MONOLIS_LIST_I *)calloc(n_conn_graphs, sizeof(MONOLIS_LIST_I));
-  gedatsu_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs);
-  gedatsu_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs);
+  monolis_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs);
+  monolis_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs);
   for (int i = 0; i < n_conn_graphs; i++) {
-    gedatsu_list_set_I(conn_graphs_vertex_id, i, conn_graphs[i].n_vertex, conn_graphs[i].vertex_id);
+    monolis_list_set_I(conn_graphs_vertex_id, i, conn_graphs[i].n_vertex, conn_graphs[i].vertex_id);
     conn_graphs_vertex_id_perm[i].n = conn_graphs[i].n_vertex;
     monolis_alloc_I_1d(conn_graphs_vertex_id_perm[i].array, conn_graphs[i].n_vertex);
     // monolis_get_sequence_array_I(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex, 1, 1); // TODO 関数ない

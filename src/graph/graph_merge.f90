@@ -4,18 +4,6 @@
 !# gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
 !# gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
 !# gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
-!# gedatsu_list_initialize_R(list_struct_R, n)
-!# gedatsu_list_initialize_I(list_struct_R, n)
-!# gedatsu_list_initialize_C(list_struct_R, n)
-!# gedatsu_list_finalize_R(list_struct_R)
-!# gedatsu_list_finalize_I(list_struct_I)
-!# gedatsu_list_finalize_C(list_struct_C)
-!# gedstsu_list_set_R(list_struct_R, id, n, array)
-!# gedstsu_list_set_I(list_struct_I, id, n, array)
-!# gedstsu_list_set_C(list_struct_C, id, n, array)
-!# gedatsu_list_get_R(list_struct_R, id, n, array)
-!# gedatsu_list_get_I(list_struct_I, id, n, array)
-!# gedatsu_list_get_C(list_struct_C, id, n, array)
 
 module mod_gedatsu_graph_merge
   use mod_monolis_utils
@@ -27,24 +15,6 @@ module mod_gedatsu_graph_merge
   integer(kint), parameter :: ORDER_DOMAIN_ID = 1
   !> merge_nodal_subgraphsフラグ（グローバル計算点順に並べる）
   integer(kint), parameter :: ORDER_NODAL_ID = 2
-
-  !> リスト構造体配列（実数型）
-  type monolis_list_R
-    integer(kint) :: n
-    real(kdouble), allocatable :: array(:)
-  end type monolis_list_R
-
-  !> リスト構造体配列（実数型）
-  type monolis_list_I
-  integer(kint) :: n
-  integer(kint), allocatable :: array(:)
-  end type monolis_list_I
-
-  !> リスト構造体配列（複素数型）
-  type monolis_list_C
-  integer(kint) :: n
-  complex(kdouble), allocatable :: array(:)
-  end type monolis_list_C
 
 contains
 
@@ -300,10 +270,10 @@ contains
     !> 結合前グラフの、ソート前後のグローバル番号を用意
     allocate(conn_graphs_vertex_id(n_conn_graphs))
     allocate(conn_graphs_vertex_id_perm(n_conn_graphs))
-    call gedatsu_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs)
-    call gedatsu_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs)
+    call monolis_list_initialize_I(conn_graphs_vertex_id, n_conn_graphs)
+    call monolis_list_initialize_I(conn_graphs_vertex_id_perm, n_conn_graphs)
     do i = 1, n_conn_graphs
-      call gedatsu_list_set_I(conn_graphs_vertex_id, i, conn_graphs(i)%n_vertex, conn_graphs(i)%vertex_id)
+      call monolis_list_set_I(conn_graphs_vertex_id, i, conn_graphs(i)%n_vertex, conn_graphs(i)%vertex_id)
       conn_graphs_vertex_id_perm(i)%n = conn_graphs(i)%n_vertex
       call monolis_alloc_I_1d(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex)
       call monolis_get_sequence_array_I(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex, 1, 1)
@@ -456,7 +426,7 @@ contains
     enddo
     !> 結合前グラフ
     allocate(merged_index(n_graphs))
-    call gedatsu_list_initialize_I(merged_index, n_graphs)
+    call monolis_list_initialize_I(merged_index, n_graphs)
     do i = 1, n_graphs
       merged_index(i)%n = graphs(i)%n_vertex + 1
       call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
@@ -574,7 +544,7 @@ contains
     enddo
     !> 結合前グラフ
     allocate(merged_index(n_graphs))
-    call gedatsu_list_initialize_I(merged_index, n_graphs)
+    call monolis_list_initialize_I(merged_index, n_graphs)
     do i = 1, n_graphs
       merged_index(i)%n = graphs(i)%n_vertex + 1
       call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
@@ -692,7 +662,7 @@ contains
     enddo
     !> 結合前グラフ
     allocate(merged_index(n_graphs))
-    call gedatsu_list_initialize_I(merged_index, n_graphs)
+    call monolis_list_initialize_I(merged_index, n_graphs)
     do i = 1, n_graphs
       merged_index(i)%n = graphs(i)%n_vertex + 1
       call monolis_alloc_I_1d(merged_index(i)%array, merged_index(i)%n)
@@ -717,197 +687,5 @@ contains
       enddo
     enddo
   end subroutine gedatsu_merge_distval_C_core
-
-  subroutine gedatsu_list_initialize_R(list_struct_R, n)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_R), intent(inout) :: list_struct_R(:)
-    !> リスト構造体配列の長さ
-    integer(kint), intent(in) :: n
-    integer(kint) :: i
-
-    do i = 1, n
-      list_struct_R(i)%n = 0
-      call monolis_dealloc_R_1d(list_struct_R(i)%array)
-    enddo
-  end subroutine gedatsu_list_initialize_R
-
-  subroutine gedatsu_list_initialize_I(list_struct_I, n)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_I), intent(inout) :: list_struct_I(:)
-    !> リスト構造体配列の長さ
-    integer(kint), intent(in) :: n
-    integer(kint) :: i
-
-    do i = 1, n
-      list_struct_I(i)%n = 0
-      call monolis_dealloc_I_1d(list_struct_I(i)%array)
-    enddo
-  end subroutine gedatsu_list_initialize_I
-
-  subroutine gedatsu_list_initialize_C(list_struct_C, n)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_C), intent(inout) :: list_struct_C(:)
-    !> リスト構造体配列の長さ
-    integer(kint), intent(in) :: n
-    integer(kint) :: i
-
-    do i = 1, n
-      list_struct_C(i)%n = 0
-      call monolis_dealloc_C_1d(list_struct_C(i)%array)
-    enddo
-  end subroutine gedatsu_list_initialize_C
-
-  subroutine gedatsu_list_finalize_R(list_struct_R)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_R), intent(inout) :: list_struct_R(:)
-    integer(kint) :: i
-
-    do i = 1, size(list_struct_R)
-      list_struct_R(i)%n = 0
-      call monolis_dealloc_R_1d(list_struct_R(i)%array)
-    enddo
-  end subroutine gedatsu_list_finalize_R
-
-  subroutine gedatsu_list_finalize_I(list_struct_I)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_I), intent(inout) :: list_struct_I(:)
-    integer(kint) :: i
-
-    do i = 1, size(list_struct_I)
-      list_struct_I(i)%n = 0
-      call monolis_dealloc_I_1d(list_struct_I(i)%array)
-    enddo
-  end subroutine gedatsu_list_finalize_I
-
-  subroutine gedatsu_list_finalize_C(list_struct_C)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_C), intent(inout) :: list_struct_C(:)
-    integer(kint) :: i
-
-    do i = 1, size(list_struct_C)
-      list_struct_C(i)%n = 0
-      call monolis_dealloc_C_1d(list_struct_C(i)%array)
-    enddo
-  end subroutine gedatsu_list_finalize_C
-
-  subroutine gedatsu_list_set_R(list_struct_R, id, n, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_R), intent(inout) :: list_struct_R(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 配列番号 id に登録する配列サイズ
-    integer(kint), intent(in) :: n
-    !> 登録する配列
-    real(kdouble), intent(in) :: array(:)
-
-    if(n /= size(array))then
-      call monolis_std_error_string("gedatsu_liset_set_R")
-      call monolis_std_error_string("n is not equal as size(array)")
-      call monolis_std_error_stop()
-    endif
-
-    list_struct_R(id)%n = n
-
-    call monolis_dealloc_R_1d(list_struct_R(id)%array)
-    call monolis_alloc_R_1d(list_struct_R(id)%array, n)
-    list_struct_R(id)%array(:) = array(:)
-  end subroutine gedatsu_list_set_R
-
-  subroutine gedatsu_list_set_I(list_struct_I, id, n, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_I), intent(inout) :: list_struct_I(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 配列番号 id に登録する配列サイズ
-    integer(kint), intent(in) :: n
-    !> 登録する配列
-    integer(kint), intent(in) :: array(:)
-
-    if(n /= size(array))then
-      call monolis_std_error_string("gedatsu_liset_set_I")
-      call monolis_std_error_string("n is not equal as size(array)")
-      call monolis_std_error_stop()
-    endif
-
-    list_struct_I(id)%n = n
-
-    call monolis_dealloc_I_1d(list_struct_I(id)%array)
-    call monolis_alloc_I_1d(list_struct_I(id)%array, n)
-    list_struct_I(id)%array(:) = array(:)
-  end subroutine gedatsu_list_set_I
-
-  subroutine gedatsu_list_set_C(list_struct_C, id, n, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_C), intent(inout) :: list_struct_C(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 配列番号 id に登録する配列サイズ
-    integer(kint), intent(in) :: n
-    !> 登録する配列
-    complex(kdouble), intent(in) :: array(:)
-
-    if(n /= size(array))then
-      call monolis_std_error_string("gedatsu_liset_set_C")
-      call monolis_std_error_string("n is not equal as size(array)")
-      call monolis_std_error_stop()
-    endif
-
-    list_struct_C(id)%n = n
-
-    call monolis_dealloc_C_1d(list_struct_C(id)%array)
-    call monolis_alloc_C_1d(list_struct_C(id)%array, n)
-    list_struct_C(id)%array(:) = array(:)
-  end subroutine gedatsu_list_set_C
-
-  subroutine gedatsu_list_get_R(list_struct_R, id, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_R), intent(in) :: list_struct_R(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 参照する配列
-    real(kdouble), allocatable, intent(inout) :: array(:)
-
-    call monolis_dealloc_R_1d(array)
-    call monolis_alloc_R_1d(array, list_struct_R(id)%n)
-    array(:) = list_struct_R(id)%array(:)
-  end subroutine gedatsu_list_get_R
-
-  subroutine gedatsu_list_get_I(list_struct_I, id, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_I), intent(in) :: list_struct_I(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 参照する配列
-    integer(kint), allocatable, intent(inout) :: array(:)
-
-    call monolis_dealloc_I_1d(array)
-    call monolis_alloc_I_1d(array, list_struct_I(id)%n)
-    array(:) = list_struct_I(id)%array(:)
-  end subroutine gedatsu_list_get_I
-
-  subroutine gedatsu_list_get_C(list_struct_C, id, array)
-    implicit none
-    !> リスト構造体配列
-    type(monolis_list_C), intent(in) :: list_struct_C(:)
-    !> 配列番号
-    integer(kint), intent(in) :: id
-    !> 参照する配列
-    complex(kdouble), allocatable, intent(inout) :: array(:)
-
-    call monolis_dealloc_C_1d(array)
-    call monolis_alloc_C_1d(array, list_struct_C(id)%n)
-    array(:) = list_struct_C(id)%array(:)
-  end subroutine gedatsu_list_get_C
 
 end module mod_gedatsu_graph_merge

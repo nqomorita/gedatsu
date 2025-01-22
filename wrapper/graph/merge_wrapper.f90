@@ -73,26 +73,26 @@ contains
     merged_graph%item(:) = merged_item(:)
 
     !> n_dof_list
-    call gedatsu_list_initialize_I(n_dof_list, n_graphs)
+    call monolis_list_initialize_I(n_dof_list, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_I_1d(Iarray)
       call monolis_alloc_I_1d(Iarray, n_dof_list_n(i))
       iE = iS + n_dof_list_n(i) - 1
       Iarray(1:n_dof_list_n(i)) = n_dof_list_array(iS:iE)
-      call gedatsu_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray)
+      call monolis_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray)
       iS = iS + n_dof_list_n(i)
     enddo
 
     !> list_struct_R
-    call gedatsu_list_initialize_R(list_struct_R, n_graphs)
+    call monolis_list_initialize_R(list_struct_R, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_R_1d(Darray)
       call monolis_alloc_R_1d(Darray, list_struct_R_n(i))
       iE = iS + list_struct_R_n(i) - 1
       Darray(1:list_struct_R_n(i)) = list_struct_R_array(iS:iE)
-      call gedatsu_list_set_R(list_struct_R, i, list_struct_R_n(i), Darray)
+      call monolis_list_set_R(list_struct_R, i, list_struct_R_n(i), Darray)
       iS = iS + list_struct_R_n(i)
     enddo
 
@@ -165,26 +165,26 @@ subroutine gedatsu_merge_distval_I_c( &
     merged_graph%item(:) = merged_item(:)
 
     !> n_dof_list
-    call gedatsu_list_initialize_I(n_dof_list, n_graphs)
+    call monolis_list_initialize_I(n_dof_list, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_I_1d(Iarray1)
       call monolis_alloc_I_1d(Iarray1, n_dof_list_n(i))
       iE = iS + n_dof_list_n(i) - 1
       Iarray1(1:n_dof_list_n(i)) = n_dof_list_array(iS:iE)
-      call gedatsu_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray1)
+      call monolis_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray1)
       iS = iS + n_dof_list_n(i)
     enddo
 
     !> list_struct_I
-    call gedatsu_list_initialize_I(list_struct_I, n_graphs)
+    call monolis_list_initialize_I(list_struct_I, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_I_1d(Iarray2)
       call monolis_alloc_I_1d(Iarray2, list_struct_I_n(i))
       iE = iS + list_struct_I_n(i) - 1
       Iarray2(1:list_struct_I_n(i)) = list_struct_I_array(iS:iE)
-      call gedatsu_list_set_I(list_struct_I, i, list_struct_I_n(i), Iarray2)
+      call monolis_list_set_I(list_struct_I, i, list_struct_I_n(i), Iarray2)
       iS = iS + list_struct_I_n(i)
     enddo
 
@@ -258,26 +258,26 @@ subroutine gedatsu_merge_distval_I_c( &
     merged_graph%item(:) = merged_item(:)
 
     !> n_dof_list
-    call gedatsu_list_initialize_I(n_dof_list, n_graphs)
+    call monolis_list_initialize_I(n_dof_list, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_I_1d(Iarray)
       call monolis_alloc_I_1d(Iarray, n_dof_list_n(i))
       iE = iS + n_dof_list_n(i) - 1
       Iarray(1:n_dof_list_n(i)) = n_dof_list_array(iS:iE)
-      call gedatsu_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray)
+      call monolis_list_set_I(n_dof_list, i, n_dof_list_n(i), Iarray)
       iS = iS + n_dof_list_n(i)
     enddo
 
     !> list_struct_C
-    call gedatsu_list_initialize_C(list_struct_C, n_graphs)
+    call monolis_list_initialize_C(list_struct_C, n_graphs)
     iS = 1
     do i = 1, n_graphs
       call monolis_dealloc_C_1d(Carray)
       call monolis_alloc_C_1d(Carray, list_struct_C_n(i))
       iE = iS + list_struct_C_n(i) - 1
       Carray(1:list_struct_C_n(i)) = list_struct_C_array(iS:iE)
-      call gedatsu_list_set_C(list_struct_C, i, list_struct_C_n(i), Carray)
+      call monolis_list_set_C(list_struct_C, i, list_struct_C_n(i), Carray)
       iS = iS + list_struct_C_n(i)
     enddo
 
