@@ -524,8 +524,8 @@ contains
     edge(1,1) = 1; edge(2,1) = 2
     edge(1,2) = 2; edge(2,2) = 1
     edge(1,3) = 2; edge(2,3) = 3
-    edge(1,4) = 3; edge(2,4) = 2
-    edge(1,5) = 3; edge(2,5) = 4
+    edge(1,4) = 3; edge(2,4) = 4
+    edge(1,5) = 3; edge(2,5) = 2
     edge(1,6) = 4; edge(2,6) = 3
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4

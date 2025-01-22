@@ -63,6 +63,18 @@ void gedatsu_graph_get_vertex_id_in_internal_region(
   int* ids);
 
 /**
+ * @brief 領域番号 domain_id に属するグラフのエッジ数を取得
+ * @param[in,out] graph graph 構造体
+ * @param[in] domain_id 領域番号
+ * @param[in] n_edge グラフのエッジ配列
+ * @ingroup graph
+ */
+void gedatsu_graph_get_n_edge_in_internal_region(
+  GEDATSU_GRAPH* graph,
+  int  domain_id,
+  int* n_edge);
+
+/**
  * @brief 領域番号 domain_id に属するグラフのエッジを取得
  * @param[in,out] graph graph 構造体
  * @param[in] domain_id 領域番号
@@ -72,7 +84,7 @@ void gedatsu_graph_get_vertex_id_in_internal_region(
  */
 void gedatsu_graph_get_edge_in_internal_region(
   GEDATSU_GRAPH* graph,
-  int* domain_id,
+  int   domain_id,
   int** edge);
 
 /**

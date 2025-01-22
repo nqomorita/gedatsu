@@ -534,8 +534,8 @@ contains
 
     graph%index = 0
     do i = 1, n_edge
-      e1 = temp(1,i)
-      e2 = temp(2,i)
+      e1 = edge(1,i)
+      e2 = edge(2,i)
       graph%index(e1 + 1) = graph%index(e1 + 1) + 1
     enddo
 
@@ -550,7 +550,7 @@ contains
     call monolis_alloc_I_1d(graph%item, in)
 
     do i = 1, n_edge
-      e2 = temp(2,i)
+      e2 = edge(2,i)
       graph%item(i) = e2
     enddo
 
@@ -599,9 +599,6 @@ contains
         edge_all(2,j) = graph%item(j)
       enddo
     enddo
-
-    call monolis_dealloc_I_1d(graph%item)
-    call monolis_alloc_I_1d(graph%item, n_edge_all)
 
     do i = 1, n_edge
       edge_all(1,n_edge_cur + i) = edge(1,i)

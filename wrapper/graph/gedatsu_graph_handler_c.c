@@ -70,44 +70,64 @@ void gedatsu_graph_get_vertex_id_in_internal_region(
   }
 }
 
+/* 領域番号 domain_id に属するグラフのエッジ数を取得 */
+void gedatsu_graph_get_n_edge_in_internal_region(
+  GEDATSU_GRAPH* graph,
+  int  domain_id,
+  int* n_edge)
+{
+  *n_edge = 0;
+  for (int i = 0; i < graph->n_vertex; ++i) {
+    if(graph->vertex_domain_id[i] != domain_id) continue;
+    int jS = graph->index[i];
+    int jE = graph->index[i + 1];
+    for (int j = jS; j < jE; ++j) {
+      int nid = graph->item[j];
+      if (graph->vertex_domain_id[nid] == domain_id) {
+        *n_edge = *n_edge + 1;
+      }
+    }
+  }
+}
+
 /* 領域番号 domain_id に属するグラフのエッジを取得 */
 void gedatsu_graph_get_edge_in_internal_region(
   GEDATSU_GRAPH* graph,
-  int* domain_id,
+  int   domain_id,
   int** edge)
 {
   int n_vertex, n_edge, idx;
   int* ids;
   int* perm;
 
-  gedatsu_graph_get_n_vertex_in_internal_region(graph, *domain_id, &n_vertex);
+  gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, &n_vertex);
 
   ids = monolis_alloc_I_1d(ids, n_vertex);
 
-  gedatsu_graph_get_vertex_id_in_internal_region(graph, *domain_id, ids);
+  gedatsu_graph_get_vertex_id_in_internal_region(graph, domain_id, ids);
 
   perm = monolis_alloc_I_1d(perm, n_vertex);
 
-  monolis_get_sequence_array_I(perm, n_vertex, 1, 1);
+  monolis_get_sequence_array_I(perm, n_vertex, 0, 1);
 
-  monolis_qsort_I_2d(ids, perm, 1, n_vertex);
+  monolis_qsort_I_2d(ids, perm, n_vertex, 0, n_vertex - 1);
 
   n_edge = 0;
 
   for (int i = 0; i < graph->n_vertex; ++i) {
-    if(graph->vertex_domain_id[i] != *domain_id) continue;
+    if(graph->vertex_domain_id[i] != domain_id) continue;
     int jS = graph->index[i];
     int jE = graph->index[i + 1];
     for (int j = jS; j < jE; ++j) {
       int nid = graph->item[j];
-      if(graph->vertex_domain_id[nid] == *domain_id){
+      if(graph->vertex_domain_id[nid] == domain_id){
         int n1 = graph->vertex_id[i];
-        monolis_bsearch_I(ids, 0, n_vertex - 1, n1, &idx);
+        monolis_bsearch_I(ids, n_vertex, 0, n_vertex - 1, n1, &idx);
         //if(idx == -1) 
         int e1 = perm[idx];
 
         int n2 = graph->vertex_id[nid];
-        monolis_bsearch_I(ids, 0, n_vertex - 1, n2, &idx);
+        monolis_bsearch_I(ids, n_vertex, 0, n_vertex - 1, n2, &idx);
         //if(idx == -1) 
         int e2 = perm[idx];
 
@@ -126,23 +146,31 @@ void gedatsu_graph_set_edge(
   int** edge,
   bool  is_sort)
 {
-  int** temp; 
+  int* temp1; 
+  int* temp2; 
 
   if(n_edge < 1){
     monolis_std_log_string("gedatsu_graph_add_edge");
     monolis_std_log_string("n_edge is less than 1");
   }
 
-  temp = monolis_alloc_I_2d(temp, n_edge, 2);
+  temp1 = monolis_alloc_I_1d(temp1, n_edge);
+  temp2 = monolis_alloc_I_1d(temp2, n_edge);
 
   for (int i = 0; i < n_edge; ++i) {
-    temp[i][0] = edge[i][0];
-    temp[i][1] = edge[i][1];
+    temp1[i] = edge[i][0];
+    temp2[i] = edge[i][1];
+  }
+
+  monolis_qsort_I_2d(temp1, temp2, n_edge, 0, n_edge - 1);
+
+  for (int i = 0; i < graph->n_vertex + 1; ++i) {
+    graph->index[i] = 0;
   }
 
   for (int i = 0; i < n_edge; ++i) {
-    int e1 = temp[i][0];
-    graph->index[e1] = graph->index[e1] + 1;
+    int e1 = temp1[i];
+    graph->index[e1 + 1] = graph->index[e1 + 1] + 1;
   }
 
   for (int i = 0; i < graph->n_vertex; ++i) {
@@ -154,7 +182,7 @@ void gedatsu_graph_set_edge(
   graph->item = monolis_alloc_I_1d(graph->item, in);
 
   for (int i = 0; i < n_edge; ++i) {
-    int e2 = temp[i][1];
+    int e2 = temp2[i];
     graph->item[i] = e2;
   }
 
@@ -162,7 +190,7 @@ void gedatsu_graph_set_edge(
     for (int i = 0; i < graph->n_vertex; ++i) {
       int jS = graph->index[i];
       int jE = graph->index[i + 1];
-      monolis_qsort_I_1d(graph->item, jS, jE);
+      monolis_qsort_I_1d(graph->item, in, jS, jE - 1);
     }
   }
 }
@@ -192,19 +220,17 @@ void gedatsu_graph_add_edge(
     int jS = graph->index[i];
     int jE = graph->index[i + 1];
     for (int j = jS; j < jE; ++j) {
-      edge_all[i][0] = i;
-      edge_all[i][1] = graph->item[j];
+      edge_all[j][0] = i;
+      edge_all[j][1] = graph->item[j];
     }
   }
-
-  monolis_dealloc_I_1d(&graph->item);
-  graph->item = monolis_alloc_I_1d(graph->item, n_edge_all);
 
   for (int i = 0; i < n_edge; ++i) {
     edge_all[n_edge_cur + i][0] = edge[i][0];
     edge_all[n_edge_cur + i][1] = edge[i][1];
   }
 
+  monolis_dealloc_I_1d(&graph->item);
   gedatsu_graph_set_edge(graph, n_edge_all, edge_all, is_sort);
 }
 
@@ -244,7 +270,7 @@ void gedatsu_graph_delete_dupulicate_edge(
     }
 
     int len_uniq = 0;
-    monolis_qsort_I_1d(temp, 1, len);
+    monolis_qsort_I_1d(temp, len, 0, len - 1);
     monolis_get_uniq_array_I(temp, len, &len_uniq);
 
     graph->item = monolis_append_I_1d(graph->item, n_total, len_uniq, temp);
