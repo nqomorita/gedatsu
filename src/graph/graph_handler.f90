@@ -594,12 +594,6 @@ contains
 
     call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
 
-    if(graph%n_vertex < maxval(edge(:,1:n_edge)))then
-      call monolis_std_error_string("gedatsu_graph_set_edge")
-      call monolis_std_error_string("edge node number is greater than the number of vertex")
-      call monolis_std_error_stop()
-    endif
-
     graph%index = 0
     do i = 1, n_edge
       e1 = temp(1,i)
