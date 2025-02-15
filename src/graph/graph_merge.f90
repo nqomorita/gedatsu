@@ -258,7 +258,7 @@ contains
     !> 計算点
     call monolis_alloc_I_1d(nodal_vertex_id, merged_nodal_graph%n_vertex)
     nodal_vertex_id(:) = merged_nodal_graph%vertex_id(:)
-    call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)
+    call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)   !> // TODO 304行目の前に呼ぶべき？
     call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
     call monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex)
     do i = 1, n_nodal_vertex

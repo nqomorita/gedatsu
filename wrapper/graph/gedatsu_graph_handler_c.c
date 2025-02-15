@@ -162,7 +162,9 @@ void gedatsu_graph_set_edge(
     temp2[i] = edge[i][1];
   }
 
-  monolis_qsort_I_2d(temp1, temp2, n_edge, 0, n_edge - 1);
+  if(is_sort) {
+    monolis_qsort_I_2d(temp1, temp2, n_edge, 0, n_edge - 1);
+  }
 
   for (int i = 0; i < graph->n_vertex + 1; ++i) {
     graph->index[i] = 0;

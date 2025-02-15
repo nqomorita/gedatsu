@@ -25,7 +25,7 @@ extern "C" {
  */
 void gedatsu_merge_nodal_subgraphs(
   const int n_graphs,
-  const GEDATSU_GRAPH* graphs,
+  GEDATSU_GRAPH* graphs,
   const MONOLIS_COM* monoCOMs,
   GEDATSU_GRAPH* merged_graph,
   MONOLIS_COM* merged_monoCOM,
@@ -44,7 +44,7 @@ void gedatsu_merge_nodal_subgraphs(
 void gedatsu_merge_connectivity_subgraphs(
   const int n_nodal_graphs,
   const GEDATSU_GRAPH* nodal_graphs,
-  const GEDATSU_GRAPH* merged_nodal_graph,
+  GEDATSU_GRAPH* merged_nodal_graph,
   const MONOLIS_COM* merged_nodal_monoCOM,
   const int n_conn_graphs,
   const GEDATSU_GRAPH* conn_graphs,
