@@ -22,17 +22,17 @@ contains
   !> 計算点グラフを結合する
   subroutine gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 通信テーブルの配列（配列長 n_graphs）
+    !> [in] 通信テーブルの配列（配列長 n_graphs）
     type(monolis_COM), intent(in) :: monoCOMs(:)
-    !> 統合されたグラフ構造
+    !> [inout] 統合されたグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_graph
-    !> 統合された通信テーブル
+    !> [inout] 統合された通信テーブル
     type(monolis_COM), intent(inout) :: merged_monoCOM
-    !> 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
+    !> [in] 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
     integer(kint), intent(in) :: order_type
 
     integer(kint) :: i, j, k, iS, iE, val, idx, tmp
@@ -169,19 +169,19 @@ contains
   subroutine gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, &
   & n_conn_graphs, conn_graphs, merged_conn_graph)
     implicit none
-    !> 統合したい節点グラフ構造の個数
+    !> [in] 統合したい節点グラフ構造の個数
     integer(kint), intent(in) :: n_nodal_graphs
-    !> グラフ構造の配列
+    !> [in] グラフ構造の配列
     type(gedatsu_graph), intent(in) :: nodal_graphs(:)
-    !> 統合された計算点グラフ構造
+    !> [in] 統合された計算点グラフ構造
     type(gedatsu_graph), intent(in) :: merged_nodal_graph
-    !> 統合された計算点グラフ構造の通信テーブル
+    !> [in] 統合された計算点グラフ構造の通信テーブル
     type(monolis_COM), intent(in) ::  merged_nodal_monoCOM
-    !> 統合したいコネクティビティグラフ構造の個数
+    !> [in] 統合したいコネクティビティグラフ構造の個数
     integer(kint), intent(in) :: n_conn_graphs
-    !> コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
+    !> [in] コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
     type(gedatsu_graph), intent(in) :: conn_graphs(:)
-    !> 統合されたコネクティビティグラフ構造
+    !> [inout] 統合されたコネクティビティグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_conn_graph
 
     integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n_edge
@@ -340,19 +340,19 @@ contains
   !> 物理量分布を結合する（実数型）
   subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !>  リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_R), intent(in) :: list_struct_R(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !> 統合された実数配列
+    !> [inout] 統合された実数配列
     real(kdouble), allocatable, intent(inout) :: merged_array_R(:)
 
     integer(kint) :: n_vertex
@@ -384,7 +384,7 @@ contains
     type(gedatsu_graph), intent(in) :: merged_graph
     !> 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !>  リスト構造体
+    !> リスト構造体
     type(monolis_list_R), intent(in) :: list_struct_R(:)
     !> 結合後の計算点が持つ物理量の個数
     integer(kint), intent(inout) :: merged_n_dof_list(:)
@@ -462,19 +462,19 @@ contains
   !> 物理量分布を結合する（整数型）
   subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_I), intent(in) :: list_struct_I(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !>  統合された整数配列
+    !> [inout] 統合された整数配列
     integer(kint), allocatable, intent(inout) :: merged_array_I(:)
 
     integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
@@ -582,19 +582,19 @@ contains
   !> 物理量分布を結合する（複素数型）
   subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_C), intent(in) :: list_struct_C(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !> 統合された複素数配列
+    !> [inout] 統合された複素数配列
     complex(kdouble), allocatable, intent(inout) :: merged_array_C(:)
 
     integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex

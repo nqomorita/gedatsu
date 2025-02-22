@@ -14,6 +14,8 @@ extern "C" {
 /**
  * @defgroup graph_conv グラフデータ処理関数群（グラフデータ変換関数）
  * グラフデータ変換に関連する関数グループ
+ * @defgroup graph_merge グラフデータ処理関数群（グラフ結合関数）
+ * グラフ結合に関連する関数グループ
 */
 
 #ifdef __cplusplus
