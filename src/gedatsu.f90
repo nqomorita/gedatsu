@@ -29,6 +29,9 @@ module mod_gedatsu
   !> @defgroup graph_part グラフデータ処理関数群（グラフ分割関数）
   !> グラフ分割に関連する関数グループ
 
+  !> @defgroup graph_merge グラフデータ処理関数群（グラフ結合関数）
+  !> グラフ結合に関連する関数グループ
+
   !> @defgroup graph_dlb 動的負荷分散関数群
   !> 動的負荷分散に関連する関数グループ
 

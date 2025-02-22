@@ -18,6 +18,8 @@ module mod_gedatsu_graph_merge
 
 contains
 
+  !> @ingroup graph_merge
+  !> 計算点グラフを結合する
   subroutine gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
     implicit none
     !> 統合したいグラフ構造の個数
@@ -162,6 +164,8 @@ contains
     & merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id)
   end subroutine gedatsu_merge_nodal_subgraphs
 
+  !> @ingroup graph_merge
+  !> コネクティビティグラフを結合する
   subroutine gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, &
   & n_conn_graphs, conn_graphs, merged_conn_graph)
     implicit none
@@ -332,6 +336,8 @@ contains
     enddo
   end subroutine gedatsu_merge_connectivity_subgraphs
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（実数型）
   subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
     implicit none
     !> 統合したいグラフ構造の個数
@@ -452,6 +458,8 @@ contains
     enddo
   end subroutine gedatsu_merge_distval_R_core
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（整数型）
   subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
     implicit none
     !> 統合したいグラフ構造の個数
@@ -570,6 +578,8 @@ contains
     enddo
   end subroutine gedatsu_merge_distval_I_core
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（複素数型）
   subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
     implicit none
     !> 統合したいグラフ構造の個数

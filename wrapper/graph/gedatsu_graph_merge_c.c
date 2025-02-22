@@ -365,7 +365,7 @@ void gedatsu_merge_connectivity_subgraphs(
   }
 }
 
-/** 物理量の結合 (実数配列) */
+/** 物理量分布の結合 (実数型) */
 void gedatsu_merge_distval_R(
   const int n_graphs,
   const GEDATSU_GRAPH* graphs,
@@ -461,7 +461,7 @@ void gedatsu_merge_distval_R(
   free(list_struct_R_array);
 }
 
-/** 物理量の結合 (整数配列) */
+/** 物理量分布の結合 (整数型) */
 void gedatsu_merge_distval_I(
   const int n_graphs,
   const GEDATSU_GRAPH* graphs,
@@ -557,7 +557,7 @@ void gedatsu_merge_distval_I(
   free(list_struct_I_array);
 }
 
-/** 物理量の結合 (複素数配列) */
+/** 物理量分布の結合 (複素数型) */
 void gedatsu_merge_distval_C(
   const int n_graphs,
   const GEDATSU_GRAPH* graphs,
