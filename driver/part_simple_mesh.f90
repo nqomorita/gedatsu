@@ -213,6 +213,7 @@ contains
     foname_full = trim(dirname)//"/metagraph.dat"
     call gedatsu_get_metagraph(com, n_domain, metagraph)
     if(.not. is_1_origin) metagraph%vertex_id = metagraph%vertex_id - 1
+    if(.not. is_1_origin) metagraph%item = metagraph%item - 1
     call monolis_output_graph(foname_full, metagraph%n_vertex, metagraph%vertex_id, metagraph%index, metagraph%item)
 
     do i = 1, n_domain
