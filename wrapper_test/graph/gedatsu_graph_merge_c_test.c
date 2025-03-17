@@ -1731,17 +1731,11 @@ void gedatsu_merge_distval_I_c_test()
   gedatsu_merge_distval_I(n_graphs, graphs, &merged_graph, n_dof_list, list_struct_I,
     &merged_n_dof_list, &merged_array_I);
 
-  for (int i = 0; i < 8; i++)
-  {
-    printf("%d ", merged_array_I[i]);
-  }
-  printf("\n");
-
   // 確認
   monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_I case2 n_dof_list",
     7, merged_n_dof_list, 7, check_merged_n_dof_list);
   monolis_test_check_eq_I("gedatsu_graph_merge_test_c dist_val_I case2 array",
-    7, merged_array_I, 7, check_merged_array_I);
+    8, merged_array_I, 8, check_merged_array_I);
 
   // free
   monolis_list_finalize_I(n_dof_list, 1);

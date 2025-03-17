@@ -503,7 +503,7 @@ void gedatsu_merge_distval_R(
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_R_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_R_n,
+  gedatsu_merge_distval_R_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_R_n, sum_merged_n_dof_list,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
@@ -645,7 +645,7 @@ void gedatsu_merge_distval_I(
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_I_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_I_n,
+  gedatsu_merge_distval_I_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_I_n, sum_merged_n_dof_list,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
@@ -787,7 +787,7 @@ void gedatsu_merge_distval_C(
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_C_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n,
+  gedatsu_merge_distval_C_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n, sum_merged_n_dof_list,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
