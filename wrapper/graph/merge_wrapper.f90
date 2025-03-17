@@ -9,7 +9,7 @@ contains
   !> vertex_idなどの一次元配列をFortran側のgraphs構造体に再構成するための中間層関数
   !> 引数は全てallocateされている前提
   subroutine gedatsu_merge_distval_R_c( &
-  & sum_n_vertex, sum_index, sum_item, &
+  & sum_n_vertex, sum_index, sum_item, sum_list_struct_R_n, &
   & n_graphs, &
   & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
   & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, merged_index, merged_item, &
@@ -17,7 +17,7 @@ contains
   & merged_n_dof_list, merged_array_R) &
   & bind(c, name = "gedatsu_merge_distval_R_c")
     implicit none
-    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item
+    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item, sum_list_struct_R_n
     integer(c_int), intent(in), value :: n_graphs
     integer(c_int), intent(in), target :: n_vertex(n_graphs), n_internal_vertex(n_graphs)
     integer(c_int), intent(in), target :: vertex_id(sum_n_vertex), vertex_domain_id(sum_n_vertex), index(sum_index), item(sum_item)
@@ -26,7 +26,7 @@ contains
     integer(c_int), intent(in), target :: merged_index(merged_n_vertex+1), merged_item(merged_index(merged_n_vertex+1))
     integer(c_int), intent(in), target :: n_dof_list_n(n_graphs), list_struct_R_n(n_graphs)
     integer(c_int), intent(in), target :: n_dof_list_array(sum_n_vertex)
-    real(c_double), intent(in), target :: list_struct_R_array(sum_n_vertex)
+    real(c_double), intent(in), target :: list_struct_R_array(sum_list_struct_R_n)
     integer(c_int), intent(inout), target :: merged_n_dof_list(merged_n_vertex)
     real(c_double), intent(inout), target :: merged_array_R(merged_n_vertex)
 
@@ -102,7 +102,7 @@ contains
   end subroutine gedatsu_merge_distval_R_c
 
 subroutine gedatsu_merge_distval_I_c( &
-  & sum_n_vertex, sum_index, sum_item, &
+  & sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n, &
   & n_graphs, &
   & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
   & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, merged_index, merged_item, &
@@ -110,7 +110,7 @@ subroutine gedatsu_merge_distval_I_c( &
   & merged_n_dof_list, merged_array_I) &
   & bind(c, name = "gedatsu_merge_distval_I_c")
     implicit none
-    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item
+    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n
     integer(c_int), intent(in), value :: n_graphs
     integer(c_int), intent(in), target :: n_vertex(n_graphs), n_internal_vertex(n_graphs)
     integer(c_int), intent(in), target :: vertex_id(sum_n_vertex), vertex_domain_id(sum_n_vertex), index(sum_index), item(sum_item)
@@ -119,7 +119,7 @@ subroutine gedatsu_merge_distval_I_c( &
     integer(c_int), intent(in), target :: merged_index(merged_n_vertex+1), merged_item(merged_index(merged_n_vertex+1))
     integer(c_int), intent(in), target :: n_dof_list_n(n_graphs), list_struct_I_n(n_graphs)
     integer(c_int), intent(in), target :: n_dof_list_array(sum_n_vertex)
-    integer(c_int), intent(in), target :: list_struct_I_array(sum_n_vertex)
+    integer(c_int), intent(in), target :: list_struct_I_array(sum_list_struct_C_n)
     integer(c_int), intent(inout), target :: merged_n_dof_list(merged_n_vertex)
     integer(c_int), intent(inout), target :: merged_array_I(merged_n_vertex)
 
@@ -194,7 +194,7 @@ subroutine gedatsu_merge_distval_I_c( &
   end subroutine gedatsu_merge_distval_I_c
 
   subroutine gedatsu_merge_distval_C_c( &
-  & sum_n_vertex, sum_index, sum_item, &
+  & sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n, &
   & n_graphs, &
   & n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item, &
   & merged_n_vertex, merged_n_internal_vertex, merged_vertex_id, merged_vertex_domain_id, merged_index, merged_item, &
@@ -202,7 +202,7 @@ subroutine gedatsu_merge_distval_I_c( &
   & merged_n_dof_list, merged_array_C) &
   & bind(c, name = "gedatsu_merge_distval_C_c")
     implicit none
-    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item
+    integer(c_int), intent(in), value :: sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n
     integer(c_int), intent(in), value :: n_graphs
     integer(c_int), intent(in), target :: n_vertex(n_graphs), n_internal_vertex(n_graphs)
     integer(c_int), intent(in), target :: vertex_id(sum_n_vertex), vertex_domain_id(sum_n_vertex), index(sum_index), item(sum_item)
@@ -211,7 +211,7 @@ subroutine gedatsu_merge_distval_I_c( &
     integer(c_int), intent(in), target :: merged_index(merged_n_vertex+1), merged_item(merged_index(merged_n_vertex+1))
     integer(c_int), intent(in), target :: n_dof_list_n(n_graphs), list_struct_C_n(n_graphs)
     integer(c_int), intent(in), target :: n_dof_list_array(sum_n_vertex)
-    complex(c_double), intent(in), target :: list_struct_C_array(sum_n_vertex)
+    complex(c_double), intent(in), target :: list_struct_C_array(sum_list_struct_C_n)
     integer(c_int), intent(inout), target :: merged_n_dof_list(merged_n_vertex)
     complex(c_double), intent(inout), target :: merged_array_C(merged_n_vertex)
 

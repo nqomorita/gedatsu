@@ -748,8 +748,8 @@ module mod_gedatsu_graph_merge_test
     conn_graphs(2)%vertex_id(3) = 2
 
     conn_graphs(3)%vertex_id(1) = 5
-    conn_graphs(3)%vertex_id(2) = 2
-    conn_graphs(3)%vertex_id(3) = 3
+    conn_graphs(3)%vertex_id(2) = 3
+    conn_graphs(3)%vertex_id(3) = 2
     conn_graphs(3)%vertex_id(4) = 4
 
     call monolis_dealloc_I_2d(edge)

@@ -186,6 +186,8 @@ void gedatsu_merge_connectivity_subgraphs(
   int* nodal_vertex_id = NULL;
   int* nodal_vertex_id_notsorted = NULL;
   int* perm = NULL;
+  int* temp1 = NULL;
+  int* temp2 = NULL;
   int* global_id_in_merged_graph = NULL;
   int* which_conn_graph = NULL;
   int* local_id_in_conn_graph = NULL;
@@ -234,6 +236,7 @@ void gedatsu_merge_connectivity_subgraphs(
       is_conn_internal[idx] = true;
     }
   }
+
   // 内部領域と袖領域に分割
   n_conn_overlap_vertex = n_conn_vertex - n_conn_internal_vertex;
   conn_internal_vertex_id = monolis_alloc_I_1d(conn_internal_vertex_id, n_conn_internal_vertex);
@@ -245,7 +248,7 @@ void gedatsu_merge_connectivity_subgraphs(
       conn_internal_vertex_id[tmp1] = conn_vertex_id[i];
       tmp1 += 1;
     } else {
-      conn_internal_vertex_id[tmp2] = conn_vertex_id[i];
+      conn_overlap_vertex_id[tmp2] = conn_vertex_id[i];
       tmp2 += 1;
     }
   }
@@ -301,6 +304,8 @@ void gedatsu_merge_connectivity_subgraphs(
   perm = monolis_alloc_I_1d(perm, n_conn_vertex);
   which_conn_graph = monolis_alloc_I_1d(which_conn_graph, n_conn_vertex);
   local_id_in_conn_graph = monolis_alloc_I_1d(local_id_in_conn_graph, n_conn_vertex);
+  temp1 = monolis_alloc_I_1d(temp1, n_conn_vertex);
+  temp2 = monolis_alloc_I_1d(temp2, n_conn_vertex);
 
   for (int i = 0; i < n_conn_vertex; i++) {
     global_id_in_merged_graph[i] = merged_conn_graph->vertex_id[i];
@@ -324,8 +329,18 @@ void gedatsu_merge_connectivity_subgraphs(
 
   monolis_get_sequence_array_I(perm, n_conn_vertex, 0, 1);
   monolis_qsort_I_2d(global_id_in_merged_graph, perm, n_conn_vertex, 0, n_conn_vertex-1);
-  monolis_qsort_I_2d(perm, which_conn_graph, n_conn_vertex, 0, n_conn_vertex-1);
-  monolis_qsort_I_2d(perm, local_id_in_conn_graph, n_conn_vertex, 0, n_conn_vertex-1);
+
+  for (int i = 0; i < n_conn_vertex; i++)
+  {
+    temp1[i] = which_conn_graph[i];
+    temp2[i] = local_id_in_conn_graph[i];
+  }
+  for (int i = 0; i < n_conn_vertex; i++)
+  {
+    tmp1 = perm[i];
+    which_conn_graph[i] = temp1[tmp1];
+    local_id_in_conn_graph[i] = temp2[tmp1];
+  }
 
   // CSR 形式グラフの作成
   for (int i = 0; i < merged_conn_graph->n_vertex; i++)  //「抽出して足す」を繰り返す
@@ -385,24 +400,30 @@ void gedatsu_merge_distval_R(
   int* list_struct_R_n = NULL;
   int* n_dof_list_array = NULL;
   double* list_struct_R_array = NULL;
-  int sum_n_vertex, sum_index, sum_item;
+  int sum_n_vertex, sum_index, sum_item, sum_merged_n_dof_list, sum_list_struct_R_n, iE_list_struct_R_array;
   int iE_n_vertex, iE_index, iE_item;
+  // merged_array_Rのサイズ取得のための配列。末尾に_tmpをつける
+  int n_vertex_tmp, val_tmp, idx_tmp;
+  int* vertex_id_tmp = NULL;
+  int* perm_tmp = NULL;
 
   n_vertex = monolis_alloc_I_1d(n_vertex, n_graphs);
   n_internal_vertex = monolis_alloc_I_1d(n_internal_vertex, n_graphs);
   n_dof_list_n = monolis_alloc_I_1d(n_dof_list_n, n_graphs);
-  list_struct_R_n = monolis_alloc_I_1d(list_struct_R_n, n_graphs)
-;
+  list_struct_R_n = monolis_alloc_I_1d(list_struct_R_n, n_graphs);
+
   // graphs構造体とlist構造体を一次元配列に変換
 
   // allocのサイズを計算
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
+  sum_list_struct_R_n = 0;
   for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
+    sum_list_struct_R_n += list_struct_R[i].n;
   }
 
   // alloc
@@ -411,14 +432,50 @@ void gedatsu_merge_distval_R(
   index = monolis_alloc_I_1d(index, sum_index);
   item = monolis_alloc_I_1d(item, sum_item);
   n_dof_list_array = monolis_alloc_I_1d(n_dof_list_array, sum_n_vertex);
-  list_struct_R_array = monolis_alloc_R_1d(list_struct_R_array, sum_n_vertex);
-  *merged_n_dof_list = (int *)calloc(merged_graph->n_vertex, sizeof(int));
-  *merged_array_R = (double *)calloc(merged_graph->n_vertex, sizeof(double));
+  list_struct_R_array = monolis_alloc_R_1d(list_struct_R_array, sum_list_struct_R_n);
+  *merged_n_dof_list = monolis_alloc_I_1d(*merged_n_dof_list, merged_graph->n_vertex);
+
+  // merged_array_Rのサイズを計算してalloc
+  n_vertex_tmp = merged_graph->n_vertex;
+
+  // ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+  vertex_id_tmp = monolis_alloc_I_1d(vertex_id_tmp, n_vertex_tmp);
+  for (int i = 0; i < n_vertex_tmp; i++)
+  {
+    vertex_id_tmp[i] = merged_graph->vertex_id[i];
+  }
+  perm_tmp = monolis_alloc_I_1d(perm_tmp, n_vertex_tmp);
+  monolis_get_sequence_array_I(perm_tmp, n_vertex_tmp, 0, 1);
+  monolis_qsort_I_2d(vertex_id_tmp, perm_tmp, n_vertex_tmp, 0, n_vertex_tmp-1);
+
+  // 結合後グラフの情報を取得
+  for (int i = 0; i < n_graphs; i++)
+  {
+    if(graphs[i].n_vertex != n_dof_list[i].n){
+      printf("*** graphs(i).n_vertex and n_dof_list(i).n don't match. *** \n");
+      exit(1);
+    }
+    for (int j = 0; j < graphs[i].n_vertex; j++)  // 結合前ローカル番号
+    {
+      val_tmp = graphs[i].vertex_id[j]; // グローバル番号
+      monolis_bsearch_I(vertex_id_tmp, n_vertex_tmp, 0, n_vertex_tmp, val_tmp, &idx_tmp); // 結合後ソート後ローカル番号
+      val_tmp = perm_tmp[idx_tmp]; // 結合後ソート前ローカル番号
+      (*merged_n_dof_list)[val_tmp] = n_dof_list[i].array[j];  // 指定した計算点の物理量の次元を上書き
+    }
+  }
+
+  sum_merged_n_dof_list = 0;
+  for (int i = 0; i < merged_graph->n_vertex; i++)
+  {
+    sum_merged_n_dof_list += (*merged_n_dof_list)[i];
+  }
+  *merged_array_R = monolis_alloc_R_1d(*merged_array_R, sum_merged_n_dof_list);
 
   // 一次元配列を作成
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
+  iE_list_struct_R_array = 0;
   for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
@@ -428,7 +485,10 @@ void gedatsu_merge_distval_R(
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
-      list_struct_R_array[iE_n_vertex+j] = list_struct_R[i].array[j];
+    }
+    for (int j = 0; j < list_struct_R[i].n; j++)
+    {
+      list_struct_R_array[iE_list_struct_R_array+j] = list_struct_R[i].array[j];
     }
     for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
@@ -439,10 +499,11 @@ void gedatsu_merge_distval_R(
     iE_n_vertex += n_vertex[i];
     iE_index += n_vertex[i] + 1;
     iE_item += graphs[i].index[n_vertex[i]];
+    iE_list_struct_R_array += list_struct_R[i].n;
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_R_c(sum_n_vertex, sum_index, sum_item,
+  gedatsu_merge_distval_R_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_R_n,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
@@ -481,13 +542,17 @@ void gedatsu_merge_distval_I(
   int* list_struct_I_n = NULL;
   int* n_dof_list_array = NULL;
   int* list_struct_I_array = NULL;
-  int sum_n_vertex, sum_index, sum_item;
+  int sum_n_vertex, sum_index, sum_item, sum_merged_n_dof_list, sum_list_struct_I_n, iE_list_struct_I_array;
   int iE_n_vertex, iE_index, iE_item;
+  // merged_array_Iのサイズ取得のための配列。末尾に_tmpをつける
+  int n_vertex_tmp, val_tmp, idx_tmp;
+  int* vertex_id_tmp = NULL;
+  int* perm_tmp = NULL;
 
-  n_vertex = (int *)calloc(n_graphs, sizeof(int));
-  n_internal_vertex = (int *)calloc(n_graphs, sizeof(int));
-  n_dof_list_n = (int *)calloc(n_graphs, sizeof(int));
-  list_struct_I_n = (int *)calloc(n_graphs, sizeof(int));
+  n_vertex = monolis_alloc_I_1d(n_vertex, n_graphs);
+  n_internal_vertex = monolis_alloc_I_1d(n_internal_vertex, n_graphs);
+  n_dof_list_n = monolis_alloc_I_1d(n_dof_list_n, n_graphs);
+  list_struct_I_n = monolis_alloc_I_1d(list_struct_I_n, n_graphs);
 
   // graphs構造体とlist構造体を一次元配列に変換
 
@@ -495,10 +560,12 @@ void gedatsu_merge_distval_I(
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
+  sum_list_struct_I_n = 0;
   for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
+    sum_list_struct_I_n += list_struct_I[i].n;
   }
 
   // alloc
@@ -507,14 +574,50 @@ void gedatsu_merge_distval_I(
   index = monolis_alloc_I_1d(index, sum_index);
   item = monolis_alloc_I_1d(item, sum_item);
   n_dof_list_array = monolis_alloc_I_1d(n_dof_list_array, sum_n_vertex);
-  list_struct_I_array = monolis_alloc_I_1d(list_struct_I_array, sum_n_vertex);
-  *merged_n_dof_list = (int *)calloc(merged_graph->n_vertex, sizeof(int));
-  *merged_array_I = (int *)calloc(merged_graph->n_vertex, sizeof(int));
+  list_struct_I_array = monolis_alloc_I_1d(list_struct_I_array, sum_list_struct_I_n);
+  *merged_n_dof_list = monolis_alloc_I_1d(*merged_n_dof_list, merged_graph->n_vertex);
+
+  // merged_array_Iのサイズを計算してalloc
+  n_vertex_tmp = merged_graph->n_vertex;
+
+  // ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+  vertex_id_tmp = monolis_alloc_I_1d(vertex_id_tmp, n_vertex_tmp);
+  for (int i = 0; i < n_vertex_tmp; i++)
+  {
+    vertex_id_tmp[i] = merged_graph->vertex_id[i];
+  }
+  perm_tmp = monolis_alloc_I_1d(perm_tmp, n_vertex_tmp);
+  monolis_get_sequence_array_I(perm_tmp, n_vertex_tmp, 0, 1);
+  monolis_qsort_I_2d(vertex_id_tmp, perm_tmp, n_vertex_tmp, 0, n_vertex_tmp-1);
+
+  // 結合後グラフの情報を取得
+  for (int i = 0; i < n_graphs; i++)
+  {
+    if(graphs[i].n_vertex != n_dof_list[i].n){
+      printf("*** graphs(i).n_vertex and n_dof_list(i).n don't match. *** \n");
+      exit(1);
+    }
+    for (int j = 0; j < graphs[i].n_vertex; j++)  // 結合前ローカル番号
+    {
+      val_tmp = graphs[i].vertex_id[j]; // グローバル番号
+      monolis_bsearch_I(vertex_id_tmp, n_vertex_tmp, 0, n_vertex_tmp, val_tmp, &idx_tmp); // 結合後ソート後ローカル番号
+      val_tmp = perm_tmp[idx_tmp]; // 結合後ソート前ローカル番号
+      (*merged_n_dof_list)[val_tmp] = n_dof_list[i].array[j];  // 指定した計算点の物理量の次元を上書き
+    }
+  }
+
+  sum_merged_n_dof_list = 0;
+  for (int i = 0; i < merged_graph->n_vertex; i++)
+  {
+    sum_merged_n_dof_list += (*merged_n_dof_list)[i];
+  }
+  *merged_array_I = monolis_alloc_I_1d(*merged_array_I, sum_merged_n_dof_list);
 
   // 一次元配列を作成
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
+  iE_list_struct_I_array = 0;
   for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
@@ -524,7 +627,10 @@ void gedatsu_merge_distval_I(
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
-      list_struct_I_array[iE_n_vertex+j] = list_struct_I[i].array[j];
+    }
+    for (int j = 0; j < list_struct_I[i].n; j++)
+    {
+      list_struct_I_array[iE_list_struct_I_array+j] = list_struct_I[i].array[j];
     }
     for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
@@ -535,10 +641,11 @@ void gedatsu_merge_distval_I(
     iE_n_vertex += n_vertex[i];
     iE_index += n_vertex[i] + 1;
     iE_item += graphs[i].index[n_vertex[i]];
+    iE_list_struct_I_array += list_struct_I[i].n;
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_I_c(sum_n_vertex, sum_index, sum_item,
+  gedatsu_merge_distval_I_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_I_n,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
@@ -577,13 +684,17 @@ void gedatsu_merge_distval_C(
   int* list_struct_C_n = NULL;
   int* n_dof_list_array = NULL;
   double complex* list_struct_C_array = NULL;
-  int sum_n_vertex, sum_index, sum_item;
+  int sum_n_vertex, sum_index, sum_item, sum_merged_n_dof_list, sum_list_struct_C_n, iE_list_struct_C_array;
   int iE_n_vertex, iE_index, iE_item;
+  // merged_array_Cのサイズ取得のための配列。末尾に_tmpをつける
+  int n_vertex_tmp, val_tmp, idx_tmp;
+  int* vertex_id_tmp = NULL;
+  int* perm_tmp = NULL;
 
-  n_vertex = (int *)calloc(n_graphs, sizeof(int));
-  n_internal_vertex = (int *)calloc(n_graphs, sizeof(int));
-  n_dof_list_n = (int *)calloc(n_graphs, sizeof(int));
-  list_struct_C_n = (int *)calloc(n_graphs, sizeof(int));
+  n_vertex = monolis_alloc_I_1d(n_vertex, n_graphs);
+  n_internal_vertex = monolis_alloc_I_1d(n_internal_vertex, n_graphs);
+  n_dof_list_n = monolis_alloc_I_1d(n_dof_list_n, n_graphs);
+  list_struct_C_n = monolis_alloc_I_1d(list_struct_C_n, n_graphs);
 
   // graphs構造体とlist構造体を一次元配列に変換
 
@@ -591,10 +702,12 @@ void gedatsu_merge_distval_C(
   sum_n_vertex = 0;
   sum_index = 0;
   sum_item = 0;
+  sum_list_struct_C_n = 0;
   for (int i = 0; i < n_graphs; i++) {
     sum_n_vertex += graphs[i].n_vertex;
     sum_index += graphs[i].n_vertex + 1;
     sum_item += graphs[i].index[graphs[i].n_vertex];
+    sum_list_struct_C_n += list_struct_C[i].n;
   }
 
   // alloc
@@ -603,14 +716,50 @@ void gedatsu_merge_distval_C(
   index = monolis_alloc_I_1d(index, sum_index);
   item = monolis_alloc_I_1d(item, sum_item);
   n_dof_list_array = monolis_alloc_I_1d(n_dof_list_array, sum_n_vertex);
-  list_struct_C_array = monolis_alloc_C_1d(list_struct_C_array, sum_n_vertex);
-  *merged_n_dof_list = (int *)calloc(merged_graph->n_vertex, sizeof(int));
-  *merged_array_C = (double complex *)calloc(merged_graph->n_vertex, sizeof(double complex));
+  list_struct_C_array = monolis_alloc_C_1d(list_struct_C_array, sum_list_struct_C_n);
+  *merged_n_dof_list = monolis_alloc_I_1d(*merged_n_dof_list, merged_graph->n_vertex);
+
+  // merged_array_Cのサイズを計算してalloc
+  n_vertex_tmp = merged_graph->n_vertex;
+
+  // ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
+  vertex_id_tmp = monolis_alloc_I_1d(vertex_id_tmp, n_vertex_tmp);
+  for (int i = 0; i < n_vertex_tmp; i++)
+  {
+    vertex_id_tmp[i] = merged_graph->vertex_id[i];
+  }
+  perm_tmp = monolis_alloc_I_1d(perm_tmp, n_vertex_tmp);
+  monolis_get_sequence_array_I(perm_tmp, n_vertex_tmp, 0, 1);
+  monolis_qsort_I_2d(vertex_id_tmp, perm_tmp, n_vertex_tmp, 0, n_vertex_tmp-1);
+
+  // 結合後グラフの情報を取得
+  for (int i = 0; i < n_graphs; i++)
+  {
+    if(graphs[i].n_vertex != n_dof_list[i].n){
+      printf("*** graphs(i).n_vertex and n_dof_list(i).n don't match. *** \n");
+      exit(1);
+    }
+    for (int j = 0; j < graphs[i].n_vertex; j++)  // 結合前ローカル番号
+    {
+      val_tmp = graphs[i].vertex_id[j]; // グローバル番号
+      monolis_bsearch_I(vertex_id_tmp, n_vertex_tmp, 0, n_vertex_tmp, val_tmp, &idx_tmp); // 結合後ソート後ローカル番号
+      val_tmp = perm_tmp[idx_tmp]; // 結合後ソート前ローカル番号
+      (*merged_n_dof_list)[val_tmp] = n_dof_list[i].array[j];  // 指定した計算点の物理量の次元を上書き
+    }
+  }
+
+  sum_merged_n_dof_list = 0;
+  for (int i = 0; i < merged_graph->n_vertex; i++)
+  {
+    sum_merged_n_dof_list += (*merged_n_dof_list)[i];
+  }
+  *merged_array_C = monolis_alloc_C_1d(*merged_array_C, sum_merged_n_dof_list);
 
   // 一次元配列を作成
   iE_n_vertex = 0;
   iE_index = 0;
   iE_item = 0;
+  iE_list_struct_C_array = 0;
   for (int i = 0; i < n_graphs; i++) {
     n_vertex[i] = graphs[i].n_vertex;
     n_internal_vertex[i] = graphs[i].n_internal_vertex;
@@ -620,7 +769,10 @@ void gedatsu_merge_distval_C(
       vertex_id[iE_n_vertex+j] = graphs[i].vertex_id[j];
       vertex_domain_id[iE_n_vertex+j] = graphs[i].vertex_domain_id[j];
       n_dof_list_array[iE_n_vertex+j] = n_dof_list[i].array[j];
-      list_struct_C_array[iE_n_vertex+j] = list_struct_C[i].array[j];
+    }
+    for (int j = 0; j < list_struct_C[i].n; j++)
+    {
+      list_struct_C_array[iE_list_struct_C_array+j] = list_struct_C[i].array[j];
     }
     for (int j = 0; j < n_vertex[i]+1; j++) {
       index[iE_index+j] = graphs[i].index[j];
@@ -631,10 +783,11 @@ void gedatsu_merge_distval_C(
     iE_n_vertex += n_vertex[i];
     iE_index += n_vertex[i] + 1;
     iE_item += graphs[i].index[n_vertex[i]];
+    iE_list_struct_C_array += list_struct_C[i].n;
   }
 
   // 結合関数（中間層関数）を呼ぶ
-  gedatsu_merge_distval_C_c(sum_n_vertex, sum_index, sum_item,
+  gedatsu_merge_distval_C_c(sum_n_vertex, sum_index, sum_item, sum_list_struct_C_n,
   n_graphs, n_vertex, n_internal_vertex, vertex_id, vertex_domain_id, index, item,
   merged_graph->n_vertex, merged_graph->n_internal_vertex,
   merged_graph->vertex_id, merged_graph->vertex_domain_id, merged_graph->index, merged_graph->item,
