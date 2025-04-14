@@ -6,13 +6,14 @@ program gedatsu_partitioner_simple_mesh
   type(gedatsu_graph) :: conn_graph
   type(gedatsu_graph), allocatable :: subgraphs(:)
   integer(kint) :: n_node, n_elem, n_base, n_domain
-  integer(kint) :: n_nw_dof, n_ew_dof, n_edge
+  integer(kint) :: n_nw_dof, n_ew_dof, n_gs_dof, n_edge
   character(monolis_charlen) :: finname, fiename, dirname
-  character(monolis_charlen) :: finwname, fiewname, label
-  logical :: is_get, is_inw, is_iew, is_1_origin
+  character(monolis_charlen) :: finwname, fiewname, fgsname, label
+  logical :: is_get, is_inw, is_iew, is_1_origin, is_given_subdomain
   integer(kint), allocatable :: elem(:,:)
   integer(kint), allocatable :: node_wgt(:,:)
   integer(kint), allocatable :: edge_wgt(:,:)
+  integer(kint), allocatable :: given_domain_id(:,:)
   real(kdouble), allocatable :: node(:,:)
 
   call monolis_mpi_initialize()
@@ -31,6 +32,7 @@ program gedatsu_partitioner_simple_mesh
     write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
     write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"--given_subdomain {input subdomain filename}"
     write(*,"(a)")"-h  : help"
     stop monolis_success
   endif
@@ -48,6 +50,7 @@ program gedatsu_partitioner_simple_mesh
     write(*,"(a)")"-inw {input node weight filename}: (default) node_weight.dat"
     write(*,"(a)")"-iew {input edge weight filename}: (default) edge_weight.dat"
     write(*,"(a)")"-d {output directory name}: (default) ./parted.0"
+    write(*,"(a)")"--given_subdomain {input subdomain filename}"
     write(*,"(a)")"-h  : help"
   endif
 
@@ -84,6 +87,14 @@ program gedatsu_partitioner_simple_mesh
   if(is_iew)then
     call monolis_std_log_string2("[input edge weight filename]", fiewname)
     call monolis_input_distval_i(fiewname, label, n_edge, n_ew_dof, edge_wgt)
+  endif
+
+  fgsname = ""
+  call monolis_get_arg_input_S("--given_subdomain", fgsname, is_given_subdomain)
+
+  if(is_given_subdomain)then
+    call monolis_std_log_string2("[input given subdomain filename]", fgsname)
+    call monolis_input_distval_i(fgsname, label, n_node, n_gs_dof, given_domain_id)
   endif
 
   call node_partition()
@@ -204,7 +215,11 @@ contains
 
     allocate(subgraphs(n_domain))
 
-    call gedatsu_graph_partition_with_weight(node_graph, n_domain, node_wgt, edge_wgt, subgraphs)
+    if(is_given_subdomain)then
+      call gedatsu_graph_partition_given_subdomain(node_graph, n_domain, given_domain_id, subgraphs)
+    else
+      call gedatsu_graph_partition_METIS_with_weight(node_graph, n_domain, node_wgt, edge_wgt, subgraphs)
+    endif
 
     allocate(com(n_domain))
 

@@ -56,7 +56,7 @@ contains
 
     n_domain = 2
 
-    call gedatsu_graph_partition(graph, n_domain, subgraphs)
+    call gedatsu_graph_partition_METIS(graph, n_domain, subgraphs)
 
     call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 3)
     call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 4)
@@ -121,7 +121,7 @@ contains
     node_wgt(1,4) = 1
     node_wgt(1,5) = 2
 
-    call gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
+    call gedatsu_graph_partition_METIS_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
 
 !    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 2)
 !    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 5)

@@ -19,7 +19,7 @@ contains
 
   !> @ingroup graph_part
   !> グラフを分割する（節点重みなし）
-  subroutine gedatsu_graph_partition(graph, n_domain, subgraphs)
+  subroutine gedatsu_graph_partition_METIS(graph, n_domain, subgraphs)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -37,11 +37,11 @@ contains
     call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
 
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
-  end subroutine gedatsu_graph_partition
+  end subroutine gedatsu_graph_partition_METIS
 
   !> @ingroup graph_part
   !> グラフを分割する（節点重みあり）
-  subroutine gedatsu_graph_partition_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
+  subroutine gedatsu_graph_partition_METIS_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
@@ -64,7 +64,31 @@ contains
     call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
 
     call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
-  end subroutine gedatsu_graph_partition_with_weight
+  end subroutine gedatsu_graph_partition_METIS_with_weight
+
+  !> @ingroup graph_part
+  !> グラフを分割する（分割結果の外部ファイル入力）
+  subroutine gedatsu_graph_partition_given_subdomain(graph, n_domain, given_domain_id, subgraphs)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    !> [in] 分割数
+    integer(kint), intent(in) :: n_domain
+    !> [in] 外部入力された既知の領域分割結果
+    integer(kint), intent(in) :: given_domain_id(:,:)
+    !> [out] 分割後の graph 構造体
+    type(gedatsu_graph), intent(out) :: subgraphs(:)
+
+    if(.not. allocated(graph%vertex_domain_id))then
+      call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
+    endif
+
+    graph%vertex_domain_id = given_domain_id(1,:)
+
+    call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
+
+    call gedatsu_get_parted_graph(graph, n_domain, subgraphs)
+  end subroutine gedatsu_graph_partition_given_subdomain
 
   !> @ingroup dev_graph_part
   !> 領域番号に従ってオーバーラップ領域を含めた分割グラフを取得
