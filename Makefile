@@ -8,8 +8,9 @@ CFLAGS = -fPIC -O2
 LINK   = $(FC)
 
 ##> directory setting
-MOD_DIR = -J ./include
-INCLUDE_1 = -I ./include -I /usr/include
+INC_DIR = ./include
+MOD_DIR = -J $(INC_DIR)
+INCLUDE_1 = -I $(INC_DIR) -I /usr/include
 INCLUDE_2 = -I ./submodule/monolis_utils/include
 USE_LIB = -L./lib -lgedatsu -L./submodule/monolis_utils/lib -lmonolis_utils -lmetis
 BIN_DIR = ./bin
@@ -39,7 +40,7 @@ ifdef FLAGS
 		FFLAGS  = -fPIC -O2 -align array64byte  -nofor-main
 		CC      = mpiicx
 		CFLAGS  = -fPIC -O2 -no-multibyte-chars
-		MOD_DIR = -module ./include
+		MOD_DIR = -module $(INC_DIR)
 		LINK   = $(FC)
 	endif
 
@@ -48,9 +49,9 @@ ifdef FLAGS
 		FFLAGS  = -Nalloc_assign -Kfast -SCALAPACK -SSL2
 		CC      = mpifccpx -Nclang 
 		CFLAGS  = -Kfast
-		MOD_DIR = -M ./include
+		MOD_DIR = -M $(INC_DIR)
 		LINK    = mpiFCCpx --linkfortran -SSL2
-		INCLUDE_1 = -I ./include
+		INCLUDE_1 = -I $(INC_DIR)
 	endif
 
 	ifeq ($(findstring METIS_INT64, $(DFLAGS)), METIS_INT64)
@@ -89,7 +90,8 @@ SRC_WRAP = \
 SRC_GRAPH = \
   graph_handler.f90 \
   graph_convert.f90 \
-  graph_part.f90
+  graph_part.f90 \
+  graph_merge.f90
 
 SRC_DLB = \
   graph_repart.f90 \
@@ -103,11 +105,16 @@ SRC_DEF_C = \
 
 SRC_GRAPH_C = \
   gedatsu_graph_convert_c.c \
-  gedatsu_graph_handler_c.c
+  gedatsu_graph_handler_c.c \
+  gedatsu_graph_merge_c.c
+
+SRC_GRAPH_CF = \
+  merge_wrapper.f90
 
 SRC_ALL_C = \
 $(addprefix define/, $(SRC_DEF_C)) \
-$(addprefix graph/, $(SRC_GRAPH_C))
+$(addprefix graph/, $(SRC_GRAPH_C)) \
+$(addprefix graph/, $(SRC_GRAPH_CF))
 
 ##> all targes
 SRC_ALL = \
@@ -123,6 +130,7 @@ $(addprefix $(WRAP_DIR)/, $(SRC_ALL_C)) \
 ./src/gedatsu.f90
 LIB_OBJSt   = $(subst $(SRC_DIR), $(OBJ_DIR), $(LIB_SOURCES:.f90=.o))
 LIB_OBJS    = $(subst $(WRAP_DIR), $(OBJ_DIR), $(LIB_OBJSt:.c=.o))
+C_HEADER    = $(subst define/, $(INC_DIR)/, $(SRC_DEF_C:.c=.h)) $(subst graph/, $(INC_DIR)/, $(SRC_GRAPH_C:.c=.h))
 
 ##> **********
 ##> target (2) test for fotran
@@ -139,11 +147,16 @@ TST_OBJS    = $(TST_OBJSt:.c=_test.o)
 TEST_C_TARGET = $(TST_WRAP_DIR)/gedatsu_c_test
 
 ##> lib objs
+SRC_DEF_C_TEST = \
+gedatsu_def_graph_c_test.c
+
 SRC_GRAPH_C_TEST = \
 gedatsu_graph_convert_c_test.c \
-gedatsu_graph_handler_c_test.c
+gedatsu_graph_handler_c_test.c \
+gedatsu_graph_merge_c_test.c
 
 SRC_ALL_C_TEST = \
+$(addprefix define/, $(SRC_DEF_C_TEST)) \
 $(addprefix graph/, $(SRC_GRAPH_C_TEST))
 
 TST_SRC_C_ALL = $(SRC_ALL_C_TEST) gedatsu_c_test.c
@@ -249,6 +262,7 @@ $(DRIVE9): $(DRV_OBJS9)
 cp_header:
 	$(CP) ./wrapper/define/gedatsu_def_graph_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_convert_c.h ./include/
+	$(CP) ./wrapper/graph/gedatsu_graph_merge_c.h ./include/
 	$(CP) ./wrapper/graph/gedatsu_graph_handler_c.h ./include/
 	$(CP) ./wrapper/gedatsu.h ./include/
 
@@ -278,7 +292,7 @@ clean:
 	$(DRIVE7) \
 	$(DRIVE8) \
 	$(DRIVE9) \
-	./include/*.h \
+	$(C_HEADER) \
 	./include/*.mod \
 	./bin/*
 

@@ -7,6 +7,7 @@ module mod_gedatsu
   use mod_gedatsu_graph_repart
   use mod_gedatsu_graph_handler
   use mod_gedatsu_graph_convert
+  use mod_gedatsu_graph_merge
   !> wrapper section
   use mod_gedatsu_wrapper_metis
   use mod_gedatsu_wrapper_parmetis

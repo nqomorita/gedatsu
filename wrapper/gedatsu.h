@@ -8,6 +8,7 @@ extern "C" {
 
 #include "gedatsu_def_graph_c.h"
 #include "gedatsu_graph_convert_c.h"
+#include "gedatsu_graph_merge_c.h"
 #include "gedatsu_graph_handler_c.h"
 
 /**

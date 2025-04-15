@@ -15,6 +15,8 @@
 !# gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 !# gedatsu_graph_set_edge(graph, n_edge, edge)
 !# gedatsu_graph_add_edge(graph, n_edge, edge)
+!# gedatsu_graph_delete_dupulicate_edge(graph)
+!# gedatsu_graph_get_edge_in_internal_region_conn_graph(graph, n_edge, edge)
 module mod_gedatsu_graph_handler
   use mod_monolis_utils
   use mod_gedatsu_graph
@@ -401,6 +403,72 @@ contains
     enddo
   end subroutine gedatsu_graph_get_edge_in_internal_region
 
+  !> *** コネクティビティグラフ結合時はこの関数を使う ***
+  !> *** 理由：nodal_graph%vertex_id は計算点番号、conn_graph%vertex_id は要素番号が記述されているから。 ***
+  !> @ingroup graph_basic
+  !> 領域番号 domain_id に属するグラフのエッジを取得
+  !> @details エッジの組はローカル節点番号で表現される
+  subroutine gedatsu_graph_get_edge_in_internal_region_conn_graph(nodal_graph, conn_graph, domain_id, edge)
+    implicit none
+    !> [in] graph 構造体（計算点グラフ）
+    type(gedatsu_graph), intent(in) :: nodal_graph
+    !> [in] graph 構造体（コネクティビティグラフ）
+    type(gedatsu_graph), intent(in) :: conn_graph
+    !> [in] 領域番号
+    integer(kint), intent(in) :: domain_id
+    !> [out] グラフのエッジ配列
+    integer(kint), intent(out) :: edge(:,:)
+
+    integer(kint) :: i, nid, idx, j, jS, jE
+    integer(kint) :: n_nodal_vertex, n_conn_vertex, n_edge, e1, e2, n1, n2
+    integer(kint), allocatable :: nodal_ids(:), conn_ids(:)
+    integer(kint), allocatable :: nodal_perm(:), conn_perm(:)
+
+    call gedatsu_graph_get_n_vertex_in_internal_region(nodal_graph, domain_id, n_nodal_vertex)
+    call gedatsu_graph_get_n_vertex_in_internal_region(conn_graph, domain_id, n_conn_vertex)
+
+    call monolis_alloc_I_1d(nodal_ids, n_nodal_vertex)
+    call monolis_alloc_I_1d(conn_ids, n_conn_vertex)
+
+    call gedatsu_graph_get_vertex_id_in_internal_region(nodal_graph, domain_id, nodal_ids)
+    call gedatsu_graph_get_vertex_id_in_internal_region(conn_graph, domain_id, conn_ids)
+
+    call monolis_alloc_I_1d(nodal_perm, n_nodal_vertex)
+    call monolis_alloc_I_1d(conn_perm, n_conn_vertex)
+
+    call monolis_get_sequence_array_I(nodal_perm, n_nodal_vertex, 1, 1)
+    call monolis_get_sequence_array_I(conn_perm, n_conn_vertex, 1, 1)
+
+    call monolis_qsort_I_2d(nodal_ids, nodal_perm, 1, n_nodal_vertex)
+    call monolis_qsort_I_2d(conn_ids, conn_perm, 1, n_conn_vertex)
+
+    n_edge = 0
+    do i = 1, conn_graph%n_vertex
+      if(conn_graph%vertex_domain_id(i) /= domain_id) cycle
+      jS = conn_graph%index(i) + 1
+      jE = conn_graph%index(i + 1)
+      do j = jS, jE
+        nid = conn_graph%item(j)
+        if(nodal_graph%vertex_domain_id(nid) == domain_id)then
+
+          n1 = conn_graph%vertex_id(i)
+          call monolis_bsearch_I(conn_ids, 1, n_conn_vertex, n1, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 1"
+          e1 = conn_perm(idx)
+
+          n2 = nodal_graph%vertex_id(nid)
+          call monolis_bsearch_I(nodal_ids, 1, n_nodal_vertex, n2, idx)
+          if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
+          e2 = nodal_perm(idx)
+
+          n_edge = n_edge + 1
+          edge(1,n_edge) = e1
+          edge(2,n_edge) = e2
+        endif
+      enddo
+    enddo
+  end subroutine gedatsu_graph_get_edge_in_internal_region_conn_graph
+
   !> @ingroup graph_basic
   !> 領域番号 domain_id のオーバーラッピング領域に属するエッジを取得
   !> @details エッジの組はローカル節点番号で表現される
@@ -526,12 +594,6 @@ contains
 
     call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
 
-    if(graph%n_vertex < maxval(edge(:,1:n_edge)))then
-      call monolis_std_error_string("gedatsu_graph_set_edge")
-      call monolis_std_error_string("edge node number is greater than the number of vertex")
-      call monolis_std_error_stop()
-    endif
-
     graph%index = 0
     do i = 1, n_edge
       e1 = temp(1,i)
@@ -636,4 +698,40 @@ contains
       endif
     enddo
   end subroutine gedatsu_graph_check_edge
+
+  !> @ingroup graph_basic
+  !> グラフの重複したエッジを削除
+  subroutine gedatsu_graph_delete_dupulicate_edge(graph)
+    implicit none
+    !> [in,out] graph 構造体
+    type(gedatsu_graph), intent(inout) :: graph
+    integer(kint) :: i, iS, iE, len, len_uniq
+    integer(kint), allocatable :: index_(:), item(:), item_tmp(:)
+
+    call monolis_alloc_I_1d(index_, graph%n_vertex+1)
+    call monolis_alloc_I_1d(item, graph%index(graph%n_vertex+1))
+
+    index_(:) = graph%index(:)
+    item(:) = graph%item(:)
+
+    call monolis_dealloc_I_1d(graph%item)
+
+    do i = 1, graph%n_vertex
+      iS = index_(i)+1
+      iE = index_(i+1)
+      len = iE - iS + 1
+
+      call monolis_dealloc_I_1d(item_tmp)
+      call monolis_alloc_I_1d(item_tmp, len)
+      item_tmp(1:len) = item(iS:iE)
+
+      call monolis_qsort_I_1d(item_tmp, 1, len)
+      call monolis_get_uniq_array_I(item_tmp, len, len_uniq)
+
+      call monolis_append_I_1d(graph%item, len_uniq, item_tmp)
+      graph%index(i+1) = graph%index(i) + len_uniq
+    enddo
+
+  end subroutine gedatsu_graph_delete_dupulicate_edge
+
 end module mod_gedatsu_graph_handler

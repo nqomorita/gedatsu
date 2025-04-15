@@ -101,6 +101,8 @@ program gedatsu_partitioner_simple_mesh
 
   call elem_partition()
 
+  !call visual_parted_mesh(n_node, node, n_elem, n_base, elem, node_graph%vertex_domain_id)
+
   call monolis_mpi_finalize()
 
 contains
@@ -228,6 +230,7 @@ contains
     foname_full = trim(dirname)//"/metagraph.dat"
     call gedatsu_get_metagraph(com, n_domain, metagraph)
     if(.not. is_1_origin) metagraph%vertex_id = metagraph%vertex_id - 1
+    if(.not. is_1_origin) metagraph%item = metagraph%item - 1
     call monolis_output_graph(foname_full, metagraph%n_vertex, metagraph%vertex_id, metagraph%index, metagraph%item)
 
     do i = 1, n_domain
@@ -266,5 +269,58 @@ contains
       call monolis_dealloc_R_2d(local_node)
     enddo
   end subroutine node_partition
+
+  subroutine visual_parted_mesh(nnode, node, nelem, nbase, elem, nodeid)
+    implicit none
+    integer(kint) :: i, j
+    integer(kint) :: nnode, nelem, nbase, elem(:,:), nodeid(:), elemid(nelem), domid(nbase)
+    real(kdouble) :: node(:,:)
+    character :: etype*6
+
+    elemid = 0
+
+    do i = 1, nelem
+      do j = 1, nbase
+        domid(j) = nodeid(elem(j,i))
+      enddo
+      if(minval(domid) == maxval(domid))then
+        elemid(i) = maxval(domid)
+      else
+        elemid(i) = -1
+      endif
+    enddo
+
+    open(20, file = trim(dirname)//"mesh.part.inp", status = "replace")
+      write(20,"(5i12)") nnode, nelem, 1, 1, 0
+      do i = 1, nnode
+        write(20,"(i0,1p3e13.5)") i, node(1,i), node(2,i), node(3,i)
+      enddo
+
+      if(nbase == 3) etype = " tri  "
+      if(nbase == 4) etype = " tet  "
+      if(nbase == 8) etype = " hex  "
+      if(nbase ==10) etype = " tet2 "
+
+      do i = 1, nelem
+        write(20,"(i0,i4,a,$)") i, 0, etype
+        do j = 1, nbase
+          write(20,"(i12,$)") elem(j,i)
+        enddo
+        write(20,*)""
+      enddo
+
+      write(20,"(a)")"1 1"
+      write(20,"(a)")"node_domid, unknown"
+      do i = 1, nnode
+        write(20,"(i0,x,i0,x,i0,x,i0)") i, nodeid(i)
+      enddo
+
+      write(20,"(a)")"1 1"
+      write(20,"(a)")"elem_domid, unknown"
+      do i = 1, nelem
+        write(20,"(i0,x,i0,x,i0,x,i0)") i, elemid(i)
+      enddo
+    close(20)
+  end subroutine visual_parted_mesh
 
 end program gedatsu_partitioner_simple_mesh

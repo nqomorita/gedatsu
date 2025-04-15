@@ -430,7 +430,7 @@ contains
     do i = 1, n_domain
       do j = 1, com(i)%recv_n_neib
         in = in + 1
-        metagraph%item(in) = com(i)%recv_neib_pe(j)
+        metagraph%item(in) = com(i)%recv_neib_pe(j) + 1
       enddo
     enddo
   end subroutine gedatsu_get_metagraph
