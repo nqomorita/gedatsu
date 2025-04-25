@@ -55,7 +55,7 @@ contains
     integer(kint_c), pointer :: part_id_c(:) => null()
     integer(kint_c), pointer :: vsize(:) => null()
     integer(kint_c), pointer :: ubvec(:) => null()
-    real(c_float), pointer :: options(:) => null()
+    integer(kint_c), pointer :: options(:) => null()
     real(c_float), pointer :: tpwgts(:) => null()
 
     if(n_part /= 1)then
@@ -133,7 +133,7 @@ contains
     integer(kint_c), pointer :: node_wgt_c(:) => null()
     integer(kint_c), pointer :: perm_c(:) => null()
     integer(kint_c), pointer :: iperm_c(:) => null()
-    real(c_float), pointer :: options(:) => null()
+    integer(kint_c), pointer :: options(:) => null()
 
 #ifdef NO_METIS
     call monolis_std_error_string("gedatsu_part_graph_metis_reordering")
