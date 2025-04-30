@@ -560,7 +560,7 @@ void gedatsu_merge_distval_C(
   const MONOLIS_LIST_I* n_dof_list,
   const MONOLIS_LIST_C* list_struct_C,
   int** merged_n_dof_list,
-  double complex** merged_array_C)
+  double _Complex** merged_array_C)
 {
   int* n_vertex = NULL;
   int* n_internal_vertex = NULL;
@@ -571,7 +571,7 @@ void gedatsu_merge_distval_C(
   int* n_dof_list_n = NULL;
   int* list_struct_C_n = NULL;
   int* n_dof_list_array = NULL;
-  double complex* list_struct_C_array = NULL;
+  double _Complex* list_struct_C_array = NULL;
 
   int sum_n_vertex, sum_index, sum_item;
   int iE_n_vertex, iE_index, iE_item;
@@ -599,9 +599,9 @@ void gedatsu_merge_distval_C(
   index = (int *)calloc(sum_index, sizeof(int));
   item = (int *)calloc(sum_item, sizeof(int));
   n_dof_list_array = (int *)calloc(sum_n_vertex, sizeof(int));
-  list_struct_C_array = (double complex *)calloc(sum_n_vertex, sizeof(double complex));
+  list_struct_C_array = (double _Complex *)calloc(sum_n_vertex, sizeof(double _Complex));
   *merged_n_dof_list = (int *)calloc(merged_graph->n_vertex, sizeof(int));
-  *merged_array_C = (double complex *)calloc(merged_graph->n_vertex, sizeof(double complex));
+  *merged_array_C = (double _Complex *)calloc(merged_graph->n_vertex, sizeof(double _Complex));
 
   // 一次元配列を作成
   iE_n_vertex = 0;

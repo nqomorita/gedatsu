@@ -1,5 +1,4 @@
 /* graph_merge_c.h */
-#include<complex.h>
 #include "monolis_utils.h"
 #include "gedatsu_def_graph_c.h"
 #ifndef GEDATSU_GRAPH_MERGE_C_H
@@ -157,7 +156,7 @@ void gedatsu_merge_distval_C(
   const MONOLIS_LIST_I* n_dof_list,
   const MONOLIS_LIST_C* list_struct_C,
   int** merged_n_dof_list,
-  double complex** merged_array_C
+  double _Complex** merged_array_C
 );
 
 void gedatsu_merge_distval_C_c(
@@ -180,9 +179,9 @@ void gedatsu_merge_distval_C_c(
   int* n_dof_list_n,
   int* n_dof_list_array,
   int* list_struct_C_n,
-  double complex* list_struct_C_array,
+  double _Complex* list_struct_C_array,
   int* merged_n_dof_list,
-  double complex* merged_array_C
+  double _Complex* merged_array_C
 );
 
 #ifdef __cplusplus
