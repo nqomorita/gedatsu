@@ -75,7 +75,7 @@ contains
     !> [in] 分割数
     integer(kint), intent(in) :: n_domain
     !> [in] 外部入力された既知の領域分割結果
-    integer(kint), intent(in) :: given_domain_id(:,:)
+    integer(kint), intent(in) :: given_domain_id(:)
     !> [out] 分割後の graph 構造体
     type(gedatsu_graph), intent(out) :: subgraphs(:)
 
@@ -83,7 +83,7 @@ contains
       call monolis_alloc_I_1d(graph%vertex_domain_id, graph%n_vertex)
     endif
 
-    graph%vertex_domain_id = given_domain_id(1,:)
+    graph%vertex_domain_id = given_domain_id
 
     call gedatsu_check_vertex_domain_id(graph%n_vertex, n_domain, graph%vertex_domain_id)
 
@@ -434,4 +434,34 @@ contains
       enddo
     enddo
   end subroutine gedatsu_get_metagraph
+
+  !> @ingroup graph_part
+  !> グラフ分割結果のメタグラフを出力
+  subroutine gedatsu_get_given_subdomain(fname, n, is_1_origin, given_domain_id)
+    type(gedatsu_graph) :: graph
+    character(monolis_charlen) :: fname
+    integer(kint) :: n
+    logical :: is_1_origin
+    integer(kint) :: i, j, jS, jE, jn
+    integer(kint), allocatable :: given_domain_id(:)
+  
+    call gedatsu_graph_initialize(graph)
+
+    call monolis_input_graph(fname, graph%n_vertex, graph%vertex_id, graph%index, graph%item)
+
+    if(.not. is_1_origin) graph%item = graph%item + 1
+
+    call monolis_alloc_I_1d(given_domain_id, n)
+
+    do i = 1, graph%n_vertex
+      jS = graph%index(i) + 1
+      jE = graph%index(i + 1)
+      do j = jS, jE
+        jn = graph%item(j)
+        given_domain_id(jn) = i - 1
+      enddo
+    enddo
+
+    call gedatsu_graph_finalize(graph)
+  end subroutine gedatsu_get_given_subdomain
 end module mod_gedatsu_graph_part

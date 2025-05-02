@@ -6,14 +6,14 @@ program gedatsu_partitioner_simple_mesh
   type(gedatsu_graph) :: conn_graph
   type(gedatsu_graph), allocatable :: subgraphs(:)
   integer(kint) :: n_node, n_elem, n_base, n_domain
-  integer(kint) :: n_nw_dof, n_ew_dof, n_gs_dof, n_edge
+  integer(kint) :: n_nw_dof, n_ew_dof, n_edge
   character(monolis_charlen) :: finname, fiename, dirname
   character(monolis_charlen) :: finwname, fiewname, fgsname, label
   logical :: is_get, is_inw, is_iew, is_1_origin, is_given_subdomain
   integer(kint), allocatable :: elem(:,:)
   integer(kint), allocatable :: node_wgt(:,:)
   integer(kint), allocatable :: edge_wgt(:,:)
-  integer(kint), allocatable :: given_domain_id(:,:)
+  integer(kint), allocatable :: given_domain_id(:)
   real(kdouble), allocatable :: node(:,:)
 
   call monolis_mpi_initialize()
@@ -94,7 +94,7 @@ program gedatsu_partitioner_simple_mesh
 
   if(is_given_subdomain)then
     call monolis_std_log_string2("[input given subdomain filename]", fgsname)
-    call monolis_input_distval_i(fgsname, label, n_node, n_gs_dof, given_domain_id)
+    call gedatsu_get_given_subdomain(fgsname, n_node, is_1_origin, given_domain_id)
   endif
 
   call node_partition()

@@ -5,7 +5,7 @@ program gedatsu_nodal_graph_partitioner
   type(gedatsu_graph) :: graph
   type(gedatsu_graph) :: metagraph
   integer(kint) :: n_domain, i
-  integer(kint) :: n_nw_dof, n_ew_dof, n_gs_dof, n_vertex, n_edge
+  integer(kint) :: n_nw_dof, n_ew_dof, n_vertex, n_edge
   character(monolis_charlen) :: finame, dirname, foname_full
   character(monolis_charlen) :: finwname, fiewname, fgsname, label
   logical :: is_get, is_inw, is_iew, is_1_origin, is_given_subdomain
@@ -13,7 +13,7 @@ program gedatsu_nodal_graph_partitioner
   type(monolis_COM), allocatable :: com(:)
   integer(kint), allocatable :: node_wgt(:,:)
   integer(kint), allocatable :: edge_wgt(:,:)
-  integer(kint), allocatable :: given_domain_id(:,:)
+  integer(kint), allocatable :: given_domain_id(:)
   integer(kint), allocatable :: id1(:)
 
   call monolis_mpi_initialize()
@@ -88,7 +88,7 @@ program gedatsu_nodal_graph_partitioner
 
   if(is_given_subdomain)then
     call monolis_std_log_string2("[input given subdomain filename]", fgsname)
-    call monolis_input_distval_i(fgsname, label, n_vertex, n_gs_dof, given_domain_id)
+    call gedatsu_get_given_subdomain(fgsname, graph%n_vertex, is_1_origin, given_domain_id)
   endif
 
   allocate(subgraphs(n_domain))
