@@ -73,33 +73,6 @@ void gedatsu_merge_distval_R(
   double** merged_array_R
 );
 
-void gedatsu_merge_distval_R_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int sum_list_struct_R_n,
-  int sum_merged_n_dof_list,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_R_n,
-  double* list_struct_R_array,
-  int* merged_n_dof_list,
-  double* merged_array_R
-);
-
 /**
  * @brief 物理量の結合 (整数配列)
  * @param[in] n_graphs 統合したいグラフ構造の個数
@@ -121,33 +94,6 @@ void gedatsu_merge_distval_I(
   int** merged_array_I
 );
 
-void gedatsu_merge_distval_I_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int sum_list_struct_I_n,
-  int sum_merged_n_dof_list,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_I_n,
-  int* list_struct_I_array,
-  int* merged_n_dof_list,
-  int* merged_array_I
-);
-
 /**
  * @brief 物理量の結合 (複素数配列)
  * @param[in] n_graphs 統合したいグラフ構造の個数
@@ -167,33 +113,6 @@ void gedatsu_merge_distval_C(
   const MONOLIS_LIST_C* list_struct_C,
   int** merged_n_dof_list,
   double complex** merged_array_C
-);
-
-void gedatsu_merge_distval_C_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int sum_list_struct_C_n,
-  int sum_merged_n_dof_list,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_C_n,
-  double complex* list_struct_C_array,
-  int* merged_n_dof_list,
-  double complex* merged_array_C
 );
 
 #ifdef __cplusplus
