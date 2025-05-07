@@ -21,10 +21,11 @@ extern "C" {
  * @param[inout] merged_graph 統合されたグラフ構造
  * @param[inout] merged_monoCOM 統合された通信テーブル
  * @param[in] order_type 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
+ * @ingroup graph_merge
  */
 void gedatsu_merge_nodal_subgraphs(
   const int n_graphs,
-  const GEDATSU_GRAPH* graphs,
+  GEDATSU_GRAPH* graphs,
   const MONOLIS_COM* monoCOMs,
   GEDATSU_GRAPH* merged_graph,
   MONOLIS_COM* merged_monoCOM,
@@ -39,11 +40,12 @@ void gedatsu_merge_nodal_subgraphs(
  * @param[in] n_conn_graphs 統合したいコネクティビティグラフ構造の個数
  * @param[in] conn_graphs コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
  * @param[inout] merged_conn_graph 結合されたコネクティビティグラフ
+ * @ingroup graph_merge
  */
 void gedatsu_merge_connectivity_subgraphs(
   const int n_nodal_graphs,
   const GEDATSU_GRAPH* nodal_graphs,
-  const GEDATSU_GRAPH* merged_nodal_graph,
+  GEDATSU_GRAPH* merged_nodal_graph,
   const MONOLIS_COM* merged_nodal_monoCOM,
   const int n_conn_graphs,
   const GEDATSU_GRAPH* conn_graphs,
@@ -58,6 +60,7 @@ void gedatsu_merge_connectivity_subgraphs(
  * @param[in] list_struct_R リスト構造体
  * @param[inout] merged_n_dof_list 結合後の計算点が持つ物理量の個数
  * @param[inout] merged_array_R 統合された実数配列
+ * @ingroup graph_merge
  */
 void gedatsu_merge_distval_R(
   const int n_graphs,
@@ -69,31 +72,6 @@ void gedatsu_merge_distval_R(
   double** merged_array_R
 );
 
-void gedatsu_merge_distval_R_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_R_n,
-  double* list_struct_R_array,
-  int* merged_n_dof_list,
-  double* merged_array_R
-);
-
 /**
  * @brief 物理量の結合 (整数配列)
  * @param[in] n_graphs 統合したいグラフ構造の個数
@@ -103,6 +81,7 @@ void gedatsu_merge_distval_R_c(
  * @param[in] list_struct_I リスト構造体
  * @param[inout] merged_n_dof_list 結合後の計算点が持つ物理量の個数
  * @param[inout] merged_array_I 統合された実数配列
+ * @ingroup graph_merge
  */
 void gedatsu_merge_distval_I(
   const int n_graphs,
@@ -114,31 +93,6 @@ void gedatsu_merge_distval_I(
   int** merged_array_I
 );
 
-void gedatsu_merge_distval_I_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_I_n,
-  int* list_struct_I_array,
-  int* merged_n_dof_list,
-  int* merged_array_I
-);
-
 /**
  * @brief 物理量の結合 (複素数配列)
  * @param[in] n_graphs 統合したいグラフ構造の個数
@@ -148,6 +102,7 @@ void gedatsu_merge_distval_I_c(
  * @param[in] list_struct_C リスト構造体
  * @param[inout] merged_n_dof_list 結合後の計算点が持つ物理量の個数
  * @param[inout] merged_array_C 統合された実数配列
+ * @ingroup graph_merge
  */
 void gedatsu_merge_distval_C(
   const int n_graphs,
@@ -157,31 +112,6 @@ void gedatsu_merge_distval_C(
   const MONOLIS_LIST_C* list_struct_C,
   int** merged_n_dof_list,
   double _Complex** merged_array_C
-);
-
-void gedatsu_merge_distval_C_c(
-  int sum_n_vertex,
-  int sum_index,
-  int sum_item,
-  int n_graphs,
-  int* n_vertex,
-  int* n_internal_vertex,
-  int* vertex_id,
-  int* vertex_domain_id,
-  int* index,
-  int* item,
-  int merged_n_vertex,
-  int merged_n_internal_vertex,
-  int* merged_vertex_id,
-  int* merged_vertex_domain_id,
-  int* merged_index,
-  int* merged_item,
-  int* n_dof_list_n,
-  int* n_dof_list_array,
-  int* list_struct_C_n,
-  double _Complex* list_struct_C_array,
-  int* merged_n_dof_list,
-  double _Complex* merged_array_C
 );
 
 #ifdef __cplusplus

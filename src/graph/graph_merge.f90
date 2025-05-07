@@ -18,19 +18,21 @@ module mod_gedatsu_graph_merge
 
 contains
 
+  !> @ingroup graph_merge
+  !> 計算点グラフを結合する
   subroutine gedatsu_merge_nodal_subgraphs(n_graphs, graphs, monoCOMs, merged_graph, merged_monoCOM, order_type)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 通信テーブルの配列（配列長 n_graphs）
+    !> [in] 通信テーブルの配列（配列長 n_graphs）
     type(monolis_COM), intent(in) :: monoCOMs(:)
-    !> 統合されたグラフ構造
+    !> [inout] 統合されたグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_graph
-    !> 統合された通信テーブル
+    !> [inout] 統合された通信テーブル
     type(monolis_COM), intent(inout) :: merged_monoCOM
-    !> 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
+    !> [in] 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
     integer(kint), intent(in) :: order_type
 
     integer(kint) :: i, j, k, iS, iE, val, idx, tmp
@@ -162,22 +164,24 @@ contains
     & merged_graph%n_internal_vertex, merged_graph%n_vertex, merged_graph%vertex_id)
   end subroutine gedatsu_merge_nodal_subgraphs
 
+  !> @ingroup graph_merge
+  !> コネクティビティグラフを結合する
   subroutine gedatsu_merge_connectivity_subgraphs(n_nodal_graphs, nodal_graphs, merged_nodal_graph, merged_nodal_monoCOM, &
   & n_conn_graphs, conn_graphs, merged_conn_graph)
     implicit none
-    !> 統合したい節点グラフ構造の個数
+    !> [in] 統合したい節点グラフ構造の個数
     integer(kint), intent(in) :: n_nodal_graphs
-    !> グラフ構造の配列
+    !> [in] グラフ構造の配列
     type(gedatsu_graph), intent(in) :: nodal_graphs(:)
-    !> 統合された計算点グラフ構造
+    !> [in] 統合された計算点グラフ構造
     type(gedatsu_graph), intent(in) :: merged_nodal_graph
-    !> 統合された計算点グラフ構造の通信テーブル
+    !> [in] 統合された計算点グラフ構造の通信テーブル
     type(monolis_COM), intent(in) ::  merged_nodal_monoCOM
-    !> 統合したいコネクティビティグラフ構造の個数
+    !> [in] 統合したいコネクティビティグラフ構造の個数
     integer(kint), intent(in) :: n_conn_graphs
-    !> コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
+    !> [in] コネクティビティグラフ構造の配列（配列長 n_conn_graphs）
     type(gedatsu_graph), intent(in) :: conn_graphs(:)
-    !> 統合されたコネクティビティグラフ構造
+    !> [inout] 統合されたコネクティビティグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_conn_graph
 
     integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n_edge
@@ -186,6 +190,7 @@ contains
     & conn_vertex_id_notsorted(:)
     integer(kint), allocatable :: nodal_vertex_id(:), nodal_vertex_id_notsorted(:), edge(:,:), &
     & perm(:), global_id_in_merged_graph(:), which_conn_graph(:), local_id_in_conn_graph(:)
+    integer(kint), allocatable :: temp1(:), temp2(:)
     logical, allocatable :: is_conn_internal(:)
     type(monolis_list_I), allocatable :: conn_graphs_vertex_id(:), conn_graphs_vertex_id_perm(:)
 
@@ -258,7 +263,7 @@ contains
     !> 計算点
     call monolis_alloc_I_1d(nodal_vertex_id, merged_nodal_graph%n_vertex)
     nodal_vertex_id(:) = merged_nodal_graph%vertex_id(:)
-    call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)
+    call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)   !> // TODO 304行目の前に呼ぶべき？
     call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
     call monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex)
     do i = 1, n_nodal_vertex
@@ -284,6 +289,8 @@ contains
     call monolis_alloc_I_1d(perm, n_conn_vertex)
     call monolis_alloc_I_1d(which_conn_graph, n_conn_vertex)
     call monolis_alloc_I_1d(local_id_in_conn_graph, n_conn_vertex)
+    call monolis_alloc_I_1d(temp1, n_conn_vertex)
+    call monolis_alloc_I_1d(temp2, n_conn_vertex)
 
     global_id_in_merged_graph(:) = merged_conn_graph%vertex_id(:)
     do i = 1, n_conn_vertex
@@ -300,8 +307,16 @@ contains
 
     call monolis_get_sequence_array_I(perm, n_conn_vertex, 1, 1)
     call monolis_qsort_I_2d(global_id_in_merged_graph, perm, 1, n_conn_vertex)
-    call monolis_qsort_I_2d(perm, which_conn_graph, 1, n_conn_vertex)
-    call monolis_qsort_I_2d(perm, local_id_in_conn_graph, 1, n_conn_vertex)
+    ! call monolis_qsort_I_2d(perm, which_conn_graph, 1, n_conn_vertex)
+    ! call monolis_qsort_I_2d(perm, local_id_in_conn_graph, 1, n_conn_vertex)
+
+    temp1(:) = which_conn_graph(:)
+    temp2(:) = local_id_in_conn_graph(:)
+    do i = 1, n_conn_vertex
+      tmp = perm(i)
+      which_conn_graph(i) = temp1(tmp)
+      local_id_in_conn_graph(i) = temp2(tmp)
+    enddo
 
     !> CSR 形式グラフの作成
     do i = 1, merged_conn_graph%n_vertex  !>「抽出して足す」を繰り返す
@@ -332,88 +347,57 @@ contains
     enddo
   end subroutine gedatsu_merge_connectivity_subgraphs
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（実数型）
   subroutine gedatsu_merge_distval_R(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !>  リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_R), intent(in) :: list_struct_R(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !> 統合された実数配列
+    !> [inout] 統合された実数配列
     real(kdouble), allocatable, intent(inout) :: merged_array_R(:)
 
-    integer(kint) :: n_vertex
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_R, iS, iE, jS, jE
+    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
+    type(monolis_list_I), allocatable :: merged_index(:)
 
     if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
     if(n_graphs /= size(list_struct_R)) stop "*** n_graphs and size(list_struct_R) don't match."
 
     n_vertex = merged_graph%n_vertex
-    call monolis_dealloc_R_1d(merged_array_R)
-    call monolis_alloc_R_1d(merged_array_R, n_vertex)
+    call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
 
-    call gedatsu_merge_distval_R_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, &
-    & merged_n_dof_list, merged_array_R)
-  end subroutine gedatsu_merge_distval_R
-
-  !> -------------------------------------------------------------------------------------------------
-  !> gedatsu_merge_distval_R から merged_array_R, merged_n_dof_list の deallocate, allocate を除いた部分
-  !> merged_array_R, merged_n_dof_list は allocate されている前提
-  !> -------------------------------------------------------------------------------------------------
-  subroutine gedatsu_merge_distval_R_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_R, &
-    & merged_n_dof_list, merged_array_R)
-    implicit none
-    !> 統合したいグラフ構造の個数
-    integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
-    type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
-    type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
-    type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !>  リスト構造体
-    type(monolis_list_R), intent(in) :: list_struct_R(:)
-    !> 結合後の計算点が持つ物理量の個数
-    integer(kint), intent(inout) :: merged_n_dof_list(:)
-    !> 統合された実数配列
-    real(kdouble), intent(inout) :: merged_array_R(:)
-
-    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
-    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
-    type(monolis_list_I), allocatable :: merged_index(:)
-
-    ! if(.not.allocated(merged_array_R)) stop "*** merged_array_R must be allocated."
-    ! if(.not.allocated(merged_n_dof_list)) stop "*** nmerged_n_dof_list must be allocated."
-
-    n_vertex = merged_graph%n_vertex
-
-    if(size(merged_array_R) /= n_vertex) stop "*** size(merged_array_R) and n_vertex don't match."
-    if(size(merged_n_dof_list) /= n_vertex) stop "*** size(merged_n_dof_list) and n_vertex don't match."
-
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
-    call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
+    call monolis_alloc_I_1d(vertex_id, n_vertex)
     vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
 
-    ! !> 結合後グラフの情報を取得
+    !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
-      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+      do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
         val = graphs(i)%vertex_id(j)  !> グローバル番号
         call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
     enddo
+    size_merged_array_R = sum(merged_n_dof_list)
+
+    call monolis_dealloc_R_1d(merged_array_R)
+    call monolis_alloc_R_1d(merged_array_R, size_merged_array_R)
 
     !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
     !> 結合後グラフ
@@ -439,7 +423,8 @@ contains
 
     !> index配列を用いて物理量分布の結合
     do i = 1, n_graphs
-      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+      do j = 1, graphs(i)%n_vertex  !> 結合前ローカル番号
+        if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
         call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
@@ -450,26 +435,28 @@ contains
         merged_array_R(iS:iE) = list_struct_R(i)%array(jS:jE)
       enddo
     enddo
-  end subroutine gedatsu_merge_distval_R_core
+  end subroutine gedatsu_merge_distval_R
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（整数型）
   subroutine gedatsu_merge_distval_I(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, merged_n_dof_list, merged_array_I)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_I), intent(in) :: list_struct_I(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !>  統合された整数配列
+    !> [inout] 統合された整数配列
     integer(kint), allocatable, intent(inout) :: merged_array_I(:)
 
-    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_I, iS, iE, jS, jE
     integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
@@ -477,43 +464,8 @@ contains
     if(n_graphs /= size(list_struct_I)) stop "*** n_graphs and size(list_struct_I) don't match."
 
     n_vertex = merged_graph%n_vertex
-    call monolis_dealloc_I_1d(merged_array_I)
-    call monolis_alloc_I_1d(merged_array_I, n_vertex)
+    call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
-
-    call gedatsu_merge_distval_I_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, &
-    & merged_n_dof_list, merged_array_I)
-  end subroutine gedatsu_merge_distval_I
-
-  subroutine gedatsu_merge_distval_I_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_I, &
-    & merged_n_dof_list, merged_array_I)
-    implicit none
-    !> 統合したいグラフ構造の個数
-    integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
-    type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
-    type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
-    type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
-    type(monolis_list_I), intent(in) :: list_struct_I(:)
-    !> 結合後の計算点が持つ物理量の個数
-    integer(kint), intent(inout) :: merged_n_dof_list(:)
-    !>  統合された整数配列
-    integer(kint), intent(inout) :: merged_array_I(:)
-
-    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
-    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
-    type(monolis_list_I), allocatable :: merged_index(:)
-
-    ! if(.not.allocated(merged_array_I)) stop "*** merged_array_I must be allocated."
-    ! if(.not.allocated(merged_n_dof_list)) stop "*** nmerged_n_dof_list must be allocated."
-
-    n_vertex = merged_graph%n_vertex
-
-    if(size(merged_array_I) /= n_vertex) stop "*** size(merged_array_I) and n_vertex don't match."
-    if(size(merged_n_dof_list) /= n_vertex) stop "*** size(merged_n_dof_list) and n_vertex don't match."
 
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
     call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
@@ -522,7 +474,7 @@ contains
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
 
-    ! !> 結合後グラフの情報を取得
+    !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
       do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
@@ -532,6 +484,10 @@ contains
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
     enddo
+    size_merged_array_I = sum(merged_n_dof_list)
+
+    call monolis_dealloc_I_1d(merged_array_I)
+    call monolis_alloc_I_1d(merged_array_I, size_merged_array_I)
 
     !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
     !> 結合後グラフ
@@ -557,7 +513,8 @@ contains
 
     !> index配列を用いて物理量分布の結合
     do i = 1, n_graphs
-      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+      do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
+        if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
         call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
@@ -568,26 +525,28 @@ contains
         merged_array_I(iS:iE) = list_struct_I(i)%array(jS:jE)
       enddo
     enddo
-  end subroutine gedatsu_merge_distval_I_core
+  end subroutine gedatsu_merge_distval_I
 
+  !> @ingroup graph_merge
+  !> 物理量分布を結合する（複素数型）
   subroutine gedatsu_merge_distval_C(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, merged_n_dof_list, merged_array_C)
     implicit none
-    !> 統合したいグラフ構造の個数
+    !> [in] 統合したいグラフ構造の個数
     integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
+    !> [in] グラフ構造の配列（配列長 n_graphs）
     type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
+    !> [in] 統合されたグラフ構造
     type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
+    !> [in] 計算点が持つ物理量の個数
     type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
+    !> [in] リスト構造体
     type(monolis_list_C), intent(in) :: list_struct_C(:)
-    !> 結合後の計算点が持つ物理量の個数
+    !> [inout] 結合後の計算点が持つ物理量の個数
     integer(kint), allocatable, intent(inout) :: merged_n_dof_list(:)
-    !> 統合された複素数配列
+    !> [inout] 統合された複素数配列
     complex(kdouble), allocatable, intent(inout) :: merged_array_C(:)
 
-    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_C, iS, iE, jS, jE
     integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
@@ -595,43 +554,8 @@ contains
     if(n_graphs /= size(list_struct_C)) stop "*** n_graphs and size(list_struct_C) don't match."
 
     n_vertex = merged_graph%n_vertex
-    call monolis_dealloc_C_1d(merged_array_C)
-    call monolis_alloc_C_1d(merged_array_C, n_vertex)
+    call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
-
-    call gedatsu_merge_distval_C_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, &
-    & merged_n_dof_list, merged_array_C)
-  end subroutine gedatsu_merge_distval_C
-
-  subroutine gedatsu_merge_distval_C_core(n_graphs, graphs, merged_graph, n_dof_list, list_struct_C, &
-    & merged_n_dof_list, merged_array_C)
-    implicit none
-    !> 統合したいグラフ構造の個数
-    integer(kint), intent(in) :: n_graphs
-    !> グラフ構造の配列（配列長 n_graphs）
-    type(gedatsu_graph), intent(in) :: graphs(:)
-    !> 統合されたグラフ構造
-    type(gedatsu_graph), intent(in) :: merged_graph
-    !> 計算点が持つ物理量の個数
-    type(monolis_list_I), intent(in) :: n_dof_list(:)
-    !> リスト構造体
-    type(monolis_list_C), intent(in) :: list_struct_C(:)
-    !> 結合後の計算点が持つ物理量の個数
-    integer(kint), intent(inout) :: merged_n_dof_list(:)
-    !> 統合された複素数配列
-    complex(kdouble), intent(inout) :: merged_array_C(:)
-
-    integer(kint) :: i, j, k, val, idx, iS, iE, jS, jE, n_vertex
-    integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
-    type(monolis_list_I), allocatable :: merged_index(:)
-
-    ! if(.not.allocated(merged_array_C)) stop "*** merged_array_C must be allocated."
-    ! if(.not.allocated(merged_n_dof_list)) stop "*** nmerged_n_dof_list must be allocated."
-
-    n_vertex = merged_graph%n_vertex
-
-    if(size(merged_array_C) /= n_vertex) stop "*** size(merged_array_C) and n_vertex don't match."
-    if(size(merged_n_dof_list) /= n_vertex) stop "*** size(merged_n_dof_list) and n_vertex don't match."
 
     !> ソート前後の結合後ローカル番号の対応付け（vertex_idでグローバル番号　→　結合後ソート後ローカル番号を検索）
     call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
@@ -640,7 +564,7 @@ contains
     call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
     call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
 
-    ! !> 結合後グラフの情報を取得
+    !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
       do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
@@ -650,6 +574,10 @@ contains
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
     enddo
+    size_merged_array_C = sum(merged_n_dof_list)
+
+    call monolis_dealloc_C_1d(merged_array_C)
+    call monolis_alloc_C_1d(merged_array_C, size_merged_array_C)
 
     !> index配列の作成 : 物理量分布の結合において、インデックス指定を簡単にするためにindex配列を使う
     !> 結合後グラフ
@@ -675,7 +603,8 @@ contains
 
     !> index配列を用いて物理量分布の結合
     do i = 1, n_graphs
-      do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
+      do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
+        if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
         call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
@@ -686,6 +615,5 @@ contains
         merged_array_C(iS:iE) = list_struct_C(i)%array(jS:jE)
       enddo
     enddo
-  end subroutine gedatsu_merge_distval_C_core
-
+  end subroutine gedatsu_merge_distval_C
 end module mod_gedatsu_graph_merge

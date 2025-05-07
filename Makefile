@@ -108,13 +108,9 @@ SRC_GRAPH_C = \
   gedatsu_graph_handler_c.c \
   gedatsu_graph_merge_c.c
 
-SRC_GRAPH_CF = \
-  merge_wrapper.f90
-
 SRC_ALL_C = \
 $(addprefix define/, $(SRC_DEF_C)) \
-$(addprefix graph/, $(SRC_GRAPH_C)) \
-$(addprefix graph/, $(SRC_GRAPH_CF))
+$(addprefix graph/, $(SRC_GRAPH_C))
 
 ##> all targes
 SRC_ALL = \

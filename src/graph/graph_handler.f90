@@ -592,7 +592,9 @@ contains
 
     temp = edge
 
-    call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
+    if(is_sort)then
+      call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
+    endif
 
     graph%index = 0
     do i = 1, n_edge
