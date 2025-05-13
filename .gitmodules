@@ -1,6 +1,6 @@
 [submodule "submodule/monolis_utils"]
 	path = submodule/monolis_utils
-	url = https://gitlab.com/morita/monolis_utils.git
+	url = https://gitlab.com/mmlab_tsukuba/monolis_utils.git
 
 [submodule "submodule/METIS"]
 	path = submodule/METIS
