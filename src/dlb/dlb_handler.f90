@@ -108,23 +108,24 @@ contains
     type(gedatsu_graph) :: nodal_graph_new
     !> [in,out] graph 構造体
     type(gedatsu_graph) :: conn_graph_new
-    integer(kint) :: i, id, idx
+    integer(kint) :: i, id, idx, n
     integer(kint), allocatable :: perm(:)
     integer(kint), allocatable :: ids(:)
 
     call monolis_alloc_I_1d(perm, nodal_graph_new%n_vertex)
 
-    call monolis_get_sequence_array_I(perm, nodal_graph_new%n_vertex, 1, 1)
+    n = 1
+    call monolis_get_sequence_array_I(perm, nodal_graph_new%n_vertex, n, n)
 
     call monolis_alloc_I_1d(ids, nodal_graph_new%n_vertex)
 
     ids = nodal_graph_new%vertex_id
 
-    call monolis_qsort_I_2d(ids, perm, 1, nodal_graph_new%n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, nodal_graph_new%n_vertex)
 
     do i = 1, conn_graph_new%index(conn_graph_new%n_vertex + 1)
       id = conn_graph_new%item(i)
-      call monolis_bsearch_I(ids, 1, nodal_graph_new%n_vertex, id, idx)
+      call monolis_bsearch_I(ids, n, nodal_graph_new%n_vertex, id, idx)
       if(idx == -1) stop "gedatsi_dlb_get_local_conn 1"
       conn_graph_new%item(i) = perm(idx)
     enddo
@@ -227,9 +228,10 @@ contains
     type(gedatsu_graph) :: graph_org
     !> [in] graph 構造体
     type(gedatsu_graph) :: graph_new
-    integer(kint) :: i, val, pos
+    integer(kint) :: i, val, pos, n
     integer(kint), allocatable :: gid(:), idx(:)
 
+    n = 1
     dlb%n_vertex_old = graph_org%n_vertex
     dlb%n_vertex_new = graph_new%n_vertex
 
@@ -239,12 +241,12 @@ contains
     call monolis_alloc_I_1d(idx, graph_org%n_vertex)
 
     gid = graph_org%vertex_id
-    call monolis_get_sequence_array_I(idx, graph_org%n_vertex, 1, 1)
-    call monolis_qsort_I_2d(gid, idx, 1, graph_org%n_vertex)
+    call monolis_get_sequence_array_I(idx, graph_org%n_vertex, n, n)
+    call monolis_qsort_I_2d(gid, idx, n, graph_org%n_vertex)
 
     do i = 1, graph_new%n_vertex
       val = graph_new%vertex_id(i)
-      call monolis_bsearch_I(gid, 1, graph_org%n_vertex, val, pos)
+      call monolis_bsearch_I(gid, n, graph_org%n_vertex, val, pos)
       if(pos == -1)then
         dlb%perm(i) = -1
       else

@@ -12,6 +12,9 @@ program gedatsu_connectivity_graph_partitioner
   logical :: is_get, is_valid, is_1_origin
   integer(kint), allocatable :: domain_id(:), id1(:), perm(:)
   logical, allocatable :: is_used(:)
+  integer(kint) :: i1
+
+  i1 = 1
 
   call monolis_mpi_initialize()
 
@@ -117,16 +120,16 @@ program gedatsu_connectivity_graph_partitioner
       & global_node_graph, global_conn_graph, local_conn_graph)
 
     call monolis_alloc_I_1d(id1, local_conn_graph%n_vertex)
-    call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(id1, local_conn_graph%n_vertex, i1, i1)
 
     !> graph.dat
     call monolis_alloc_I_1d(perm, local_node_graph%n_vertex)
-    call monolis_get_sequence_array_I(perm, local_node_graph%n_vertex, 1, 1)
-    call monolis_qsort_I_2d(local_node_graph%vertex_id, perm, 1, local_node_graph%n_vertex)
+    call monolis_get_sequence_array_I(perm, local_node_graph%n_vertex, i1, i1)
+    call monolis_qsort_I_2d(local_node_graph%vertex_id, perm, i1, local_node_graph%n_vertex)
 
     do j = 1, local_conn_graph%index(local_conn_graph%n_vertex + 1)
       id = local_conn_graph%item(j)
-      call monolis_bsearch_I(local_node_graph%vertex_id, 1, local_node_graph%n_vertex, id, idx)
+      call monolis_bsearch_I(local_node_graph%vertex_id, i1, local_node_graph%n_vertex, id, idx)
       local_conn_graph%item(j) = perm(idx)
     enddo
 

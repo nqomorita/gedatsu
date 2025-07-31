@@ -15,6 +15,9 @@ program gedatsu_nodal_graph_partitioner
   integer(kint), allocatable :: edge_wgt(:,:)
   integer(kint), allocatable :: given_domain_id(:)
   integer(kint), allocatable :: id1(:)
+  integer(kint) :: i1
+
+  i1 = 1
 
   call monolis_mpi_initialize()
 
@@ -116,7 +119,7 @@ program gedatsu_nodal_graph_partitioner
     !> graph.dat
     foname_full = monolis_get_output_file_name_by_domain_id(".", dirname, trim(finame), i - 1)
     call monolis_alloc_I_1d(id1, subgraphs(i)%n_vertex)
-    call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(id1, subgraphs(i)%n_vertex, i1, i1)
 
     if(.not. is_1_origin) id1 = id1 - 1
     if(.not. is_1_origin) subgraphs(i)%item = subgraphs(i)%item - 1

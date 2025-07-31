@@ -98,7 +98,7 @@ contains
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge, n_recv_conn
     integer(kint) :: n_merge_edge, n_item
-    integer(kint) :: i, j, jS, jE, in, jn, i1, my_rank, id1, id2
+    integer(kint) :: i, j, jS, jE, in, jn, i1, my_rank, id1, id2, n, m
     !integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
     integer(kint), allocatable :: send_edge(:)
@@ -115,6 +115,8 @@ contains
     integer(kint), allocatable :: is_dup(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    n = 1
+    m = 2
 
     !# 計算点の送受信
     n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
@@ -125,14 +127,14 @@ contains
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
        & dlb%COM_node%send_index, dlb%COM_node%send_item, &
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-       & conn_graph_org%vertex_id, recv_global_id, 1, dlb%COM_node%comm)
+       & conn_graph_org%vertex_id, recv_global_id, n, dlb%COM_node%comm)
 
     !# エッジの送受信
     n_send_edge = conn_graph_org%index(conn_graph_org%n_vertex + 1)
     n_recv_edge = dlb%COM_edge%recv_index(dlb%COM_edge%recv_n_neib + 1)
 
-    call monolis_alloc_I_1d(send_edge, 2*n_send_edge)
-    call monolis_alloc_I_1d(recv_edge, 2*n_recv_edge)
+    call monolis_alloc_I_1d(send_edge, n_send_edge*2)
+    call monolis_alloc_I_1d(recv_edge, n_recv_edge*2)
 
     do i = 1, conn_graph_org%n_vertex
       jS = conn_graph_org%index(i) + 1
@@ -148,7 +150,7 @@ contains
        & dlb%COM_edge%recv_n_neib, dlb%COM_edge%recv_neib_pe, &
        & dlb%COM_edge%send_index, dlb%COM_edge%send_item, &
        & dlb%COM_edge%recv_index, dlb%COM_edge%recv_item, &
-       & send_edge, recv_edge, 2, dlb%COM_edge%comm)
+       & send_edge, recv_edge, m, dlb%COM_edge%comm)
 
     !# 2 次元エッジ配列を conn 情報に変換
     if(n_recv_edge > 0)then
@@ -176,8 +178,8 @@ contains
       enddo
     else
       n_recv_conn = 0
-      call monolis_alloc_I_1d(recv_conn_index, 1)
-      call monolis_alloc_I_1d(recv_conn_item, 1)
+      call monolis_alloc_I_1d(recv_conn_index, n)
+      call monolis_alloc_I_1d(recv_conn_item, n)
     endif
 
     !# graph_temp に global ID のまま結合
@@ -217,18 +219,18 @@ contains
     !# recv_conn 中の重複削除
     call monolis_alloc_I_1d(global_conn_id_tmp, conn_graph_org%n_vertex)
     global_conn_id_tmp = conn_graph_org%vertex_id
-    call monolis_qsort_I_1d(global_conn_id_tmp, 1, conn_graph_org%n_vertex)
+    call monolis_qsort_I_1d(global_conn_id_tmp, n, conn_graph_org%n_vertex)
 
     call monolis_alloc_I_1d(recv_global_id_tmp, n_recv_conn)
     recv_global_id_tmp = recv_global_id
-    call monolis_qsort_I_1d(recv_global_id_tmp, 1, n_recv_conn)
+    call monolis_qsort_I_1d(recv_global_id_tmp, n, n_recv_conn)
     call monolis_alloc_I_1d(recv_global_id_used, n_recv_conn)
 
     call monolis_alloc_I_1d(is_dup, graph_temp%n_vertex)
     do i = conn_graph_org%n_vertex + 1, graph_temp%n_vertex
       in = graph_temp%vertex_id(i)
-      call monolis_bsearch_I(global_conn_id_tmp, 1, conn_graph_org%n_vertex, in, id1)
-      call monolis_bsearch_I(recv_global_id_tmp, 1, n_recv_conn, in, id2)
+      call monolis_bsearch_I(global_conn_id_tmp, n, conn_graph_org%n_vertex, in, id1)
+      call monolis_bsearch_I(recv_global_id_tmp, n, n_recv_conn, in, id2)
       recv_global_id_used(id2) = recv_global_id_used(id2) + 1
       if(id1 /= -1 .or. recv_global_id_used(id2) > 1)then
         is_dup(i) = 1
@@ -239,7 +241,7 @@ contains
     !# 検索用配列の作成（nodal_graph_new のグローバル節点 id）
     call monolis_alloc_I_1d(global_conn_id_tmp, nodal_graph_new%n_vertex)
     global_conn_id_tmp = nodal_graph_new%vertex_id
-    call monolis_qsort_I_1d(global_conn_id_tmp, 1, nodal_graph_new%n_vertex)
+    call monolis_qsort_I_1d(global_conn_id_tmp, n, nodal_graph_new%n_vertex)
 
     !# マージする conn 数の取得
     call monolis_alloc_I_1d(is_merge_edge, graph_temp%n_vertex)
@@ -251,7 +253,7 @@ contains
       is_merge_edge(i) = 1
       do j = jS, jE
         i1 = graph_temp%item(j)
-        call monolis_bsearch_I(global_conn_id_tmp, 1, nodal_graph_new%n_vertex, i1, id1)
+        call monolis_bsearch_I(global_conn_id_tmp, n, nodal_graph_new%n_vertex, i1, id1)
         if(id1 == - 1)then
           is_merge_edge(i) = 0
           cycle aa
@@ -356,10 +358,11 @@ contains
     type(monolis_COM), intent(in) :: COM
     !> [in] recv 計算点のグローバル id
     integer(kint) :: recv_global_id(:)
-    integer(kint) :: i, n_recv_node, id, pos, my_rank
+    integer(kint) :: i, n_recv_node, id, pos, my_rank, n
     integer(kint), allocatable :: ids(:), perm(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    n = 1
 
     n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
 
@@ -367,15 +370,15 @@ contains
 
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
 
-    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, n, n)
 
     ids = graph_new%vertex_id
 
-    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, graph_new%n_vertex)
 
     do i = 1, n_recv_node
       id = recv_global_id(i)
-      call monolis_bsearch_I(ids, 1, graph_new%n_vertex, id, pos)
+      call monolis_bsearch_I(ids, n, graph_new%n_vertex, id, pos)
 
       if(pos == -1)then
         dlb%COM_node%recv_item(i) = -1

@@ -360,7 +360,7 @@ contains
     integer(kint), intent(out) :: edge(:,:)
 
     integer(kint) :: i, nid, idx, j, jS, jE
-    integer(kint) :: n_vertex, n_edge, e1, e2, n1, n2
+    integer(kint) :: n_vertex, n_edge, e1, e2, n1, n2, n
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
 
@@ -372,9 +372,10 @@ contains
 
     call monolis_alloc_I_1d(perm, n_vertex)
 
-    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+    n = 1
+    call monolis_get_sequence_array_I(perm, n_vertex, n, n)
 
-    call monolis_qsort_I_2d(ids, perm, 1, n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, n_vertex)
 
     n_edge = 0
     do i = 1, graph%n_vertex
@@ -386,12 +387,12 @@ contains
         if(graph%vertex_domain_id(nid) == domain_id)then
 
           n1 = graph%vertex_id(i)
-          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx)
+          call monolis_bsearch_I(ids, n, n_vertex, n1, idx)
           if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 1"
           e1 = perm(idx)
 
           n2 = graph%vertex_id(nid)
-          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx)
+          call monolis_bsearch_I(ids, n, n_vertex, n2, idx)
           if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
           e2 = perm(idx)
 
@@ -420,7 +421,7 @@ contains
     integer(kint), intent(out) :: edge(:,:)
 
     integer(kint) :: i, nid, idx, j, jS, jE
-    integer(kint) :: n_nodal_vertex, n_conn_vertex, n_edge, e1, e2, n1, n2
+    integer(kint) :: n_nodal_vertex, n_conn_vertex, n_edge, e1, e2, n1, n2, n
     integer(kint), allocatable :: nodal_ids(:), conn_ids(:)
     integer(kint), allocatable :: nodal_perm(:), conn_perm(:)
 
@@ -436,11 +437,12 @@ contains
     call monolis_alloc_I_1d(nodal_perm, n_nodal_vertex)
     call monolis_alloc_I_1d(conn_perm, n_conn_vertex)
 
-    call monolis_get_sequence_array_I(nodal_perm, n_nodal_vertex, 1, 1)
-    call monolis_get_sequence_array_I(conn_perm, n_conn_vertex, 1, 1)
+    n = 1
+    call monolis_get_sequence_array_I(nodal_perm, n_nodal_vertex, n, n)
+    call monolis_get_sequence_array_I(conn_perm, n_conn_vertex, n, n)
 
-    call monolis_qsort_I_2d(nodal_ids, nodal_perm, 1, n_nodal_vertex)
-    call monolis_qsort_I_2d(conn_ids, conn_perm, 1, n_conn_vertex)
+    call monolis_qsort_I_2d(nodal_ids, nodal_perm, n, n_nodal_vertex)
+    call monolis_qsort_I_2d(conn_ids, conn_perm, n, n_conn_vertex)
 
     n_edge = 0
     do i = 1, conn_graph%n_vertex
@@ -452,12 +454,12 @@ contains
         if(nodal_graph%vertex_domain_id(nid) == domain_id)then
 
           n1 = conn_graph%vertex_id(i)
-          call monolis_bsearch_I(conn_ids, 1, n_conn_vertex, n1, idx)
+          call monolis_bsearch_I(conn_ids, n, n_conn_vertex, n1, idx)
           if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 1"
           e1 = conn_perm(idx)
 
           n2 = nodal_graph%vertex_id(nid)
-          call monolis_bsearch_I(nodal_ids, 1, n_nodal_vertex, n2, idx)
+          call monolis_bsearch_I(nodal_ids, n, n_nodal_vertex, n2, idx)
           if(idx == -1) stop "gedatsu_graph_get_edge_in_internal_region 2"
           e2 = nodal_perm(idx)
 
@@ -480,7 +482,7 @@ contains
     integer(kint), intent(in) :: domain_id
     !> [out] グラフエッジ
     integer(kint), intent(out) :: edge(:,:)
-    integer(kint) :: i, j, jS, jE, gid, idx1, idx2, lid1, lid2
+    integer(kint) :: i, j, jS, jE, gid, idx1, idx2, lid1, lid2, n
     integer(kint) :: n_edge, n1, n2, n_vertex
     integer(kint), allocatable :: ids(:)
     integer(kint), allocatable :: perm(:)
@@ -501,9 +503,10 @@ contains
 
     call monolis_alloc_I_1d(perm, n_vertex)
 
-    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
+    n = 1
+    call monolis_get_sequence_array_I(perm, n_vertex, n, n)
 
-    call monolis_qsort_I_2d(ids, perm, 1, n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, n_vertex)
 
     call monolis_alloc_L_1d(is_in, graph%n_vertex)
     call monolis_alloc_L_1d(is_border, graph%n_vertex)
@@ -522,8 +525,8 @@ contains
           n1 = graph%vertex_id(i)
           n2 = graph%vertex_id(gid)
 
-          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx1)
-          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx2)
+          call monolis_bsearch_I(ids, n, n_vertex, n1, idx1)
+          call monolis_bsearch_I(ids, n, n_vertex, n2, idx2)
 
           if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 1"
           if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 2"
@@ -549,8 +552,8 @@ contains
           n1 = graph%vertex_id(i)
           n2 = graph%vertex_id(gid)
 
-          call monolis_bsearch_I(ids, 1, n_vertex, n1, idx1)
-          call monolis_bsearch_I(ids, 1, n_vertex, n2, idx2)
+          call monolis_bsearch_I(ids, n, n_vertex, n1, idx1)
+          call monolis_bsearch_I(ids, n, n_vertex, n2, idx2)
 
           if(idx1 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 1"
           if(idx2 == -1) stop "gedatsu_graph_get_edge_in_overlap_region 2"
@@ -579,7 +582,7 @@ contains
     integer(kint), intent(in) :: edge(:,:)
     !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
     logical :: is_sort
-    integer(kint) :: i, e1, e2, jS, jE, in
+    integer(kint) :: i, e1, e2, jS, jE, in, n
     integer(kint), allocatable :: temp(:,:)
 
     if(n_edge < 1)then
@@ -588,12 +591,14 @@ contains
       call monolis_std_error_stop()
     endif
 
-    call monolis_alloc_I_2d(temp, 2, n_edge)
+    n = 2
+    call monolis_alloc_I_2d(temp, n, n_edge)
 
     temp = edge
 
+    n = 1
     if(is_sort)then
-      call monolis_qsort_I_2d(temp(1,:), temp(2,:), 1, n_edge)
+      call monolis_qsort_I_2d(temp(1,:), temp(2,:), n, n_edge)
     endif
 
     graph%index = 0
@@ -640,7 +645,7 @@ contains
     integer(kint), intent(in) :: edge(:,:)
     !> [in] グラフの隣接ノード情報を昇順ソートするフラグ
     logical :: is_sort
-    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE
+    integer(kint) :: n_edge_all, n_edge_cur, i, j, jS, jE, n
     integer(kint), allocatable :: edge_all(:,:)
 
     if(n_edge < 1)then
@@ -653,7 +658,8 @@ contains
 
     n_edge_all = n_edge_cur + n_edge
 
-    call monolis_alloc_I_2d(edge_all, 2, n_edge_all)
+    n = 2
+    call monolis_alloc_I_2d(edge_all, n, n_edge_all)
 
     do i = 1, graph%n_vertex
       jS = graph%index(i) + 1
@@ -707,7 +713,7 @@ contains
     implicit none
     !> [in,out] graph 構造体
     type(gedatsu_graph), intent(inout) :: graph
-    integer(kint) :: i, iS, iE, len, len_uniq
+    integer(kint) :: i, iS, iE, len, len_uniq, n
     integer(kint), allocatable :: index_(:), item(:), item_tmp(:)
 
     call monolis_alloc_I_1d(index_, graph%n_vertex+1)
@@ -727,7 +733,8 @@ contains
       call monolis_alloc_I_1d(item_tmp, len)
       item_tmp(1:len) = item(iS:iE)
 
-      call monolis_qsort_I_1d(item_tmp, 1, len)
+      n = 1
+      call monolis_qsort_I_1d(item_tmp, n, len)
       call monolis_get_uniq_array_I(item_tmp, len, len_uniq)
 
       call monolis_append_I_1d(graph%item, len_uniq, item_tmp)

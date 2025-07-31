@@ -68,24 +68,24 @@ contains
       item = item - 1
 
       !# allocate section
-      allocate(index_c(n_vertex+1), source = 0)
+      allocate(index_c(n_vertex+1), source = monolis_I_zero)
       index_c = index
 
       nz = index(n_vertex+1)
-      allocate(item_c(nz), source = 0)
+      allocate(item_c(nz), source = monolis_I_zero)
       item_c = item
 
-      allocate(part_id_c(n_vertex), source = 0)
+      allocate(part_id_c(n_vertex), source = monolis_I_zero)
 
       if(allocated(node_wgt))then
-        allocate(node_wgt_c(n_vertex), source = 0)
+        allocate(node_wgt_c(n_vertex), source = monolis_I_zero)
         node_wgt_c = node_wgt(1,:)
       else
         node_wgt_c => null()
       endif
 
       if(allocated(edge_wgt))then
-        allocate(edge_wgt_c(nz), source = 0)
+        allocate(edge_wgt_c(nz), source = monolis_I_zero)
         edge_wgt_c = edge_wgt(1,:)
       else
         edge_wgt_c => null()
@@ -144,15 +144,15 @@ contains
     item = item - 1
 
     !# allocate section
-    allocate(index_c(n_vertex+1), source = 0)
+    allocate(index_c(n_vertex+1), source = monolis_I_zero)
     index_c = index
 
     nz = index(n_vertex+1)
-    allocate(item_c(nz), source = 0)
+    allocate(item_c(nz), source = monolis_I_zero)
     item_c = item
 
-    allocate(perm_c(n_vertex), source = 0)
-    allocate(iperm_c(n_vertex), source = 0)
+    allocate(perm_c(n_vertex), source = monolis_I_zero)
+    allocate(iperm_c(n_vertex), source = monolis_I_zero)
 
     node_wgt_c => null()
 

@@ -1007,44 +1007,60 @@ contains
     integer(kint), allocatable :: vertex_id(:)
     integer(kint), allocatable :: index(:)
     integer(kint), allocatable :: item(:)
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4
+    integer(kint) :: expected_5, expected_6, expected_8, expected_11, expected_14
+    integer(kint) :: expected_19, expected_22
+
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_5 = 5
+    expected_6 = 6
+    expected_8 = 8
+    expected_11 = 11
+    expected_14 = 14
+    expected_19 = 19
+    expected_22 = 22
 
     call monolis_std_global_log_string("gedatsu_simple_mesh2graph_convertor")
 
     fname = "driver/output.c/graph.conv.dat"
     call monolis_input_graph(fname, n_vertex, vertex_id, index, item)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 1", n_vertex, 6)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 1", n_vertex, expected_6)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 2", index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 3", index(2), 3)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 4", index(3), 8)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 5", index(4), 11)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 6", index(5), 14)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 7", index(6), 19)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 8", index(7), 22)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 2", index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 3", index(2), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 4", index(3), expected_8)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 5", index(4), expected_11)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 6", index(5), expected_14)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 7", index(6), expected_19)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org 8", index(7), expected_22)
 
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 1", item(1), 1)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 2", item(2), 3)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 3", item(3), 4)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 4", item(4), 0)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 5", item(5), 2)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 6", item(6), 3)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 7", item(7), 4)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 8", item(8), 5)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 9", item(9), 1)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 10", item(10), 4)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 11", item(11), 5)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 12", item(12), 0)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 13", item(13), 1)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 14", item(14), 4)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 15", item(15), 0)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 16", item(16), 1)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 17", item(17), 2)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 18", item(18), 3)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 19", item(19), 5)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 20", item(20), 1)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 21", item(21), 2)
-    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 22", item(22), 4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 1", item(1), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 2", item(2), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 3", item(3), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 4", item(4), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 5", item(5), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 6", item(6), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 7", item(7), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 8", item(8), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 9", item(9), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 10", item(10), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 11", item(11), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 12", item(12), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 13", item(13), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 14", item(14), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 15", item(15), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 16", item(16), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 17", item(17), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 18", item(18), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 19", item(19), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 20", item(20), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 21", item(21), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_simple_mesh2graph_convertor 0org a 22", item(22), expected_4)
   end subroutine gedatsu_simple_mesh2graph_convertor_test
 
 end module mod_gedatsu_driver_test_c

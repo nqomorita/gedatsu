@@ -89,19 +89,19 @@ contains
       nflag = 0
 
       !# allocate section
-      allocate(vtxdist_c(n_part+1), source = 0)
+      allocate(vtxdist_c(n_part+1), source = monolis_I_zero)
       vtxdist_c = vtxdist
 
-      allocate(index_c(n_vertex+1), source = 0)
+      allocate(index_c(n_vertex+1), source = monolis_I_zero)
       index_c = index
 
       nz = index(n_vertex+1)
-      allocate(item_c(nz), source = 0)
+      allocate(item_c(nz), source = monolis_I_zero)
       do i = 1, nz
         item_c(i) = vertex_id(item(i) + 1) - 1
       enddo
 
-      allocate(part_id_c(n_vertex), source = 0)
+      allocate(part_id_c(n_vertex), source = monolis_I_zero)
 
       !# No weight
       wflag = 0
@@ -109,7 +109,7 @@ contains
       if(allocated(node_wgt))then
         !# Only node weight
         wflag = 2
-        allocate(node_wgt_c(n_vertex), source = 0)
+        allocate(node_wgt_c(n_vertex), source = monolis_I_zero)
         node_wgt_c = node_wgt(1,:)
       else
         node_wgt_c => null()
@@ -123,21 +123,21 @@ contains
           !# Only edge weight
           wflag = 1
         endif
-        allocate(edge_wgt_c(nz), source = 0)
+        allocate(edge_wgt_c(nz), source = monolis_I_zero)
         edge_wgt_c = edge_wgt(1,:)
       else
         edge_wgt_c => null()
       endif
 
-      allocate(vsize(n_vertex), source = 0)
+      allocate(vsize(n_vertex), source = monolis_I_zero)
 
       allocate(tpwgts(ncon*n_part), source = 0.0)
 
       allocate(ubvec(ncon), source = 1.05)
 
-      allocate(options(3), source = 0)
+      allocate(options(3), source = monolis_I_zero)
 
-      allocate(edgecut(1), source = 0)
+      allocate(edgecut(1), source = monolis_I_zero)
 
       allocate(itr(1), source = 0.1)
 

@@ -35,11 +35,13 @@ contains
     !> [in] 部分領域ごとに並べるか、グローバル計算点番号順に並べるかを決めるフラグ [ORDER_DOMAIN_ID, ORDER_NODAL_ID]
     integer(kint), intent(in) :: order_type
 
-    integer(kint) :: i, j, k, iS, iE, val, idx, tmp
+    integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n, m
     integer(kint) :: n_vertex, n_internal_vertex, n_overlap_vertex, n_vertex_uniq, n_edge
     integer(kint), allocatable :: vertex_id(:), internal_vertex_id(:), overlap_vertex_id(:), vertex_id_notsorted(:), edge(:,:)
     logical, allocatable :: is_internal(:), is_already_count_overlap(:)
 
+    n = 1
+    m = 2
     n_vertex = 0
     n_internal_vertex = 0
     do i = 1, n_graphs
@@ -58,7 +60,7 @@ contains
     enddo
 
     !> つなげた vertex_id を昇順ソート＋重複削除
-    call monolis_qsort_I_1d(vertex_id, 1, n_vertex)
+    call monolis_qsort_I_1d(vertex_id, n, n_vertex)
     call monolis_get_uniq_array_I(vertex_id, n_vertex, tmp)
     n_vertex = tmp  !> 重複を削除した全計算点数
     call monolis_realloc_I_1d(vertex_id, n_vertex)
@@ -68,7 +70,7 @@ contains
     do i = 1, n_graphs
       do j = 1, graphs(i)%n_internal_vertex
         val = graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)
         is_internal(idx) = .true.
       enddo
     enddo
@@ -114,7 +116,7 @@ contains
       do i = 1, n_graphs
         do j = graphs(i)%n_internal_vertex+1, graphs(i)%n_vertex
           val = graphs(i)%vertex_id(j)
-          call monolis_bsearch_I(overlap_vertex_id, 1, n_overlap_vertex, val, idx)
+          call monolis_bsearch_I(overlap_vertex_id, n, n_overlap_vertex, val, idx)
           if(idx == -1) cycle
           if(.not. is_already_count_overlap(idx))then
             merged_graph%vertex_id(n_internal_vertex+k) = val
@@ -131,7 +133,7 @@ contains
     call monolis_alloc_I_1d(vertex_id_notsorted, n_vertex)
     do i = 1, n_vertex  !> i が「ソートしていない本来の結合後ローカル番号」
       val = merged_graph%vertex_id(i)
-      call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)
+      call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)
       vertex_id_notsorted(idx) = i
     enddo
 
@@ -139,7 +141,7 @@ contains
     do i = 1, n_graphs
       call monolis_dealloc_I_2d(edge)
       call gedatsu_graph_get_n_edge(graphs(i), n_edge)
-      call monolis_alloc_I_2d(edge, 2, n_edge)
+      call monolis_alloc_I_2d(edge, m, n_edge)
       call gedatsu_graph_get_edge_in_internal_region(graphs(i), monolis_mpi_get_global_my_rank(), edge) !> domain_id はランク番号
 
       !> edge を「ソートしていない本来の結合後ローカル番号」に変換
@@ -147,7 +149,7 @@ contains
         do k = 1, 2
           idx = edge(k,j) !> 結合前グラフにおけるローカル番号
           val = graphs(i)%vertex_id(idx)  !> グローバル番号
-          call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
+          call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx) !> 「ソート後の結合後ローカル番号」
           edge(k,j) = vertex_id_notsorted(idx)  !> 「ソートしていない本来の結合後ローカル番号」
         enddo
       enddo
@@ -184,7 +186,7 @@ contains
     !> [inout] 統合されたコネクティビティグラフ構造
     type(gedatsu_graph), intent(inout) :: merged_conn_graph
 
-    integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n_edge
+    integer(kint) :: i, j, k, iS, iE, val, idx, tmp, n_edge, n, m
     integer(kint) :: n_conn_vertex, n_conn_internal_vertex, n_conn_overlap_vertex, n_nodal_vertex
     integer(kint), allocatable :: conn_vertex_id(:), conn_internal_vertex_id(:), conn_overlap_vertex_id(:), &
     & conn_vertex_id_notsorted(:)
@@ -196,6 +198,8 @@ contains
 
     if(n_nodal_graphs /= n_conn_graphs) stop "*** n_nodal_graphs /= n_conn_graphs"
 
+    n = 1
+    m = 2
     n_conn_vertex = 0
     n_conn_internal_vertex = 0
     do i = 1, n_conn_graphs
@@ -213,7 +217,7 @@ contains
     enddo
 
     !> つなげた conn_vertex_id を昇順ソート＋重複削除
-    call monolis_qsort_I_1d(conn_vertex_id, 1, n_conn_vertex)
+    call monolis_qsort_I_1d(conn_vertex_id, n, n_conn_vertex)
     call monolis_get_uniq_array_I(conn_vertex_id, n_conn_vertex, tmp)
     n_conn_vertex = tmp
     call monolis_realloc_I_1d(conn_vertex_id, n_conn_vertex)
@@ -223,7 +227,7 @@ contains
     do i = 1, n_conn_graphs
       do j = 1, conn_graphs(i)%n_internal_vertex
         val = conn_graphs(i)%vertex_id(j)
-        call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx)
+        call monolis_bsearch_I(conn_vertex_id, n, n_conn_vertex, val, idx)
         is_conn_internal(idx) = .true.
       enddo
     enddo
@@ -257,18 +261,18 @@ contains
     call monolis_alloc_I_1d(conn_vertex_id_notsorted, n_conn_vertex)
     do i = 1, n_conn_vertex
       val = merged_conn_graph%vertex_id(i)
-      call monolis_bsearch_I(conn_vertex_id, 1, n_conn_vertex, val, idx)
+      call monolis_bsearch_I(conn_vertex_id, n, n_conn_vertex, val, idx)
       conn_vertex_id_notsorted(i) = idx
     enddo
     !> 計算点
     call monolis_alloc_I_1d(nodal_vertex_id, merged_nodal_graph%n_vertex)
     nodal_vertex_id(:) = merged_nodal_graph%vertex_id(:)
     call gedatsu_graph_get_n_vertex(merged_nodal_graph, n_nodal_vertex)   !> // TODO 304行目の前に呼ぶべき？
-    call monolis_qsort_I_1d(nodal_vertex_id, 1, n_nodal_vertex)
+    call monolis_qsort_I_1d(nodal_vertex_id, n, n_nodal_vertex)
     call monolis_alloc_I_1d(nodal_vertex_id_notsorted, n_nodal_vertex)
     do i = 1, n_nodal_vertex
       val = merged_nodal_graph%vertex_id(i)
-      call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, idx)
+      call monolis_bsearch_I(nodal_vertex_id, n, n_nodal_vertex, val, idx)
       nodal_vertex_id_notsorted(idx) = i
     enddo
 
@@ -281,8 +285,8 @@ contains
       call monolis_list_set_I(conn_graphs_vertex_id, i, conn_graphs(i)%n_vertex, conn_graphs(i)%vertex_id)
       conn_graphs_vertex_id_perm(i)%n = conn_graphs(i)%n_vertex
       call monolis_alloc_I_1d(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex)
-      call monolis_get_sequence_array_I(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex, 1, 1)
-      call monolis_qsort_I_2d(conn_graphs_vertex_id(i)%array, conn_graphs_vertex_id_perm(i)%array, 1, conn_graphs(i)%n_vertex)
+      call monolis_get_sequence_array_I(conn_graphs_vertex_id_perm(i)%array, conn_graphs(i)%n_vertex, n, n)
+      call monolis_qsort_I_2d(conn_graphs_vertex_id(i)%array, conn_graphs_vertex_id_perm(i)%array, n, conn_graphs(i)%n_vertex)
     enddo
 
     call monolis_alloc_I_1d(global_id_in_merged_graph, n_conn_vertex)
@@ -296,7 +300,7 @@ contains
     do i = 1, n_conn_vertex
       val = merged_conn_graph%vertex_id(i)  !> グローバル番号
       do j = 1, n_conn_graphs
-        call monolis_bsearch_I(conn_graphs_vertex_id(j)%array, 1, conn_graphs_vertex_id(j)%n, val, idx)  !> ソート後ローカル番号
+        call monolis_bsearch_I(conn_graphs_vertex_id(j)%array, n, conn_graphs_vertex_id(j)%n, val, idx)  !> ソート後ローカル番号
         if(idx == -1) cycle
         tmp = conn_graphs_vertex_id_perm(j)%array(idx)  !> ソート前ローカル番号
         which_conn_graph(i) = j
@@ -305,8 +309,8 @@ contains
       enddo
     enddo
 
-    call monolis_get_sequence_array_I(perm, n_conn_vertex, 1, 1)
-    call monolis_qsort_I_2d(global_id_in_merged_graph, perm, 1, n_conn_vertex)
+    call monolis_get_sequence_array_I(perm, n_conn_vertex, n, n)
+    call monolis_qsort_I_2d(global_id_in_merged_graph, perm, n, n_conn_vertex)
     ! call monolis_qsort_I_2d(perm, which_conn_graph, 1, n_conn_vertex)
     ! call monolis_qsort_I_2d(perm, local_id_in_conn_graph, 1, n_conn_vertex)
 
@@ -323,7 +327,7 @@ contains
       !グローバル要素番号取得
       val = merged_conn_graph%vertex_id(i)
       ! グローバル要素番号に対して二分探索→iとローカル番号がわかるので、要素を抽出できる
-      call monolis_bsearch_I(global_id_in_merged_graph, 1, n_conn_vertex, val, idx) !> // TODO 重複削除していないが、ソートはされているので二分探索使っても問題ない？
+      call monolis_bsearch_I(global_id_in_merged_graph, n, n_conn_vertex, val, idx) !> // TODO 重複削除していないが、ソートはされているので二分探索使っても問題ない？
 
       iS = conn_graphs(which_conn_graph(idx))%index(local_id_in_conn_graph(idx)) + 1
       iE = conn_graphs(which_conn_graph(idx))%index(local_id_in_conn_graph(idx) + 1)
@@ -331,7 +335,7 @@ contains
       !> edgeに追加
       n_edge = iE - iS + 1
       call monolis_dealloc_I_2d(edge)
-      call monolis_alloc_I_2d(edge, 2, n_edge)
+      call monolis_alloc_I_2d(edge, m, n_edge)
       edge(1,:) = i
       edge(2,1:n_edge) = conn_graphs(which_conn_graph(idx))%item(iS:iE)
 
@@ -339,7 +343,7 @@ contains
       do j = 1, n_edge
         tmp = edge(2,j)     !> 結合前ローカル番号
         val = nodal_graphs(which_conn_graph(idx))%vertex_id(tmp)    !> グローバル番号
-        call monolis_bsearch_I(nodal_vertex_id, 1, n_nodal_vertex, val, tmp)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(nodal_vertex_id, n, n_nodal_vertex, val, tmp)  !> 結合後ソート後ローカル番号
         edge(2,j) = nodal_vertex_id_notsorted(tmp)  !> 結合後ソート前ローカル番号
       enddo
 
@@ -366,13 +370,14 @@ contains
     !> [inout] 統合された実数配列
     real(kdouble), allocatable, intent(inout) :: merged_array_R(:)
 
-    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_R, iS, iE, jS, jE
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_R, iS, iE, jS, jE, n
     integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
     if(n_graphs /= size(n_dof_list)) stop "*** n_graphs and size(n_dof_list) don't match."
     if(n_graphs /= size(list_struct_R)) stop "*** n_graphs and size(list_struct_R) don't match."
 
+    n = 1
     n_vertex = merged_graph%n_vertex
     call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
@@ -381,15 +386,15 @@ contains
     call monolis_alloc_I_1d(vertex_id, n_vertex)
     vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
-    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
-    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, n, n)
+    call monolis_qsort_I_2d(vertex_id, perm, n, n_vertex)
 
     !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
       do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
@@ -426,7 +431,7 @@ contains
       do j = 1, graphs(i)%n_vertex  !> 結合前ローカル番号
         if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         iS = index(val) + 1
         iE = index(val+1)
@@ -456,7 +461,7 @@ contains
     !> [inout] 統合された整数配列
     integer(kint), allocatable, intent(inout) :: merged_array_I(:)
 
-    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_I, iS, iE, jS, jE
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_I, iS, iE, jS, jE, n
     integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
@@ -464,6 +469,7 @@ contains
     if(n_graphs /= size(list_struct_I)) stop "*** n_graphs and size(list_struct_I) don't match."
 
     n_vertex = merged_graph%n_vertex
+    n = 1
     call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
 
@@ -471,15 +477,15 @@ contains
     call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
     vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
-    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
-    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, n, n)
+    call monolis_qsort_I_2d(vertex_id, perm, n, n_vertex)
 
     !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
       do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
@@ -516,7 +522,7 @@ contains
       do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
         if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         iS = index(val) + 1
         iE = index(val+1)
@@ -546,7 +552,7 @@ contains
     !> [inout] 統合された複素数配列
     complex(kdouble), allocatable, intent(inout) :: merged_array_C(:)
 
-    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_C, iS, iE, jS, jE
+    integer(kint) :: i, j, k, n_vertex, val, idx, size_merged_array_C, iS, iE, jS, jE, n
     integer(kint), allocatable :: perm(:), vertex_id(:), index(:)
     type(monolis_list_I), allocatable :: merged_index(:)
 
@@ -554,6 +560,7 @@ contains
     if(n_graphs /= size(list_struct_C)) stop "*** n_graphs and size(list_struct_C) don't match."
 
     n_vertex = merged_graph%n_vertex
+    n = 1
     call monolis_dealloc_I_1d(merged_n_dof_list)
     call monolis_alloc_I_1d(merged_n_dof_list, n_vertex)
 
@@ -561,15 +568,15 @@ contains
     call monolis_alloc_I_1d(vertex_id, merged_graph%n_vertex)
     vertex_id(:) = merged_graph%vertex_id(:)
     call monolis_alloc_I_1d(perm, n_vertex)
-    call monolis_get_sequence_array_I(perm, n_vertex, 1, 1)
-    call monolis_qsort_I_2d(vertex_id, perm, 1, n_vertex)
+    call monolis_get_sequence_array_I(perm, n_vertex, n, n)
+    call monolis_qsort_I_2d(vertex_id, perm, n, n_vertex)
 
     !> 結合後グラフの情報を取得
     do i = 1, n_graphs
       if(graphs(i)%n_vertex /= n_dof_list(i)%n) stop "*** graphs(i)%n_vertex and n_dof_list(i)%n don't match. ***"
       do j = 1, n_dof_list(i)%n !> 結合前ローカル番号
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         merged_n_dof_list(val) = n_dof_list(i)%array(j)  !> 指定した計算点の物理量の次元を上書き
       enddo
@@ -606,7 +613,7 @@ contains
       do j = 1, graphs(i)%n_vertex !> 結合前ローカル番号
         if(n_dof_list(i)%array(j) == 0) cycle     !> // TODO 必要ない？
         val = graphs(i)%vertex_id(j)  !> グローバル番号
-        call monolis_bsearch_I(vertex_id, 1, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
+        call monolis_bsearch_I(vertex_id, n, n_vertex, val, idx)  !> 結合後ソート後ローカル番号
         val = perm(idx)  !> 結合後ソート前ローカル番号
         iS = index(val) + 1
         iE = index(val+1)

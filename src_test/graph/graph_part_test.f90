@@ -28,10 +28,17 @@ contains
     integer(kint) :: n_vertex, n_edge, edge(2,8)
     integer(kint) :: n_domain
     type(gedatsu_graph) :: subgraphs(2)
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_8
 
     call monolis_std_log_string("gedatsu_graph_partition")
 
     n_vertex = 5
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_8 = 8
 
     call gedatsu_graph_set_n_vertex(graph, n_vertex)
 
@@ -52,29 +59,29 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
+    call gedatsu_graph_set_edge(graph, expected_8, edge, .true.)
 
     n_domain = 2
 
     call gedatsu_graph_partition_METIS(graph, n_domain, subgraphs)
 
-    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 3)
-    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 4)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 2", subgraph%n_internal_vertex, 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 3", subgraph%vertex_id(1), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 4", subgraph%vertex_id(2), 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 5", subgraph%vertex_id(3), 3)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 6", subgraph%vertex_domain_id(1), 0)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 7", subgraph%vertex_domain_id(2), 0)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 8", subgraph%vertex_domain_id(3), 0)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 9", subgraph%index(1), 0)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 10", subgraph%index(2), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 11", subgraph%index(3), 3)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 12", subgraph%index(4), 4)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 13", subgraph%item(1), 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 14", subgraph%item(2), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 15", subgraph%item(3), 3)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 16", subgraph%item(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, expected_3)
+    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, expected_4)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 2", subgraph%n_internal_vertex, expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 3", subgraph%vertex_id(1), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 4", subgraph%vertex_id(2), expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 5", subgraph%vertex_id(3), expected_3)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 6", subgraph%vertex_domain_id(1), expected_0)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 7", subgraph%vertex_domain_id(2), expected_0)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 8", subgraph%vertex_domain_id(3), expected_0)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 9", subgraph%index(1), expected_0)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 10", subgraph%index(2), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 11", subgraph%index(3), expected_3)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 12", subgraph%index(4), expected_4)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 13", subgraph%item(1), expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 14", subgraph%item(2), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 15", subgraph%item(3), expected_3)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 16", subgraph%item(4), expected_2)
   end subroutine gedatsu_graph_partition_test
 
   subroutine gedatsu_graph_partition_with_weight_test()
@@ -85,10 +92,18 @@ contains
     integer(kint), allocatable :: node_wgt(:,:)
     integer(kint), allocatable :: edge_wgt(:,:)
     type(gedatsu_graph) :: subgraphs(2)
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_8
 
     call monolis_std_log_string("gedatsu_graph_partition_with_weight")
 
     n_vertex = 5
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_5 = 5
+    expected_8 = 8
 
     call gedatsu_graph_set_n_vertex(graph, n_vertex)
 
@@ -109,11 +124,11 @@ contains
     edge(1,7) = 4; edge(2,7) = 5
     edge(1,8) = 5; edge(2,8) = 4
 
-    call gedatsu_graph_set_edge(graph, n_edge, edge, .true.)
+    call gedatsu_graph_set_edge(graph, expected_8, edge, .true.)
 
     n_domain = 2
 
-    call monolis_alloc_I_2d(node_wgt, 1, 5)
+    call monolis_alloc_I_2d(node_wgt, expected_1, expected_5)
 
     node_wgt(1,1) = 1
     node_wgt(1,2) = 1
@@ -123,23 +138,23 @@ contains
 
     call gedatsu_graph_partition_METIS_with_weight(graph, n_domain, node_wgt, edge_wgt, subgraphs)
 
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, 5)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 2", subgraph%n_internal_vertex, 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 3", subgraph%vertex_id(1), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 4", subgraph%vertex_id(2), 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 5", subgraph%vertex_id(3), 3)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 6", subgraph%vertex_domain_id(1), 0)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 7", subgraph%vertex_domain_id(2), 0)
-!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 8", subgraph%vertex_domain_id(3), 0)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 9", subgraph%index(1), 0)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 10", subgraph%index(2), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 11", subgraph%index(3), 3)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 12", subgraph%index(4), 4)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 13", subgraph%item(1), 2)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 14", subgraph%item(2), 1)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 15", subgraph%item(3), 3)
-!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 16", subgraph%item(4), 2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(1)%n_vertex, expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 1", subgraphs(2)%n_vertex, expected_5)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 2", subgraph%n_internal_vertex, expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 3", subgraph%vertex_id(1), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 4", subgraph%vertex_id(2), expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 5", subgraph%vertex_id(3), expected_3)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 6", subgraph%vertex_domain_id(1), expected_0)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 7", subgraph%vertex_domain_id(2), expected_0)
+!    !call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 8", subgraph%vertex_domain_id(3), expected_0)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 9", subgraph%index(1), expected_0)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 10", subgraph%index(2), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 11", subgraph%index(3), expected_3)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 12", subgraph%index(4), expected_4)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 13", subgraph%item(1), expected_2)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 14", subgraph%item(2), expected_1)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 15", subgraph%item(3), expected_3)
+!    call monolis_test_check_eq_I1("gedatsu_graph_partition_test case a 16", subgraph%item(4), expected_2)
   end subroutine gedatsu_graph_partition_with_weight_test
 
   subroutine gedatsu_check_vertex_domain_id_test()
@@ -169,10 +184,18 @@ contains
     integer(kint) :: n_vertex, n_edge, edge(2,8)
     integer(kint) :: domain_id
     type(gedatsu_graph) :: subgraph
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_8
 
     call monolis_std_log_string("gedatsu_get_parted_graph_main")
 
     n_vertex = 5
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_5 = 5
+    expected_8 = 8
 
     call gedatsu_graph_set_n_vertex(graph, n_vertex)
 
@@ -205,17 +228,17 @@ contains
 
     call gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
 
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 1", subgraph%n_vertex, 2)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 2", subgraph%n_internal_vertex, 2)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 3", subgraph%vertex_id(1), 1)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 4", subgraph%vertex_id(2), 2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 1", subgraph%n_vertex, expected_2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 2", subgraph%n_internal_vertex, expected_2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 3", subgraph%vertex_id(1), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 4", subgraph%vertex_id(2), expected_2)
     !call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 5", subgraph%vertex_domain_id(1), 0)
     !call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 6", subgraph%vertex_domain_id(2), 0)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 7", subgraph%index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 8", subgraph%index(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 9", subgraph%index(3), 2)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 10", subgraph%item(1), 2)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 11", subgraph%item(2), 1)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 7", subgraph%index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 8", subgraph%index(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 9", subgraph%index(3), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 10", subgraph%item(1), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case a 11", subgraph%item(2), expected_1)
 
     domain_id = 1
 
@@ -223,22 +246,22 @@ contains
 
     call gedatsu_get_parted_graph_main(graph, domain_id, subgraph)
 
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 1", subgraph%n_vertex, 3)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 2", subgraph%n_internal_vertex, 3)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 3", subgraph%vertex_id(1), 3)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 4", subgraph%vertex_id(2), 4)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 5", subgraph%vertex_id(3), 5)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 1", subgraph%n_vertex, expected_3)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 2", subgraph%n_internal_vertex, expected_3)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 3", subgraph%vertex_id(1), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 4", subgraph%vertex_id(2), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 5", subgraph%vertex_id(3), expected_5)
     !call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 6", subgraph%vertex_domain_id(1), 1)
     !call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 7", subgraph%vertex_domain_id(2), 1)
     !call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 8", subgraph%vertex_domain_id(3), 1)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 9", subgraph%index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 10", subgraph%index(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 11", subgraph%index(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 12", subgraph%index(4), 4)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 13", subgraph%item(1), 2)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 14", subgraph%item(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 15", subgraph%item(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 16", subgraph%item(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 9", subgraph%index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 10", subgraph%index(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 11", subgraph%index(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 12", subgraph%index(4), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 13", subgraph%item(1), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 14", subgraph%item(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 15", subgraph%item(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_get_parted_graph_main case b 16", subgraph%item(4), expected_2)
   end subroutine gedatsu_get_parted_graph_main_test
 
   subroutine gedatsu_add_overlapping_nodes_test()
@@ -247,10 +270,18 @@ contains
     integer(kint) :: n_vertex, n_edge, edge(2,8)
     integer(kint) :: domain_id
     type(gedatsu_graph) :: subgraph
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_6
 
     call monolis_std_log_string("gedatsu_add_overlapping_nodes")
 
     n_vertex = 5
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_5 = 5
+    expected_6 = 6
 
     call gedatsu_graph_set_n_vertex(graph, n_vertex)
 
@@ -285,22 +316,22 @@ contains
 
     call gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
 
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 1", subgraph%n_vertex, 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 2", subgraph%n_internal_vertex, 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 3", subgraph%vertex_id(1), 1)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 4", subgraph%vertex_id(2), 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 5", subgraph%vertex_id(3), 3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 1", subgraph%n_vertex, expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 2", subgraph%n_internal_vertex, expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 3", subgraph%vertex_id(1), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 4", subgraph%vertex_id(2), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 5", subgraph%vertex_id(3), expected_3)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 6", subgraph%vertex_domain_id(1), 0)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 7", subgraph%vertex_domain_id(2), 0)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 8", subgraph%vertex_domain_id(3), 0)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 9", subgraph%index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 10", subgraph%index(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 11", subgraph%index(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 12", subgraph%index(4), 4)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 13", subgraph%item(1), 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 14", subgraph%item(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 15", subgraph%item(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 16", subgraph%item(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 9", subgraph%index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 10", subgraph%index(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 11", subgraph%index(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 12", subgraph%index(4), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 13", subgraph%item(1), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 14", subgraph%item(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 15", subgraph%item(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case a 16", subgraph%item(4), expected_2)
 
     call gedatsu_graph_finalize(subgraph)
 
@@ -310,25 +341,25 @@ contains
 
     call gedatsu_add_overlapping_nodes(graph, domain_id, subgraph)
 
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 1", subgraph%n_vertex, 4)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 2", subgraph%n_internal_vertex, 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 3", subgraph%vertex_id(1), 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 4", subgraph%vertex_id(2), 4)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 5", subgraph%vertex_id(3), 5)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 6", subgraph%vertex_id(4), 2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 1", subgraph%n_vertex, expected_4)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 2", subgraph%n_internal_vertex, expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 3", subgraph%vertex_id(1), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 4", subgraph%vertex_id(2), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 5", subgraph%vertex_id(3), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 6", subgraph%vertex_id(4), expected_2)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 7", subgraph%vertex_domain_id(1), 0)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 8", subgraph%vertex_domain_id(2), 0)
     !call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 9", subgraph%vertex_domain_id(3), 0)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 9", subgraph%index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 10", subgraph%index(2), 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 11", subgraph%index(3), 4)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 12", subgraph%index(4), 5)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 13", subgraph%index(5), 6)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 14", subgraph%item(1), 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 15", subgraph%item(2), 4)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 16", subgraph%item(3), 1)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 17", subgraph%item(4), 3)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 18", subgraph%item(5), 2)
-    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 19", subgraph%item(6), 1)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 9", subgraph%index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 10", subgraph%index(2), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 11", subgraph%index(3), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 12", subgraph%index(4), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 13", subgraph%index(5), expected_6)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 14", subgraph%item(1), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 15", subgraph%item(2), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 16", subgraph%item(3), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 17", subgraph%item(4), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 18", subgraph%item(5), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_add_overlapping_nodes case b 19", subgraph%item(6), expected_1)
   end subroutine gedatsu_add_overlapping_nodes_test
 end module mod_gedatsu_graph_part_test

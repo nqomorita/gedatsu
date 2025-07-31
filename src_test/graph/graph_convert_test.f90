@@ -22,12 +22,19 @@ contains
     integer(kint) :: elem(2,3)
     integer(kint), allocatable :: index(:)
     integer(kint), allocatable :: item(:)
+    integer(kint) :: expected_0, expected_2, expected_3, expected_4, expected_6
+    integer(kint) :: expected_1
 
     call monolis_std_log_string("gedatsu_convert_simple_mesh_to_connectivity_graph")
 
     n_elem = 3
-
     n_base = 2
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_6 = 6
 
     elem(1,1) = 1; elem(2,1) = 2
     elem(1,2) = 2; elem(2,2) = 3
@@ -35,16 +42,16 @@ contains
 
     call gedatsu_convert_simple_mesh_to_connectivity_graph(n_elem, n_base, elem, index, item)
 
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 1", index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 2", index(2), 2)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 3", index(3), 4)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 4", index(4), 6)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 5", item(1), 1)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 6", item(2), 2)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 7", item(3), 2)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 8", item(4), 3)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 9", item(5), 3)
-    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 10", item(6), 4)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 1", index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 2", index(2), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 3", index(3), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 4", index(4), expected_6)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 5", item(1), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 6", item(2), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 7", item(3), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 8", item(4), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 9", item(5), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_convert_simple_elem_to_connectivity_graph 10", item(6), expected_4)
   end subroutine gedatsu_convert_simple_elem_to_connectivity_graph_test
 
   subroutine gedatsu_convert_connectivity_graph_to_nodal_graph_test()
@@ -57,15 +64,21 @@ contains
     integer(kint), allocatable :: conn_item(:)
     integer(kint), allocatable :: nodal_index(:)
     integer(kint), allocatable :: nodal_item(:)
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_6
 
     call monolis_std_log_string("gedatsu_convert_simple_mesh_to_connectivity_graph")
     call monolis_std_log_string("gedatsu_convert_connectivity_graph_to_nodal_graph")
 
     n_node = 4
-
     n_elem = 3
-
     n_base = 2
+    expected_0 = 0
+    expected_1 = 1
+    expected_2 = 2
+    expected_3 = 3
+    expected_4 = 4
+    expected_5 = 5
+    expected_6 = 6
 
     elem(1,1) = 1; elem(2,1) = 2
     elem(1,2) = 2; elem(2,2) = 3
@@ -76,17 +89,17 @@ contains
     call gedatsu_convert_connectivity_graph_to_nodal_graph &
       & (n_node, n_elem, conn_index, conn_item, nodal_index, nodal_item)
 
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 1", nodal_index(1), 0)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 2", nodal_index(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 3", nodal_index(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 4", nodal_index(4), 5)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 5", nodal_index(5), 6)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 6", nodal_item(1), 2)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 7", nodal_item(2), 1)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 8", nodal_item(3), 3)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 9", nodal_item(4), 2)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 10", nodal_item(5), 4)
-    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 11", nodal_item(6), 3)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 1", nodal_index(1), expected_0)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 2", nodal_index(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 3", nodal_index(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 4", nodal_index(4), expected_5)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 5", nodal_index(5), expected_6)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 6", nodal_item(1), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 7", nodal_item(2), expected_1)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 8", nodal_item(3), expected_3)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 9", nodal_item(4), expected_2)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 10", nodal_item(5), expected_4)
+    call monolis_test_check_eq_I1("gedatsu_convert_connectivity_graph_to_nodal_graph_test 11", nodal_item(6), expected_3)
   end subroutine gedatsu_convert_connectivity_graph_to_nodal_graph_test
 
   subroutine gedatsu_check_connectivity_graph_test()

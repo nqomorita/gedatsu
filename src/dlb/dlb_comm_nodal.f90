@@ -93,8 +93,11 @@ contains
     integer(kint) :: recv_n_edge_list(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: i, in, j, n_item
+    integer(kint) :: i, in, j, n_item, n, m
     integer(kint) :: my_rank, comm_size
+
+    n = 1
+    m = 2
 
     call monolis_com_finalize(dlb%COM_node)
     call monolis_com_finalize(dlb%COM_edge)
@@ -121,9 +124,9 @@ contains
     enddo
 
     if(dlb%COM_node%send_n_neib == 0)then
-      call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, 1)
-      call monolis_palloc_I_1d(dlb%COM_node%send_index, 2)
-      call monolis_palloc_I_1d(dlb%COM_node%send_item, 1)
+      call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, n)
+      call monolis_palloc_I_1d(dlb%COM_node%send_index, m)
+      call monolis_palloc_I_1d(dlb%COM_node%send_item, n)
     else
       call monolis_palloc_I_1d(dlb%COM_node%send_neib_pe, dlb%COM_node%send_n_neib)
       call monolis_palloc_I_1d(dlb%COM_node%send_index, dlb%COM_node%send_n_neib + 1)
@@ -160,9 +163,9 @@ contains
     enddo
 
     if(dlb%COM_node%recv_n_neib == 0)then
-      call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, 1)
-      call monolis_palloc_I_1d(dlb%COM_node%recv_index, 2)
-      call monolis_palloc_I_1d(dlb%COM_node%recv_item, 1)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, n)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_index, m)
+      call monolis_palloc_I_1d(dlb%COM_node%recv_item, n)
     else
       call monolis_palloc_I_1d(dlb%COM_node%recv_neib_pe, dlb%COM_node%recv_n_neib)
       call monolis_palloc_I_1d(dlb%COM_node%recv_index, dlb%COM_node%recv_n_neib + 1)
@@ -178,7 +181,7 @@ contains
       endif
     enddo
 
-    call monolis_get_sequence_array_I(dlb%COM_node%recv_item, n_item, 1, 1)
+    call monolis_get_sequence_array_I(dlb%COM_node%recv_item, n_item, n, n)
 
     !# edge セクション
     !# send table の作成
@@ -191,9 +194,9 @@ contains
     enddo
 
     if(dlb%COM_edge%send_n_neib == 0)then
-      call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, 1)
-      call monolis_palloc_I_1d(dlb%COM_edge%send_index, 2)
-      call monolis_palloc_I_1d(dlb%COM_edge%send_item, 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, n)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_index, m)
+      call monolis_palloc_I_1d(dlb%COM_edge%send_item, n)
     else
       call monolis_palloc_I_1d(dlb%COM_edge%send_neib_pe, dlb%COM_edge%send_n_neib)
       call monolis_palloc_I_1d(dlb%COM_edge%send_index, dlb%COM_edge%send_n_neib + 1)
@@ -230,9 +233,9 @@ contains
     enddo
 
     if(dlb%COM_edge%recv_n_neib == 0)then
-      call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, 1)
-      call monolis_palloc_I_1d(dlb%COM_edge%recv_index, 2)
-      call monolis_palloc_I_1d(dlb%COM_edge%recv_item, 1)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, n)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_index, m)
+      call monolis_palloc_I_1d(dlb%COM_edge%recv_item, n)
     else
       call monolis_palloc_I_1d(dlb%COM_edge%recv_neib_pe, dlb%COM_edge%recv_n_neib)
       call monolis_palloc_I_1d(dlb%COM_edge%recv_index, dlb%COM_edge%recv_n_neib + 1)
@@ -248,7 +251,7 @@ contains
       endif
     enddo
 
-    call monolis_get_sequence_array_I(dlb%COM_edge%recv_item, n_item, 1, 1)
+    call monolis_get_sequence_array_I(dlb%COM_edge%recv_item, n_item, n, n)
   end subroutine gedatsu_dlb_generate_nodal_graph_comm_table
 
   !> @ingroup group_dlb
@@ -264,7 +267,7 @@ contains
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
     integer(kint) :: n_recv_node, n_recv_edge, n_send_edge
-    integer(kint) :: n_merge_node, n_merge_edge, n_my_edge
+    integer(kint) :: n_merge_node, n_merge_edge, n_my_edge, n, m
     integer(kint) :: i, j, jS, jE, in, i1, i2, my_rank, id1, id2
     integer(kint), allocatable :: domain_id_org(:)
     integer(kint), allocatable :: recv_global_id(:)
@@ -282,6 +285,8 @@ contains
     integer(kint), allocatable :: perm(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    n = 1
+    m = 2
 
     !# 計算点の送受信
     n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
@@ -294,13 +299,13 @@ contains
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
        & dlb%COM_node%send_index, dlb%COM_node%send_item, &
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-       & graph_org%vertex_id, recv_global_id, 1, dlb%COM_node%comm)
+       & graph_org%vertex_id, recv_global_id, n, dlb%COM_node%comm)
 
     call monolis_SendRecv_I(dlb%COM_node%send_n_neib, dlb%COM_node%send_neib_pe, &
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
        & dlb%COM_node%send_index, dlb%COM_node%send_item, &
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-       & graph_org%vertex_domain_id, recv_domain_new, 1, dlb%COM_node%comm)
+       & graph_org%vertex_domain_id, recv_domain_new, n, dlb%COM_node%comm)
 
     call gedatsu_dlb_get_domain_id_org(graph_org, COM, domain_id_org)
 
@@ -308,14 +313,14 @@ contains
        & dlb%COM_node%recv_n_neib, dlb%COM_node%recv_neib_pe, &
        & dlb%COM_node%send_index, dlb%COM_node%send_item, &
        & dlb%COM_node%recv_index, dlb%COM_node%recv_item, &
-       & domain_id_org, recv_domain_org, 1, dlb%COM_node%comm)
+       & domain_id_org, recv_domain_org, n, dlb%COM_node%comm)
 
     !# エッジの送受信
     n_send_edge = graph_org%index(graph_org%n_vertex + 1)
     n_recv_edge = dlb%COM_edge%recv_index(dlb%COM_edge%recv_n_neib + 1)
 
-    call monolis_alloc_I_1d(send_edge, 2*n_send_edge)
-    call monolis_alloc_I_1d(recv_edge, 2*n_recv_edge)
+    call monolis_alloc_I_1d(send_edge, n_send_edge*2)
+    call monolis_alloc_I_1d(recv_edge, n_recv_edge*2)
 
     do i = 1, graph_org%n_vertex
       jS = graph_org%index(i) + 1
@@ -331,25 +336,25 @@ contains
        & dlb%COM_edge%recv_n_neib, dlb%COM_edge%recv_neib_pe, &
        & dlb%COM_edge%send_index, dlb%COM_edge%send_item, &
        & dlb%COM_edge%recv_index, dlb%COM_edge%recv_item, &
-       & send_edge, recv_edge, 2, dlb%COM_edge%comm)
+       & send_edge, recv_edge, m, dlb%COM_edge%comm)
 
     !# 検索用配列の作成
     call monolis_alloc_I_1d(global_id_tmp, graph_org%n_vertex)
     global_id_tmp = graph_org%vertex_id
-    call monolis_qsort_I_1d(global_id_tmp, 1, graph_org%n_vertex)
+    call monolis_qsort_I_1d(global_id_tmp, n, graph_org%n_vertex)
 
     call monolis_alloc_I_1d(recv_global_id_used, n_recv_node)
     call monolis_alloc_I_1d(recv_global_id_tmp, n_recv_node)
     recv_global_id_tmp = recv_global_id
-    call monolis_qsort_I_1d(recv_global_id_tmp, 1, n_recv_node)
+    call monolis_qsort_I_1d(recv_global_id_tmp, n, n_recv_node)
 
     !# 計算点のマージ（自領域 + 受信領域）
     call monolis_alloc_I_1d(is_merge_node, n_recv_node)
     n_merge_node = 0
     do i = 1, n_recv_node
       in = recv_global_id(i)
-      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, in, id1)
-      call monolis_bsearch_I(recv_global_id_tmp, 1, n_recv_node, in, id2)
+      call monolis_bsearch_I(global_id_tmp, n, graph_org%n_vertex, in, id1)
+      call monolis_bsearch_I(recv_global_id_tmp, n, n_recv_node, in, id2)
       recv_global_id_used(id2) = recv_global_id_used(id2) + 1
       if(id1 == -1 .and. recv_global_id_used(id2) == 1)then
         is_merge_node(i) = 1
@@ -363,8 +368,8 @@ contains
     do i = 1, n_recv_edge
       i1 = recv_edge(2*i-1)
       i2 = recv_edge(2*i  )
-      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, i1, id1)
-      call monolis_bsearch_I(global_id_tmp, 1, graph_org%n_vertex, i2, id2)
+      call monolis_bsearch_I(global_id_tmp, n, graph_org%n_vertex, i1, id1)
+      call monolis_bsearch_I(global_id_tmp, n, graph_org%n_vertex, i2, id2)
       if(.not.(id1 /= -1 .and. id2 /= -1))then
         is_merge_edge(i) = 1
         n_merge_edge = n_merge_edge + 1
@@ -389,7 +394,7 @@ contains
     enddo
 
     n_my_edge = n_send_edge + n_merge_edge
-    call monolis_alloc_I_2d(my_edge, 2,n_my_edge)
+    call monolis_alloc_I_2d(my_edge, m, n_my_edge)
 
     do i = 1, n_send_edge
       my_edge(1,i) = send_edge(2*i-1)
@@ -409,16 +414,16 @@ contains
 
     call monolis_alloc_I_1d(perm, graph_tmp%n_vertex)
 
-    call monolis_get_sequence_array_I(perm, graph_tmp%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(perm, graph_tmp%n_vertex, n, n)
 
     ids = graph_tmp%vertex_id
 
-    call monolis_qsort_I_2d(ids, perm, 1, graph_tmp%n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, graph_tmp%n_vertex)
 
     do i = 1, n_my_edge
-      call monolis_bsearch_I(ids, 1, graph_tmp%n_vertex, my_edge(1,i), in)
+      call monolis_bsearch_I(ids, n, graph_tmp%n_vertex, my_edge(1,i), in)
       my_edge(1,i) = perm(in)
-      call monolis_bsearch_I(ids, 1, graph_tmp%n_vertex, my_edge(2,i), in)
+      call monolis_bsearch_I(ids, n, graph_tmp%n_vertex, my_edge(2,i), in)
       my_edge(2,i) = perm(in)
     enddo
 
@@ -435,12 +440,14 @@ contains
     type(gedatsu_graph), intent(inout) :: graph_new
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: my_rank, n_vertex, n_edge, i
+    integer(kint) :: my_rank, n_vertex, n_edge, i, n, m
     integer(kint), allocatable :: perm(:), iperm(:), ids(:)
     integer(kint), allocatable :: OVL_vertex_id(:)
     integer(kint), allocatable :: edge(:,:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    n = 1
+    m = 2
 
     !> internal region
     call gedatsu_graph_get_n_vertex_in_internal_region(graph_tmp, my_rank, n_vertex)
@@ -462,15 +469,15 @@ contains
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
     call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
 
-    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, n, n)
     ids = graph_new%vertex_id
-    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_internal_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, graph_new%n_internal_vertex)
 
     do i = 1, graph_new%n_vertex
       iperm(perm(i)) = i
     enddo
 
-    call monolis_alloc_I_2d(edge, 2, n_edge)
+    call monolis_alloc_I_2d(edge, m, n_edge)
 
     call gedatsu_graph_get_edge_in_internal_region(graph_tmp, my_rank, edge)
 
@@ -500,8 +507,8 @@ contains
     call monolis_dealloc_I_1d(iperm)
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
     call monolis_alloc_I_1d(iperm, graph_new%n_vertex)
-    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
-    call monolis_qsort_I_2d(graph_new%vertex_id, perm, 1, graph_new%n_internal_vertex)
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, n, n)
+    call monolis_qsort_I_2d(graph_new%vertex_id, perm, n, graph_new%n_internal_vertex)
     call monolis_qsort_I_2d(graph_new%vertex_id, perm, graph_new%n_internal_vertex + 1, graph_new%n_vertex)
 
     do i = 1, graph_new%n_vertex
@@ -509,7 +516,7 @@ contains
     enddo
 
     call monolis_dealloc_I_2d(edge)
-    call monolis_alloc_I_2d(edge, 2, n_edge)
+    call monolis_alloc_I_2d(edge, m, n_edge)
 
     call gedatsu_graph_get_edge_in_overlap_region(graph_tmp, my_rank, edge)
 
@@ -535,10 +542,11 @@ contains
     integer(kint) :: recv_domain_org(:)
     !> [in] COM 構造体
     type(monolis_COM), intent(in) :: COM
-    integer(kint) :: i, n_recv_node, id, pos, my_rank
+    integer(kint) :: i, n_recv_node, id, pos, my_rank, n
     integer(kint), allocatable :: ids(:), perm(:)
 
     my_rank = monolis_mpi_get_local_my_rank(COM%comm)
+    n = 1
 
     n_recv_node = dlb%COM_node%recv_index(dlb%COM_node%recv_n_neib + 1)
 
@@ -546,15 +554,15 @@ contains
 
     call monolis_alloc_I_1d(perm, graph_new%n_vertex)
 
-    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, 1, 1)
+    call monolis_get_sequence_array_I(perm, graph_new%n_vertex, n, n)
 
     ids = graph_new%vertex_id
 
-    call monolis_qsort_I_2d(ids, perm, 1, graph_new%n_vertex)
+    call monolis_qsort_I_2d(ids, perm, n, graph_new%n_vertex)
 
     do i = 1, n_recv_node
       id = recv_global_id(i)
-      call monolis_bsearch_I(ids, 1, graph_new%n_vertex, id, pos)
+      call monolis_bsearch_I(ids, n, graph_new%n_vertex, id, pos)
 
       if(pos == -1 .or. recv_domain_org(i) == my_rank)then
         dlb%COM_node%recv_item(i) = -1
@@ -643,7 +651,7 @@ contains
     type(monolis_COM), intent(in) :: COM
     !> [out] 元の領域番号
     integer(kint), allocatable :: domain_id_org(:)
-    integer(kint) :: my_rank
+    integer(kint) :: my_rank, n
     real(kdouble) :: tcomm
 
     call monolis_alloc_I_1d(domain_id_org, graph%n_vertex)
@@ -652,6 +660,7 @@ contains
 
     domain_id_org = my_rank
 
-    call monolis_mpi_update_I(COM, 1, domain_id_org, tcomm)
+    n = 1
+    call monolis_mpi_update_I(COM, n, domain_id_org, tcomm)
   end subroutine gedatsu_dlb_get_domain_id_org
 end module mod_gedatsu_dlb_comm_nodal

@@ -8,6 +8,9 @@ program gedatsu_simple_mesh2graph_convertor
   integer(kint), allocatable :: elem(:,:), vertex_id(:)
   integer(kint), allocatable :: conn_index(:), conn_item(:)
   integer(kint), allocatable :: nodal_index(:), nodal_item(:)
+  integer(kint) :: i1
+
+  i1 = 1
 
   call monolis_mpi_initialize()
 
@@ -47,7 +50,7 @@ program gedatsu_simple_mesh2graph_convertor
 
   call monolis_alloc_I_1d(vertex_id, n_node)
 
-  call monolis_get_sequence_array_I(vertex_id, n_node, 1, 1)
+  call monolis_get_sequence_array_I(vertex_id, n_node, i1, i1)
 
   if(.not. is_1_origin)then
     nodal_item = nodal_item - 1

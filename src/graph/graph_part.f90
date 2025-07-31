@@ -100,14 +100,15 @@ contains
     integer(kint), intent(in) :: n_domain
     !> [in,out] 領域分割番号
     integer(kint), intent(in) :: vertex_domain_id(:)
-    integer(kint) :: newlen
+    integer(kint) :: newlen, n
     integer(kint), allocatable :: temp(:)
 
     call monolis_alloc_I_1d(temp, n_vertex)
 
     temp = vertex_domain_id
 
-    call monolis_qsort_I_1d(temp, 1, n_vertex)
+    n = 1
+    call monolis_qsort_I_1d(temp, n, n_vertex)
 
     call monolis_get_uniq_array_I(temp, n_vertex, newlen)
 
@@ -146,7 +147,7 @@ contains
     integer(kint), intent(in) :: domain_id
     !> [in,out] 領域番号 domain_id に属する分割 graph 構造体
     type(gedatsu_graph), intent(inout) :: subgraph
-    integer(kint) :: n_vertex, n_edge
+    integer(kint) :: n_vertex, n_edge, n
     integer(kint), allocatable :: edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_internal_region(graph, domain_id, n_vertex)
@@ -166,7 +167,8 @@ contains
 
     call monolis_alloc_I_1d(subgraph%item, n_edge)
 
-    call monolis_alloc_I_2d(edge, 2, n_edge)
+    n = 2
+    call monolis_alloc_I_2d(edge, n, n_edge)
 
     call gedatsu_graph_get_edge_in_internal_region(graph, domain_id, edge)
 
@@ -183,7 +185,7 @@ contains
     integer(kint), intent(in) :: domain_id
     !> [in,out] 領域番号 domain_id に属する分割 graph 構造体
     type(gedatsu_graph), intent(inout) :: subgraph
-    integer(kint) :: n_vertex, n_edge
+    integer(kint) :: n_vertex, n_edge, n
     integer(kint), allocatable :: OVL_vertex_id(:), edge(:,:)
 
     call gedatsu_graph_get_n_vertex_in_overlap_region(graph, domain_id, n_vertex)
@@ -200,7 +202,8 @@ contains
 
     if(n_edge == 0) return
 
-    call monolis_alloc_I_2d(edge, 2, n_edge)
+    n = 2
+    call monolis_alloc_I_2d(edge, n, n_edge)
 
     call gedatsu_graph_get_edge_in_overlap_region(graph, domain_id, edge)
 

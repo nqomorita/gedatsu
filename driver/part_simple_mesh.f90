@@ -15,6 +15,10 @@ program gedatsu_partitioner_simple_mesh
   integer(kint), allocatable :: edge_wgt(:,:)
   integer(kint), allocatable :: given_domain_id(:)
   real(kdouble), allocatable :: node(:,:)
+  integer(kint) :: i1, i3
+
+  i1 = 1
+  i3 = 3
 
   call monolis_mpi_initialize()
 
@@ -101,7 +105,7 @@ program gedatsu_partitioner_simple_mesh
 
   call elem_partition()
 
-  !call visual_parted_mesh(n_node, node, n_elem, n_base, elem, node_graph%vertex_domain_id)
+  call visual_parted_mesh(n_node, node, n_elem, n_base, elem, node_graph%vertex_domain_id)
 
   call monolis_mpi_finalize()
 
@@ -144,19 +148,19 @@ contains
       if(.not. is_1_origin) subgraphs(i)%vertex_id = subgraphs(i)%vertex_id + 1
 
       call monolis_alloc_I_1d(conn_graph%vertex_id, conn_graph%n_vertex)
-      call monolis_get_sequence_array_I(conn_graph%vertex_id, conn_graph%n_vertex, 1, 1)
+      call monolis_get_sequence_array_I(conn_graph%vertex_id, conn_graph%n_vertex, i1, i1)
 
       call gedatsu_get_parted_connectivity_main(i - 1, domain_id, &
         & node_graph, conn_graph, local_conn_graph)
 
       !> graph.dat
       call monolis_alloc_I_1d(perm, subgraphs(i)%n_vertex)
-      call monolis_get_sequence_array_I(perm, subgraphs(i)%n_vertex, 1, 1)
-      call monolis_qsort_I_2d(subgraphs(i)%vertex_id, perm, 1, subgraphs(i)%n_vertex)
+      call monolis_get_sequence_array_I(perm, subgraphs(i)%n_vertex, i1, i1)
+            call monolis_qsort_I_2d(subgraphs(i)%vertex_id, perm, i1, subgraphs(i)%n_vertex)
 
       do j = 1, local_conn_graph%index(local_conn_graph%n_vertex + 1)
         id = local_conn_graph%item(j)
-        call monolis_bsearch_I(subgraphs(i)%vertex_id, 1, subgraphs(i)%n_vertex, id, idx)
+        call monolis_bsearch_I(subgraphs(i)%vertex_id, i1, subgraphs(i)%n_vertex, id, idx)
         local_conn_graph%item(j) = perm(idx)
       enddo
 
@@ -213,7 +217,7 @@ contains
 
     call monolis_alloc_I_1d(node_graph%vertex_id, n_node)
 
-    call monolis_get_sequence_array_I(node_graph%vertex_id, n_node, 1, 1)
+    call monolis_get_sequence_array_I(node_graph%vertex_id, n_node, i1, i1)
 
     allocate(subgraphs(n_domain))
 
@@ -235,7 +239,7 @@ contains
 
     do i = 1, n_domain
       !> node.dat
-      call monolis_alloc_R_2d(local_node, 3, subgraphs(i)%n_vertex)
+      call monolis_alloc_R_2d(local_node, i3, subgraphs(i)%n_vertex)
 
       do j = 1, subgraphs(i)%n_vertex
         in = subgraphs(i)%vertex_id(j)

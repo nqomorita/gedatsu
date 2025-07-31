@@ -10,6 +10,9 @@ program gedatsu_bc_partitioner_C
   integer(kint), allocatable :: perm(:)
   integer(kint), allocatable :: i_bc(:,:), i_bc_local(:,:)
   complex(kdouble), allocatable :: c_bc(:), c_bc_local(:)
+  integer(kint) :: i1
+
+  i1 = 1
 
   call monolis_mpi_initialize()
 
@@ -79,12 +82,12 @@ program gedatsu_bc_partitioner_C
     graph(i)%vertex_id = graph(i)%vertex_id + shift
 
     call monolis_alloc_I_1d(perm, graph(i)%n_vertex)
-    call monolis_get_sequence_array_I(perm, graph(i)%n_vertex, 1, 1)
-    call monolis_qsort_I_2d(graph(i)%vertex_id, perm, 1, graph(i)%n_vertex)
+    call monolis_get_sequence_array_I(perm, graph(i)%n_vertex, i1, i1)
+    call monolis_qsort_I_2d(graph(i)%vertex_id, perm, i1, graph(i)%n_vertex)
 
     n_bc_local = 0
     do j = 1, n_bc
-      call monolis_bsearch_I(graph(i)%vertex_id, 1, graph(i)%n_vertex, i_bc(1,j) + shift, idx)
+      call monolis_bsearch_I(graph(i)%vertex_id, i1, graph(i)%n_vertex, i_bc(1,j) + shift, idx)
       if(idx > 0) n_bc_local = n_bc_local + 1
     enddo
 
@@ -93,7 +96,7 @@ program gedatsu_bc_partitioner_C
 
     n_bc_local = 0
     do j = 1, n_bc
-      call monolis_bsearch_I(graph(i)%vertex_id, 1, graph(i)%n_vertex, i_bc(1,j) + shift, idx)
+      call monolis_bsearch_I(graph(i)%vertex_id, i1, graph(i)%n_vertex, i_bc(1,j) + shift, idx)
       if(idx > 0)then
         n_bc_local = n_bc_local + 1
         in = perm(idx)
