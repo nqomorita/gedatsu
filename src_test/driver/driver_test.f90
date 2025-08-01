@@ -1010,7 +1010,8 @@ contains
     integer(kint), allocatable :: vertex_id(:)
     integer(kint), allocatable :: index(:)
     integer(kint), allocatable :: item(:)
-    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_6, expected_8, expected_11, expected_14, expected_19, expected_22
+    integer(kint) :: expected_0, expected_1, expected_2, expected_3, expected_4, expected_5, expected_6
+    integer(kint) :: expected_8, expected_11, expected_14, expected_19, expected_22
 
     call monolis_std_global_log_string("gedatsu_simple_mesh2graph_convertor")
 
