@@ -1015,7 +1015,8 @@ module mod_gedatsu_graph_merge_test
     list_struct_R(3)%array(5) = 6.0d0
     list_struct_R(3)%array(6) = 7.0d0
 
-    call gedatsu_merge_distval_R(exp_3, nodal_graphs, merged_nodal_graph, n_dof_list, list_struct_R, merged_n_dof_list, merged_array_R)
+    call gedatsu_merge_distval_R(exp_3, nodal_graphs, merged_nodal_graph, n_dof_list, &
+      list_struct_R, merged_n_dof_list, merged_array_R)
 
     !> 確認
     call monolis_alloc_I_1d(check_n_dof_list, exp_7)
